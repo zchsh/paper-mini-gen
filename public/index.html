@@ -4,9 +4,14 @@
 		<title>Paper Mini Gen</title>
 		<script src="/imagetracer_v1.2.6.js"></script>
 		<style>
-			svg path {
-				stroke-width: 5;
-			     stroke-
+			svg path[fill="rgb(255,255,255)"] {
+				/* TODO: great as a preview! but need to do in JS too... */
+				display: none;
+			}
+			svg path[fill="rgb(0,0,0)"] {
+				/* TODO: great as a preview! but need to do in JS too... */
+				/* TODO: add HTML slider that controls this somehow... */
+				stroke-width: 15;
 			}
 		</style>
 	</head>
@@ -40,6 +45,7 @@
 					blurradius,
 					colorsampling: 0,
 					colorquantcycles: 1,
+					strokewidth: 0,
 					pal: [
 						{ r: 0, g: 0, b: 0, a: 255 },
 						{ r: 255, g: 255, b: 255, a: 255 },
@@ -59,7 +65,19 @@
 					} /* callback function to run on SVG string result */,
 					options
 				);
-				// Remove the traced paths that are white
+				/**
+				 * TODO: process SVG, offsetting the outline,
+				 * and boolean adding the resulting shapes.
+				 *
+				 * Step one is probably to remove the traced paths that are white.
+				 * We only want to outline and boolean add the traced paths
+				 * that are black. Speficially, remove paths with
+				 * `fill="rgb(255,255,255)"`.
+				 *
+				 * Maybe you could do this by cloning the inner HTML of "svgcontainer"
+				 * to a new container... and then running operations on that container.
+				 * Eg get element by attribute, where "fill" === "rgb(255,255,255)".
+				 */
 			}
 		</script>
 	</body>
