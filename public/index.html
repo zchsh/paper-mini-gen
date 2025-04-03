@@ -6,12 +6,12 @@
 		<style>
 			svg path[fill="rgb(255,255,255)"] {
 				/* TODO: great as a preview! but need to do in JS too... */
-				display: none;
+				/* display: none; */
 			}
 			svg path[fill="rgb(0,0,0)"] {
 				/* TODO: great as a preview! but need to do in JS too... */
 				/* TODO: add HTML slider that controls this somehow... */
-				stroke-width: 15;
+				/* stroke-width: 15; */
 			}
 		</style>
 	</head>
@@ -19,41 +19,65 @@
 		<p>
 			<img src="/2025-04-03-test-outline-image.png" />
 		</p>
-		<p style="color: red">TODO: ADJUST CONTRAST OF IMAGE BEFORE TRACING</p>
+		<p style="color: magenta">TODO: ADJUST CONTRAST OF IMAGE BEFORE TRACING</p>
 		<a href="https://github.com/image-js/image-js"
 			>https://github.com/image-js/image-js</a
 		>
 		<p><button onClick="traceImage()">Trace Image</button></p>
 		<p>OPTIONS</p>
-		<p>Path omit: <input id="pathomit" type="number" min="0" value="8" /></p>
+		<p>Path omit: <input id="pathomit" type="number" min="0" value="50" /></p>
 		<p>
 			Blur radius:
-			<input id="blurradius" type="number" min="0" max="5" value="1" />
+			<input id="blurradius" type="number" min="0" max="5" value="2" />
+		</p>
+		<p>
+			Blur delta:
+			<input id="blurdelta" type="number" min="0" max="100" value="20" />
+		</p>
+		<p>
+			Line error threshold:
+			<input id="ltres" type="number" min="1" value="5" />
+		</p>
+		<p>
+			Quadratic split error threshold:
+			<input id="qtres" type="number" min="1" value="5" />
 		</p>
 		<div id="svgcontainer"></div>
-		<p style="color: red">TODO: OFFSET OUTLINE OF TRACED SVG ABOVE</p>
+		<p>FOREGROUND ELEMENTS ONLY</p>
+		<div id="svgcontainer_foreground"></div>
+		<p style="color: magenta">CONVERT PATHS TO POLYGONS</p>
+		<p style="color: magenta">OFFSET PATHS</p>
+		<p style="color: magenta">BOOLEAN ADDITION</p>
 		<script>
 			function traceImage() {
-				document.getElementById("svgcontainer").innerHTML = "";
+				// NOTE: uses https://github.com/jankovicsandras/imagetracerjs
 				const pathomit = parseInt(document.getElementById("pathomit").value);
+				const ltres = parseInt(document.getElementById("ltres").value);
+				const qtres = parseInt(document.getElementById("qtres").value);
 				const blurradius = parseInt(
 					document.getElementById("blurradius").value
 				);
+				const blurdelta = parseInt(document.getElementById("blurdelta").value);
 				// Adding custom palette. This will override numberofcolors.
 				const options = {
 					pathomit,
 					blurradius,
+					blurdelta,
+					ltres,
+					qtres,
 					colorsampling: 0,
 					colorquantcycles: 1,
 					strokewidth: 0,
+					roundcoords: 2,
 					pal: [
 						{ r: 0, g: 0, b: 0, a: 255 },
-						{ r: 255, g: 255, b: 255, a: 255 },
+						{ r: 245, g: 245, b: 245, a: 255 },
 					],
 				};
 				/**
 				 * TODO: maybe try increasing the contrast of the image before
 				 * trying to trace it?
+				 * TODO: maybe allow user to INVERT the image before tracing it?
 				 *
 				 * https://github.com/image-js/image-js
 				 */
@@ -61,22 +85,53 @@
 				ImageTracer.imageToSVG(
 					"/2025-04-03-test-outline-image.png" /* input filename / URL */,
 					function (svgstr) {
+						document.getElementById("svgcontainer").innerHTML = "";
 						ImageTracer.appendSVGString(svgstr, "svgcontainer");
+						afterTrace();
 					} /* callback function to run on SVG string result */,
 					options
 				);
+			}
+
+			function afterTrace() {
 				/**
-				 * TODO: process SVG, offsetting the outline,
-				 * and boolean adding the resulting shapes.
 				 *
-				 * Step one is probably to remove the traced paths that are white.
+				 * Isolate so only "foreground" paths remain.
 				 * We only want to outline and boolean add the traced paths
-				 * that are black. Speficially, remove paths with
+				 * that are "foreground" (ie black). Speficially, remove paths with
 				 * `fill="rgb(255,255,255)"`.
 				 *
 				 * Maybe you could do this by cloning the inner HTML of "svgcontainer"
 				 * to a new container... and then running operations on that container.
 				 * Eg get element by attribute, where "fill" === "rgb(255,255,255)".
+				 */
+				const foreground = document.getElementById("svgcontainer_foreground");
+				foreground.innerHTML =
+					document.getElementById("svgcontainer").innerHTML;
+				const backgroundPaths = document
+					.querySelectorAll(
+						`#svgcontainer_foreground path[fill="rgb(245,245,245)"]`
+					)
+					.forEach((e) => e.remove());
+
+				/**
+				 * TODO: look into converting paths to polygons
+				 * https://www.npmjs.com/package/svg-path-to-polygons
+				 * Another option: https://betravis.github.io/shape-tools/path-to-polygon/
+				 * More of a deep dive: https://phrogz.net/SVG/convert_path_to_polygon.xhtml
+				 */
+
+				/**
+				 * TODO: look into path offset (not stroke?)
+				 * This looks promising: https://danmarshall.github.io/svg-path-outline/
+				 */
+
+				/**
+				 * TODO: look into boolean operations
+				 * Likely need to convert SVG paths to polygons first...
+				 * Once that's done...
+				 * Potentially useful library for boolean operations on the SVG:
+				 * https://github.com/junmer/clipper-lib?tab=readme-ov-file
 				 */
 			}
 		</script>
