@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Paper Mini Gen</title>
+		<script src="/imagetracer_v1.2.6.js"></script>
+		<style>
+			svg path {
+				stroke-width: 5;
+			     stroke-
+			}
+		</style>
+	</head>
+	<body>
+		<p>
+			<img src="/2025-04-03-test-outline-image.png" />
+		</p>
+		<p style="color: red">TODO: ADJUST CONTRAST OF IMAGE BEFORE TRACING</p>
+		<a href="https://github.com/image-js/image-js"
+			>https://github.com/image-js/image-js</a
+		>
+		<p><button onClick="traceImage()">Trace Image</button></p>
+		<p>OPTIONS</p>
+		<p>Path omit: <input id="pathomit" type="number" min="0" value="8" /></p>
+		<p>
+			Blur radius:
+			<input id="blurradius" type="number" min="0" max="5" value="1" />
+		</p>
+		<div id="svgcontainer"></div>
+		<p style="color: red">TODO: OFFSET OUTLINE OF TRACED SVG ABOVE</p>
+		<script>
+			function traceImage() {
+				document.getElementById("svgcontainer").innerHTML = "";
+				const pathomit = parseInt(document.getElementById("pathomit").value);
+				const blurradius = parseInt(
+					document.getElementById("blurradius").value
+				);
+				// Adding custom palette. This will override numberofcolors.
+				const options = {
+					pathomit,
+					blurradius,
+					colorsampling: 0,
+					colorquantcycles: 1,
+					pal: [
+						{ r: 0, g: 0, b: 0, a: 255 },
+						{ r: 255, g: 255, b: 255, a: 255 },
+					],
+				};
+				/**
+				 * TODO: maybe try increasing the contrast of the image before
+				 * trying to trace it?
+				 *
+				 * https://github.com/image-js/image-js
+				 */
+				// Loading an image, tracing with the 'posterized2' option preset, and appending the SVG to an element with id="svgcontainer"
+				ImageTracer.imageToSVG(
+					"/2025-04-03-test-outline-image.png" /* input filename / URL */,
+					function (svgstr) {
+						ImageTracer.appendSVGString(svgstr, "svgcontainer");
+					} /* callback function to run on SVG string result */,
+					options
+				);
+				// Remove the traced paths that are white
+			}
+		</script>
+	</body>
+</html>
