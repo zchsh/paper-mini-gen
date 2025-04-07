@@ -14,7 +14,7 @@ An attempt at making it easier to create printable paper miniatures.
 - [ ] Create a toy file like `basic-point-at-length.html`, but with `path-to-polygon` implementation
   - Make the same thing, but make it work for weirdly layered paths
 - [ ] Final packaging as a `.zip` file with an `index.html` etcetera
-  - Could also build into a file with simple `@include` style assembly, a la Mustache
+  - Could also build into a single `.html` file with simple `@include` style assembly, a la Mustache... self container "app" that runs in your browser, even offline! Zero external dependencies... pretty cool!
   - Could then share this with folks... creative commons etc
   - Consider browser print functionality...
   - Consider arrangement of "results" on page... maybe let them be dragged around, even rotated?
