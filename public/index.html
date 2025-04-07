@@ -3,6 +3,7 @@
 	<head>
 		<title>Paper Mini Gen</title>
 		<script src="/imagetracer_v1.2.6.js"></script>
+		<script src="/lib/svg-path-to-polygon.js"></script>
 		<style>
 			svg path[fill="rgb(255,255,255)"] {
 				/* TODO: great as a preview! but need to do in JS too... */
@@ -42,10 +43,21 @@
 			Quadratic split error threshold:
 			<input id="qtres" type="number" min="1" value="5" />
 		</p>
+		<p>
+			Polyline sample frequency:
+			<input
+				id="polylinesamplefrequency"
+				type="number"
+				min="1"
+				max="200"
+				value="40"
+			/>
+		</p>
 		<div id="svgcontainer"></div>
 		<p>FOREGROUND ELEMENTS ONLY</p>
 		<div id="svgcontainer_foreground"></div>
 		<p style="color: magenta">CONVERT PATHS TO POLYGONS</p>
+		<div id="svgcontainer_polygon"></div>
 		<p style="color: magenta">OFFSET PATHS</p>
 		<p style="color: magenta">BOOLEAN ADDITION</p>
 		<script>
@@ -120,7 +132,19 @@
 				 * Another option: https://betravis.github.io/shape-tools/path-to-polygon/
 				 * More of a deep dive: https://phrogz.net/SVG/convert_path_to_polygon.xhtml
 				 */
-
+				const polylinesamplefrequency = parseInt(
+					document.getElementById("polylinesamplefrequency").value
+				);
+				const polygonSvgContainer = document.getElementById(
+					"svgcontainer_polygon"
+				);
+				polygonSvgContainer.innerHTML = document.getElementById(
+					"svgcontainer_foreground"
+				).innerHTML;
+				convertPathsToPolygons(
+					polygonSvgContainer.querySelector("svg"),
+					polylinesamplefrequency
+				);
 				/**
 				 * TODO: look into path offset (not stroke?)
 				 * This looks promising: https://danmarshall.github.io/svg-path-outline/
@@ -133,6 +157,55 @@
 				 * Potentially useful library for boolean operations on the SVG:
 				 * https://github.com/junmer/clipper-lib?tab=readme-ov-file
 				 */
+			}
+
+			/**
+			 * PATH TO POLYLINE
+			 */
+			function buildSvgNode(n, v) {
+				n = document.createElementNS("http://www.w3.org/2000/svg", n);
+				for (var p in v) n.setAttributeNS(null, p, v[p]);
+				return n;
+			}
+
+			function convertPathsToPolygons(mySvg, sampleFrequency) {
+				const myPaths = mySvg.querySelectorAll(`path`);
+				console.log({ mySvg, myPaths });
+				for (const myPath of myPaths) {
+					myPath.setAttribute("fill", "rgba(0,0,0,0.2)");
+					var pathLength = myPath.getTotalLength();
+					const numPoints = Math.ceil(pathLength * (sampleFrequency / 100.0));
+					console.log({ pathLength, numPoints });
+					var polygonPoints = [];
+					const points = [];
+					console.log({ myPath, pathLength });
+					for (var i = 0; i < numPoints; i++) {
+						var p = myPath.getPointAtLength((i * pathLength) / numPoints);
+						polygonPoints.push(p.x);
+						polygonPoints.push(p.y);
+						points.push({ x: p.x, y: p.y });
+					}
+					// append this new polygon child
+					const newPolygon = buildSvgNode("polygon", {
+						points: polygonPoints.join(","),
+						fill: "transparent",
+						stroke: "rgba(0,0,0,0.4)",
+						"stroke-width": 2,
+					});
+					mySvg.appendChild(newPolygon);
+					for (const polygonPoint of points) {
+						const newDot = buildSvgNode("circle", {
+							cx: polygonPoint.x,
+							cy: polygonPoint.y,
+							r: 1.5,
+							fill: "#ff0000",
+							opacity: "0.9",
+							stroke: "none",
+						});
+						mySvg.appendChild(newDot);
+					}
+					// TODO: remove the existing path child (mypath)
+				}
 			}
 		</script>
 	</body>

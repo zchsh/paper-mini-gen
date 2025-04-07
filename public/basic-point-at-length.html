@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>basic point at length</title>
+		<style>
+			path {
+				fill: rgba(0, 0, 0, 0.2);
+			}
+		</style>
+	</head>
+	<body>
+		<p>
+			Polyline sample frequency:
+			<input
+				id="polylinesamplefrequency"
+				type="number"
+				min="1"
+				max="200"
+				value="40"
+			/>
+		</p>
+		<button
+			onClick="convertPathsToPolygons(document.querySelector('#svgone svg'), parseInt(
+					document.getElementById('polylinesamplefrequency').value
+				))"
+		>
+			Convert (1) to polygon
+		</button>
+
+		<button
+			onClick="convertPathsToPolygons(document.querySelector('#svgtwo svg'), parseInt(
+					document.getElementById('polylinesamplefrequency').value
+				))"
+		>
+			Convert (2) to polygon
+		</button>
+
+		<p>(1)</p>
+		<div id="svgone">
+			<svg
+				width="324"
+				height="308"
+				version="1.1"
+				xmlns="http://www.w3.org/2000/svg"
+				desc="Created with imagetracer.js version 1.2.6"
+			>
+				<path
+					fill="rgb(0,0,0)"
+					stroke="rgb(0,0,0)"
+					stroke-width="0"
+					opacity="1"
+					d="M 165.5 75 Q 177.62 74.88 182 82.5 L 185 94.5 L 177.5 106 L 165.5 109 L 154 101.5 L 151 89.5 L 158.5 78 L 165.5 75 Z "
+				></path>
+				<path
+					fill="rgb(0,0,0)"
+					stroke="rgb(0,0,0)"
+					stroke-width="0"
+					opacity="1"
+					d="M 102 117 L 125 117 L 125 133 L 102 133 L 102 117 Z "
+				></path>
+				<path
+					fill="rgb(0,0,0)"
+					stroke="rgb(0,0,0)"
+					stroke-width="0"
+					opacity="1"
+					d="M 133 117 L 190.5 117 L 191 119.5 L 204 168.5 L 189 169 L 189 224.5 L 172 225 L 172 174.5 L 164 174 L 164 225 L 147 225 L 147 133.5 L 133 133 L 133 117 Z "
+				></path>
+			</svg>
+		</div>
+
+		<p>(2)</p>
+		<div id="svgtwo">
+			<svg
+				width="324"
+				height="308"
+				version="1.1"
+				xmlns="http://www.w3.org/2000/svg"
+				desc="Created with imagetracer.js version 1.2.6"
+			>
+				<path
+					fill="rgb(0,0,0)"
+					stroke="rgb(0,0,0)"
+					stroke-width="0"
+					opacity="1"
+					d="M 165.5 75 Q 177.62 74.88 182 82.5 L 185 94.5 L 177.5 106 L 165.5 109 L 154 101.5 L 151 89.5 L 158.5 78 L 165.5 75 Z "
+				></path>
+				<path
+					fill="rgb(0,0,0)"
+					stroke="rgb(0,0,0)"
+					stroke-width="0"
+					opacity="1"
+					d="M 207.5 88 L 212 89 L 213 93.5 L 212 96 L 207.5 97 L 205 96 L 204 91.5 L 205 89 L 207.5 88 Z "
+				></path>
+				<path
+					fill="rgb(0,0,0)"
+					stroke="rgb(0,0,0)"
+					stroke-width="0"
+					opacity="1"
+					d="M 102 117 L 125 117 L 125 133 L 102 133 L 102 117 Z "
+				></path>
+				<path
+					fill="rgb(0,0,0)"
+					stroke="rgb(0,0,0)"
+					stroke-width="0"
+					opacity="1"
+					d="M 133 117 L 190.5 117 L 191 119.5 L 204 168.5 L 189 169 L 189 224.5 L 172 225 L 172 174.5 L 164 174 L 164 225 L 147 225 L 147 133.5 L 133 133 L 133 117 Z M 155 134 L 155 143 L 157 139 L 159 143 Q 163 144 161 135 L 159 136 L 155 138 L 155 134 Z M 158 149 L 158 158 L 160 153 L 164 158 L 163 151 L 158 149 Z M 168 151 L 165 157 L 170 158 L 171 156 L 167 157 L 171 153 L 168 151 Z M 179 151 L 176 154 L 178 158 L 182 157 L 181 157 L 178 155 L 183 155 L 182 153 L 179 151 Z "
+				></path>
+			</svg>
+		</div>
+
+		<script>
+			function buildSvgNode(n, v) {
+				n = document.createElementNS("http://www.w3.org/2000/svg", n);
+				for (var p in v) n.setAttributeNS(null, p, v[p]);
+				return n;
+			}
+
+			function convertPathsToPolygons(mySvg, sampleFrequency) {
+				const myPaths = mySvg.querySelectorAll(`path`);
+				console.log({ mySvg, myPaths });
+				for (const myPath of myPaths) {
+					myPath.setAttribute("fill", "rgba(0,0,0,0.2)");
+					var pathLength = myPath.getTotalLength();
+					const numPoints = Math.ceil(pathLength * (sampleFrequency / 100.0));
+					console.log({ pathLength, numPoints });
+					var polygonPoints = [];
+					const points = [];
+					console.log({ myPath, pathLength });
+					for (var i = 0; i < numPoints; i++) {
+						var p = myPath.getPointAtLength((i * pathLength) / numPoints);
+						polygonPoints.push(p.x);
+						polygonPoints.push(p.y);
+						points.push({ x: p.x, y: p.y });
+					}
+					// append this new polygon child
+					const newPolygon = buildSvgNode("polygon", {
+						points: polygonPoints.join(","),
+						fill: "transparent",
+						stroke: "rgba(0,0,0,0.4)",
+						"stroke-width": 2,
+					});
+					mySvg.appendChild(newPolygon);
+					for (const polygonPoint of points) {
+						const newDot = buildSvgNode("circle", {
+							cx: polygonPoint.x,
+							cy: polygonPoint.y,
+							r: 1.5,
+							fill: "#ff0000",
+							opacity: "0.9",
+							stroke: "none",
+						});
+						mySvg.appendChild(newDot);
+					}
+					// TODO: remove the existing path child (mypath)
+				}
+			}
+		</script>
+	</body>
+</html>
