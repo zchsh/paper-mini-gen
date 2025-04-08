@@ -2,8 +2,11 @@
 <html>
 	<head>
 		<title>Paper Mini Gen</title>
-		<script src="/imagetracer_v1.2.6.js"></script>
-		<script src="/lib/svg-path-to-polygon.js"></script>
+		<script type="text/javascript" src="/imagetracer_v1.2.6.js"></script>
+		<script type="text/javascript" src="/lib/svg-path-to-polygon.js"></script>
+		<script type="text/javascript" src="/lib/dat.gui.min.js"></script>
+		<script type="text/javascript" src="/lib/pathseg.js"></script>
+		<script type="text/javascript" src="/lib/path-to-polygon.js"></script>
 		<style>
 			svg path[fill="rgb(255,255,255)"] {
 				/* TODO: great as a preview! but need to do in JS too... */
@@ -18,7 +21,10 @@
 	</head>
 	<body>
 		<p>
-			<img src="/2025-04-03-test-outline-image.png" />
+			<input type="file" id="image-input" accept="image/png, image/jpeg" />
+		</p>
+		<p>
+			<img id="image-preview" src="/2025-04-03-test-outline-image.png" />
 		</p>
 		<p style="color: magenta">TODO: ADJUST CONTRAST OF IMAGE BEFORE TRACING</p>
 		<a href="https://github.com/image-js/image-js"
@@ -61,6 +67,24 @@
 		<p style="color: magenta">OFFSET PATHS</p>
 		<p style="color: magenta">BOOLEAN ADDITION</p>
 		<script>
+			function onImageSelection(input) {
+				if (input.files && input.files[0]) {
+					var reader = new FileReader();
+					reader.onload = function (e) {
+						document
+							.getElementById("image-preview")
+							.setAttribute("src", e.target.result);
+					};
+					reader.readAsDataURL(input.files[0]);
+				}
+			}
+
+			document
+				.getElementById("image-input")
+				.addEventListener("change", function () {
+					onImageSelection(this);
+				});
+
 			function traceImage() {
 				// NOTE: uses https://github.com/jankovicsandras/imagetracerjs
 				const pathomit = parseInt(document.getElementById("pathomit").value);
@@ -94,8 +118,10 @@
 				 * https://github.com/image-js/image-js
 				 */
 				// Loading an image, tracing with the 'posterized2' option preset, and appending the SVG to an element with id="svgcontainer"
+				const imageElement = document.getElementById("image-preview");
+				const imageSource = imageElement.getAttribute("src");
 				ImageTracer.imageToSVG(
-					"/2025-04-03-test-outline-image.png" /* input filename / URL */,
+					imageSource /* input filename / URL */,
 					function (svgstr) {
 						document.getElementById("svgcontainer").innerHTML = "";
 						ImageTracer.appendSVGString(svgstr, "svgcontainer");
@@ -141,10 +167,7 @@
 				polygonSvgContainer.innerHTML = document.getElementById(
 					"svgcontainer_foreground"
 				).innerHTML;
-				convertPathsToPolygons(
-					polygonSvgContainer.querySelector("svg"),
-					polylinesamplefrequency
-				);
+				convertPathsToPolygon(polygonSvgContainer.querySelector("svg"));
 				/**
 				 * TODO: look into path offset (not stroke?)
 				 * This looks promising: https://danmarshall.github.io/svg-path-outline/
@@ -157,55 +180,6 @@
 				 * Potentially useful library for boolean operations on the SVG:
 				 * https://github.com/junmer/clipper-lib?tab=readme-ov-file
 				 */
-			}
-
-			/**
-			 * PATH TO POLYLINE
-			 */
-			function buildSvgNode(n, v) {
-				n = document.createElementNS("http://www.w3.org/2000/svg", n);
-				for (var p in v) n.setAttributeNS(null, p, v[p]);
-				return n;
-			}
-
-			function convertPathsToPolygons(mySvg, sampleFrequency) {
-				const myPaths = mySvg.querySelectorAll(`path`);
-				console.log({ mySvg, myPaths });
-				for (const myPath of myPaths) {
-					myPath.setAttribute("fill", "rgba(0,0,0,0.2)");
-					var pathLength = myPath.getTotalLength();
-					const numPoints = Math.ceil(pathLength * (sampleFrequency / 100.0));
-					console.log({ pathLength, numPoints });
-					var polygonPoints = [];
-					const points = [];
-					console.log({ myPath, pathLength });
-					for (var i = 0; i < numPoints; i++) {
-						var p = myPath.getPointAtLength((i * pathLength) / numPoints);
-						polygonPoints.push(p.x);
-						polygonPoints.push(p.y);
-						points.push({ x: p.x, y: p.y });
-					}
-					// append this new polygon child
-					const newPolygon = buildSvgNode("polygon", {
-						points: polygonPoints.join(","),
-						fill: "transparent",
-						stroke: "rgba(0,0,0,0.4)",
-						"stroke-width": 2,
-					});
-					mySvg.appendChild(newPolygon);
-					for (const polygonPoint of points) {
-						const newDot = buildSvgNode("circle", {
-							cx: polygonPoint.x,
-							cy: polygonPoint.y,
-							r: 1.5,
-							fill: "#ff0000",
-							opacity: "0.9",
-							stroke: "none",
-						});
-						mySvg.appendChild(newDot);
-					}
-					// TODO: remove the existing path child (mypath)
-				}
 			}
 		</script>
 	</body>

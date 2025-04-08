@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Path to Polygon Converter</title>
+		<script type="text/javascript" src="/lib/dat.gui.min.js"></script>
+		<script type="text/javascript" src="/lib/pathseg.js"></script>
+		<script type="text/javascript" src="/lib/path-to-polygon.js"></script>
+	</head>
+	<body>
+		<button
+			onClick="convertPathsToPolygon(document.querySelector('#svgone svg'))"
+		>
+			Convert (1) to polygon
+		</button>
+
+		<p>(1)</p>
+		<div id="svgone">
+			<svg
+				width="324"
+				height="308"
+				version="1.1"
+				xmlns="http://www.w3.org/2000/svg"
+				desc="Created with imagetracer.js version 1.2.6"
+			>
+				<path
+					fill="rgb(0,0,0)"
+					stroke="rgb(0,0,0)"
+					stroke-width="0"
+					opacity="1"
+					d="M 165.5 75 Q 177.62 74.88 182 82.5 L 185 94.5 L 177.5 106 L 165.5 109 L 154 101.5 L 151 89.5 L 158.5 78 L 165.5 75 Z "
+				></path>
+				<path
+					fill="rgb(0,0,0)"
+					stroke="rgb(0,0,0)"
+					stroke-width="0"
+					opacity="1"
+					d="M 102 117 L 125 117 L 125 133 L 102 133 L 102 117 Z "
+				></path>
+				<path
+					fill="rgb(0,0,0)"
+					stroke="rgb(0,0,0)"
+					stroke-width="0"
+					opacity="1"
+					d="M 133 117 L 190.5 117 L 191 119.5 L 204 168.5 L 189 169 L 189 224.5 L 172 225 L 172 174.5 L 164 174 L 164 225 L 147 225 L 147 133.5 L 133 133 L 133 117 Z "
+				></path>
+			</svg>
+		</div>
+	</body>
+</html>
