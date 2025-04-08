@@ -1,0 +1,41 @@
+<html>
+	<head>
+		<script src="https://www.lactame.com/lib/image-js/0.21.2/image.min.js"></script>
+	</head>
+
+	<body>
+		<p>OPTIONS</p>
+		<p>
+			Threshold
+			<input id="threshold" type="number" min="0" max="100" value="50" />
+		</p>
+		<p>
+			Radius
+			<input id="radius" type="number" min="1" max="100" value="1" />
+		</p>
+		<p><button onClick="processImage()">Adjust Image</button></p>
+		<img
+			id="raw-image"
+			src="https://www.lactame.com/github/image-js/image-js/3073b80c7d626196cb669f9d617f491a8338ca66/test/img/taxi/original.jpeg"
+		/>
+		<img id="processed-image" />
+
+		<script>
+			async function processImage() {
+				// Load the original raw image from a source element
+				const imgElemRaw = document.getElementById("raw-image");
+				let image = await IJS.Image.load(imgElemRaw.src);
+				// Gather optional settings
+				const threshold =
+					parseInt(document.getElementById("threshold").value) / 100;
+				const radius = parseInt(document.getElementById("radius").value);
+				// Convert to grayscale
+				let grey = image.gaussianFilter({ radius }).grey().mask({ threshold });
+				const processedImageSrc = grey.toDataURL();
+				// Load the image into a destination element
+				const imgElemProcessed = document.getElementById("processed-image");
+				imgElemProcessed.src = processedImageSrc;
+			}
+		</script>
+	</body>
+</html>
