@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Toy - Polygon Offset</title>
+		<script
+			src="https://pomax.github.io/bezierjs/bezier.js"
+			type="text/javascript"
+		></script>
+		<script
+			src="https://microsoft.github.io/maker.js/target/js/browser.maker.js"
+			type="text/javascript"
+		></script>
+		<script
+			src="https://danmarshall.github.io/svg-path-outline/browser/index.js"
+			type="text/javascript"
+		></script>
+	</head>
+	<body>
+		<script>
+			/**
+			 * TODO: look into path offset (not stroke?)
+			 * This looks promising: https://danmarshall.github.io/svg-path-outline/
+			 */
+			var spo = require("svg-path-outline");
+			// console.log({ spo });
+			// var outlineData = spo(
+			// 	"M 144.5 126 L 199.5 126 L 202 128.5 L 214 177.5 L 211.5 180 Q 202.5 177.5 200 181.5 L 200 232.5 L 199 235 L 184.5 236 L 182 235 L 181 232.5 L 181 186.5 L 179.5 185 L 175 186.5 L 175 232.5 L 174 235 L 159.5 236 L 157 235 L 156 232.5 L 156 145.5 L 154.5 144 Q 144.42 146.08 141 141.5 L 141 128.5 L 142.5 127 L 144.5 126 Z ",
+			// 	5,
+			// 	{ tagName: "polygon" }
+			// );
+			// console.log({ outlineData });
+
+			function buildSvgNode(n, v) {
+				n = document.createElementNS("http://www.w3.org/2000/svg", n);
+				for (var p in v) n.setAttributeNS(null, p, v[p]);
+				return n;
+			}
+
+			function applyOffset(svgElement) {
+				console.log({ svgElement });
+				const polygonElems = svgElement.querySelectorAll("polygon");
+				for (const polygonElem of polygonElems) {
+					const polygonData = polygonElem.getAttribute("d");
+					const outlineData = spo(polygonData, 5, { tagName: "polygon" });
+					const outlinePath = buildSvgNode("path", {
+						points: outlineData,
+						fill: "transparent",
+						stroke: "rgba(0,0,0,0.4)",
+						"stroke-width": 2,
+					});
+					svgElem.appendChild(outlinePath);
+				}
+			}
+		</script>
+		<p>Original SVG</p>
+		<div id="original-svg">
+			<svg
+				width="344"
+				height="328"
+				version="1.1"
+				xmlns="http://www.w3.org/2000/svg"
+				desc="Created with imagetracer.js version 1.2.6"
+			>
+				<path
+					fill="rgb(0,0,0)"
+					stroke="rgb(0,0,0)"
+					stroke-width="0"
+					opacity="1"
+					d="M 175.5 84 Q 187.47 83.53 192 90.5 Q 196.47 95.03 196 104.5 L 189.5 116 Q 184.97 120.47 175.5 120 L 164 113.5 Q 159.53 108.97 160 99.5 L 166.5 88 L 175.5 84 Z "
+				></path>
+				<path
+					fill="rgb(0,0,0)"
+					stroke="rgb(0,0,0)"
+					stroke-width="0"
+					opacity="1"
+					d="M 216.5 97 Q 223 96 224 100.5 Q 225 107 220.5 108 Q 214 109 213 104.5 Q 212 98 216.5 97 Z "
+				></path>
+				<path
+					fill="rgb(0,0,0)"
+					stroke="rgb(0,0,0)"
+					stroke-width="0"
+					opacity="1"
+					d="M 114.5 126 L 133.5 126 L 137 128.5 L 137 141.5 L 135.5 143 L 114.5 144 L 112 143 L 111 129.5 L 112 127 L 114.5 126 Z "
+				></path>
+				<path
+					fill="rgb(0,0,0)"
+					stroke="rgb(0,0,0)"
+					stroke-width="0"
+					opacity="1"
+					d="M 144.5 126 L 199.5 126 L 202 128.5 L 214 177.5 L 211.5 180 Q 202.5 177.5 200 181.5 L 200 232.5 L 199 235 L 184.5 236 L 182 235 L 181 232.5 L 181 186.5 L 179.5 185 L 175 186.5 L 175 232.5 L 174 235 L 159.5 236 L 157 235 L 156 232.5 L 156 145.5 L 154.5 144 Q 144.42 146.08 141 141.5 L 141 128.5 L 142.5 127 L 144.5 126 Z "
+				></path>
+			</svg>
+		</div>
+		<p>
+			Offset:
+			<input type="number" min="0" max="100" value="5" />
+		</p>
+		<button onClick="applyOffset(document.querySelector('#original-svg svg'))">
+			Apply offset
+		</button>
+	</body>
+</html>
