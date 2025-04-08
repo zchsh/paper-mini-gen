@@ -25,7 +25,7 @@
 			<input type="file" id="image-input" accept="image/png, image/jpeg" />
 		</p>
 		<p>
-			<img id="image-preview" src="/sample-char-art-02.jpeg" />
+			<img id="image-preview" src="/sample-char-art-00.jpeg" />
 		</p>
 		<script>
 			function onImageSelection(input) {
@@ -100,22 +100,24 @@
 					colorquantcycles: 1,
 					strokewidth: 0,
 					roundcoords: 2,
+					/**
+					 * Set a custom palette, of:
+					 * - black (foreground shapes)
+					 * - nearly-white (background shapes, will remove in later step)
+					 */
 					pal: [
 						{ r: 0, g: 0, b: 0, a: 255 },
 						{ r: 245, g: 245, b: 245, a: 255 },
 					],
 				};
-				/**
-				 * TODO: maybe try increasing the contrast of the image before
-				 * trying to trace it?
-				 * TODO: maybe allow user to INVERT the image before tracing it?
-				 *
-				 * https://github.com/image-js/image-js
-				 */
 				// Loading an image, tracing with the 'posterized2' option preset, and appending the SVG to an element with id="svgcontainer"
 				const imageSource = document
 					.getElementById("processed-image")
 					.getAttribute("src");
+				/**
+				 * TODO: is there a way to trace with straight lines only?
+				 * Could simplify the process dramatically...
+				 */
 				ImageTracer.imageToSVG(
 					imageSource /* input filename / URL */,
 					function (svgstr) {
@@ -126,8 +128,6 @@
 				);
 			}
 		</script>
-
-		<h2 style="color: magenta">WIP BELOW</h2>
 
 		<p><button onClick="traceImage()">Trace Image</button></p>
 		<p>OPTIONS</p>
@@ -143,74 +143,82 @@
 		<div id="svgcontainer"></div>
 
 		<script>
-			function afterTrace() {
+			function cleanupTrace() {
 				/**
+				 * Clone the SVG generated at the previous step
+				 */
+				const cleanedTraceContainer = document.getElementById(
+					"svgcontainer_polygon"
+				);
+				cleanedTraceContainer.innerHTML =
+					document.getElementById("svgcontainer").innerHTML;
+				/**
+				 * Retain only the "foreground" paths.
 				 *
-				 * Isolate so only "foreground" paths remain.
 				 * We only want to outline and boolean add the traced paths
 				 * that are "foreground" (ie black). Speficially, remove paths with
-				 * `fill="rgb(255,255,255)"`.
-				 *
-				 * Maybe you could do this by cloning the inner HTML of "svgcontainer"
-				 * to a new container... and then running operations on that container.
-				 * Eg get element by attribute, where "fill" === "rgb(255,255,255)".
+				 * `fill="rgb(245,245,245)"`. Note this specific colour was set
+				 * in the palette of the trace in an earlier step.
 				 */
-				const foreground = document.getElementById("svgcontainer_foreground");
-				foreground.innerHTML =
-					document.getElementById("svgcontainer").innerHTML;
-				const backgroundPaths = document
-					.querySelectorAll(
-						`#svgcontainer_foreground path[fill="rgb(245,245,245)"]`
-					)
+				cleanedTraceContainer
+					.querySelectorAll(`path[fill="rgb(245,245,245)"]`)
 					.forEach((e) => e.remove());
 
 				/**
-				 * TODO: look into converting paths to polygons
-				 * https://www.npmjs.com/package/svg-path-to-polygons
-				 * Another option: https://betravis.github.io/shape-tools/path-to-polygon/
-				 * More of a deep dive: https://phrogz.net/SVG/convert_path_to_polygon.xhtml
+				 * Convert the foreground paths, which may include curves,
+				 * to polygons, which will consist of straigh lines only.
+				 *
+				 * The current approach is swiped from:
+				 * https://betravis.github.io/shape-tools/path-to-polygon/
+				 *
+				 * That being said, it doesn't seem to do _any_ sampling along
+				 * curves... instead it only keeps the control points. Maybe
+				 * it'd be possible to improve the tracing further by combining
+				 * the "retain all control points" approach with a
+				 * "sample along the line" approach... perhaps sampling along
+				 * the line only for curved segments? This is a deep dive though,
+				 * and certainly not something I intend to try to tackle at this time.
+				 * More the sample-along-the-line approach:
+				 * https://phrogz.net/SVG/convert_path_to_polygon.xhtml
+				 * And there's a very naive implementation in:
+				 * `basic-point-at-length.html` (in this repo)
 				 */
 				const polylinesamplefrequency = parseInt(
 					document.getElementById("polylinesamplefrequency").value
 				);
-				const polygonSvgContainer = document.getElementById(
-					"svgcontainer_polygon"
-				);
-				polygonSvgContainer.innerHTML = document.getElementById(
-					"svgcontainer_foreground"
-				).innerHTML;
-				convertPathsToPolygon(polygonSvgContainer.querySelector("svg"));
-				/**
-				 * TODO: look into path offset (not stroke?)
-				 * This looks promising: https://danmarshall.github.io/svg-path-outline/
-				 */
-
-				/**
-				 * TODO: look into boolean operations
-				 * Likely need to convert SVG paths to polygons first...
-				 * Once that's done...
-				 * Potentially useful library for boolean operations on the SVG:
-				 * https://github.com/junmer/clipper-lib?tab=readme-ov-file
-				 */
+				convertPathsToPolygon(cleanedTraceContainer.querySelector("svg"));
 			}
 		</script>
-		<p><button onClick="afterTrace()">afterTrace()</button></p>
 
-		<p>FOREGROUND ELEMENTS ONLY</p>
-		<div id="svgcontainer_foreground"></div>
-		<p style="color: magenta">CONVERT PATHS TO POLYGONS</p>
-		<p>
-			Polyline sample frequency:
-			<input
-				id="polylinesamplefrequency"
-				type="number"
-				min="1"
-				max="200"
-				value="40"
-			/>
-		</p>
+		<h2>CLEANUP TRACE</h2>
+		<ul>
+			<li>Retain "foreground" elements only</li>
+			<li>Convert curves lines to straight lines</li>
+		</ul>
+		<p><button onClick="cleanupTrace()">cleanupTrace()</button></p>
 		<div id="svgcontainer_polygon"></div>
-		<p style="color: magenta">OFFSET PATHS</p>
-		<p style="color: magenta">BOOLEAN ADDITION</p>
+
+		<h2 style="color: magenta">~~~WIP BELOW~~~</h2>
+		<h2 style="color: magenta">OFFSET PATH & BOOLEAN ADDITION</h2>
+
+		<script>
+			/**
+			 * TODO: look into path offset (not stroke?)
+			 * This looks promising: https://danmarshall.github.io/svg-path-outline/
+			 */
+
+			/**
+			 * TODO: look into boolean operations
+			 * Likely need to convert SVG paths to polygons first...
+			 * Once that's done...
+			 * Potentially useful library for boolean operations on the SVG:
+			 * https://github.com/junmer/clipper-lib?tab=readme-ov-file
+			 */
+		</script>
+
+		<p style="color: magenta">
+			TODO: haven't started on this, but hopefully will be relatively smooth
+			since we have a polygon with straight lines and points!
+		</p>
 	</body>
 </html>
