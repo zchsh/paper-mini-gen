@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Toy - Polygon Offset</title>
+		<!-- https://github.com/Pomax/bezierjs -->
+		<script src="/lib/bezier.js" type="text/javascript"></script>
+		<script
+			src="https://microsoft.github.io/maker.js/target/js/browser.maker.js"
+			type="text/javascript"
+		></script>
+		<script
+			src="https://danmarshall.github.io/svg-path-outline/browser/index.js"
+			type="text/javascript"
+		></script>
+		<script type="text/javascript" src="/lib/get-input-as-int.js"></script>
+	</head>
+	<body>
+		<!--  -->
+		<!--  -->
+		<!--  -->
+		<h2>PATH OFFSET</h2>
+		<!--  -->
+		<!--  -->
+		<!--  -->
+
+		<script>
+			/* https://danmarshall.github.io/svg-path-outline/ */
+			var spo = require("svg-path-outline");
+
+			function buildSvgNode(n, v) {
+				n = document.createElementNS("http://www.w3.org/2000/svg", n);
+				for (var p in v) n.setAttributeNS(null, p, v[p]);
+				return n;
+			}
+
+			function applyOffset(svgSource, svgDestContainer = null) {
+				let svgDest;
+				if (svgDestContainer !== null) {
+					svgDestContainer.innerHTML = svgSource.parentNode.innerHTML;
+					svgDest = svgDestContainer.querySelector("svg");
+				} else {
+					svgDest = svgSource;
+				}
+				const offset = getInputAsInt("offset");
+				// Remove any path elements from previous applications
+				const pathElems = svgDest.querySelectorAll("path");
+				for (const pathElem of pathElems) {
+					pathElem.remove();
+				}
+				// From each polygon element, generate an offset path element
+				const polygonElems = svgDest.querySelectorAll("polygon");
+				for (const polygonElem of polygonElems) {
+					const polygonData = polygonElem.getAttribute("points");
+					const outlineData = spo(polygonData, offset, { tagName: "polygon" });
+					const outlinePath = buildSvgNode("path", {
+						d: outlineData,
+						fill: "rgba(255,0,0,0.4)",
+					});
+					svgDest.appendChild(outlinePath);
+				}
+			}
+		</script>
+		<p>Original SVG</p>
+		<div id="original-svg">
+			<svg
+				width="328"
+				height="312"
+				version="1.1"
+				xmlns="http://www.w3.org/2000/svg"
+				desc="Created with imagetracer.js version 1.2.6"
+			>
+				<polygon
+					points=" 164.5,77 185,84.5 187,99.5 179.5,109 164.5,111 155,103.5 153,88.5 160.5,79 164.5,77"
+					fill="transparent"
+					stroke="rgba(0,0,0,0.4)"
+					stroke-width="2"
+				></polygon>
+				<polygon
+					points=" 210.5,89 215,91.5 216,94.5 213.5,99 210.5,100 206,97.5 205,93.5 207.5,90 210.5,89"
+					fill="transparent"
+					stroke="rgba(0,0,0,0.4)"
+					stroke-width="2"
+				></polygon>
+				<polygon
+					points=" 104,119 128,119 128,135 104,135 104,119"
+					fill="transparent"
+					stroke="rgba(0,0,0,0.4)"
+					stroke-width="2"
+				></polygon>
+				<polygon
+					points=" 134,119 193.5,119 194,122.5 206,171 192.5,171 191,172.5 191,226.5 174,227 174,177.5 172.5,176 166,177.5 166,227 149,227 149,137.5 148,135 134,135 134,119"
+					fill="transparent"
+					stroke="rgba(0,0,0,0.4)"
+					stroke-width="2"
+				></polygon>
+			</svg>
+		</div>
+		<p>
+			Offset:
+			<input id="offset" type="number" min="0" max="100" value="30" />
+		</p>
+		<button
+			onClick="applyOffset(document.querySelector('#original-svg svg'), document.querySelector('#offset-svg'))"
+		>
+			Apply offset
+		</button>
+		<div id="offset-svg"></div>
+
+		<!--  -->
+		<!--  -->
+		<!--  -->
+		<h2 style="color: magenta">(WIP) PATH OFFSET CONVERSION TO POLYGON</h2>
+		<!--  -->
+		<!--  -->
+		<!--  -->
+
+		<script>
+			/**
+			 * TODO: look into boolean operations
+			 * Likely need to convert SVG paths to polygons first...
+			 * Once that's done...
+			 * Potentially useful library for boolean operations on the SVG:
+			 * https://github.com/junmer/clipper-lib?tab=readme-ov-fil
+			 *
+			 * RELEVANT DEMO:
+			 * https://jsclipper.sourceforge.net/6.2.1.0/index.html?p=basic_demo_boolean_svg.html
+			 * RELEVANT SOURCE:
+			 * https://jsclipper.sourceforge.net/6.2.1.0/index.html?p=sources_as_text/basic_demo_boolean_svg.txt
+			 *
+			 * If this ends up being super difficult... consider an alternative,
+			 * which might be to use the built-in "group" element.
+			 */
+			function applyAddition(svgSource, svgDestContainer = null) {
+				let svgDest;
+				if (svgDestContainer !== null) {
+					svgDestContainer.innerHTML = svgSource.parentNode.innerHTML;
+					svgDest = svgDestContainer.querySelector("svg");
+				} else {
+					svgDest = svgSource;
+				}
+				// Remove any path elements from previous applications
+				const polygonElems = svgDest.querySelectorAll("polygon");
+				for (const polygonElem of polygonElems) {
+					polygonElem.remove();
+				}
+				const pathElems = svgElement.querySelectorAll("path");
+				// TODO: convert the path elements to polygons, with `path-to-polygon`
+			}
+		</script>
+
+		<button
+			onClick="applyAddition(document.querySelector('#offset-svg svg'), document.querySelector('#offset-svg-polygon'))"
+		>
+			Convert offset paths to polygons
+		</button>
+		<div id="offset-svg-polygon"></div>
+
+		<!--  -->
+		<!--  -->
+		<!--  -->
+		<h2 style="color: magenta">(NOT STARTED) BOOLEAN ADDITION</h2>
+		<!--  -->
+		<!--  -->
+		<!--  -->
+	</body>
+</html>

@@ -6,11 +6,22 @@ An attempt at making it easier to create printable paper miniatures.
 
 ### Implement offset on traced path
 
-- [ ] Test path offset in "toy" file, with two simple shapes
+- [x] Test path offset in "toy" file, with two simple shapes
+  - Done in `toy-offset-and-addition.html`
+- [ ] Clean up offset path utilities
+- [ ] Add path offset step to main "index" file
 
 ### Implement boolean addition on traced and offset path
 
 - [ ] Test boolean addition in "toy" file, with two simple shapes
+  - Currently a work in progress, in `toy-offset-and-addition.html`
+- [ ] Clean up boolean path addition utilities
+- [ ] Add boolean path addition step to main "index" file
+
+### Explore path smoothing AFTER boolean addition
+
+- Want it to be easy to cut out the shapes
+- Path smoothing of some kind might help with that
 
 ### Revisit image processing
 
