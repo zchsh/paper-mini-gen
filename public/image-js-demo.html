@@ -1,6 +1,9 @@
 <html>
 	<head>
-		<script src="https://www.lactame.com/lib/image-js/0.21.2/image.min.js"></script>
+		<!-- https://www.lactame.com/lib/image-js/0.21.2/image.min.js -->
+		<script type="text/javascript" src="/lib/image.min.js"></script>
+		<script type="text/javascript" src="/lib/get-input-as-int.js"></script>
+		<script type="text/javascript" src="/lib/apply-threshold.js"></script>
 	</head>
 
 	<body>
@@ -23,18 +26,18 @@
 		<script>
 			async function processImage() {
 				// Load the original raw image from a source element
-				const imgElemRaw = document.getElementById("raw-image");
-				let image = await IJS.Image.load(imgElemRaw.src);
+				const imgElem = document.getElementById("raw-image");
 				// Gather optional settings
-				const threshold =
-					parseInt(document.getElementById("threshold").value) / 100;
-				const radius = parseInt(document.getElementById("radius").value);
-				// Convert to grayscale
-				let grey = image.gaussianFilter({ radius }).grey().mask({ threshold });
-				const processedImageSrc = grey.toDataURL();
+				const threshold = getInputAsInt("threshold") / 100;
+				const radius = getInputAsInt("radius");
+				// Proces the image
+				const processedSrc = await applyThreshold(
+					imgElem.src,
+					threshold,
+					radius
+				);
 				// Load the image into a destination element
-				const imgElemProcessed = document.getElementById("processed-image");
-				imgElemProcessed.src = processedImageSrc;
+				document.getElementById("processed-image").src = processedSrc;
 			}
 		</script>
 	</body>
