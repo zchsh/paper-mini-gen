@@ -148,7 +148,7 @@
 				 * Clone the SVG generated at the previous step
 				 */
 				const cleanedTraceContainer = document.getElementById(
-					"svgcontainer_polygon"
+					"svgcontainer_cleanup"
 				);
 				cleanedTraceContainer.innerHTML =
 					document.getElementById("svgcontainer").innerHTML;
@@ -183,9 +183,6 @@
 				 * And there's a very naive implementation in:
 				 * `basic-point-at-length.html` (in this repo)
 				 */
-				const polylinesamplefrequency = parseInt(
-					document.getElementById("polylinesamplefrequency").value
-				);
 				convertPathsToPolygon(cleanedTraceContainer.querySelector("svg"));
 			}
 		</script>
@@ -196,7 +193,7 @@
 			<li>Convert curves lines to straight lines</li>
 		</ul>
 		<p><button onClick="cleanupTrace()">cleanupTrace()</button></p>
-		<div id="svgcontainer_polygon"></div>
+		<div id="svgcontainer_cleanup"></div>
 
 		<h2 style="color: magenta">~~~WIP BELOW~~~</h2>
 		<h2 style="color: magenta">OFFSET PATH & BOOLEAN ADDITION</h2>
