@@ -16,10 +16,10 @@ An attempt at making it easier to create printable paper miniatures.
 - [x] Play around with image filtering
   - I have something I'm super happy with in `image-js-demo.html`!
 - [ ] Add image filtering to main workflow
-  - Starting to split out `.js` files probably makes a lot of sense at this point
-  - Localinzing `image-js` probably makes sense.
-  - First, update the "toy" example to split out the JS. HTML should be super simple. But function should be pure JS, no HTML injection.
-  - Then, update the main `index.html` to use the same approach.
+  - [x] Starting to split out `.js` files probably makes a lot of sense at this point
+  - [x] Localizing `image-js` probably makes sense.
+  - [x] First, update the "toy" example to split out the JS. HTML should be super simple. But function should be pure JS, no HTML injection.
+  - [ ] Then, update the main `index.html` to use the same approach.
 - [ ] Final packaging as a `.zip` file with an `index.html` etcetera
   - Could also build into a single `.html` file with simple `@include` style assembly, a la Mustache... self container "app" that runs in your browser, even offline! Zero external dependencies... pretty cool!
   - Could then share this with folks... creative commons etc

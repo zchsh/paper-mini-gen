@@ -2,11 +2,15 @@
 <html>
 	<head>
 		<title>Paper Mini Gen</title>
-		<script type="text/javascript" src="/imagetracer_v1.2.6.js"></script>
-		<script type="text/javascript" src="/lib/svg-path-to-polygon.js"></script>
+		<link rel="shortcut icon" href="#" />
+		<script type="text/javascript" src="/lib/imagetracer_v1.2.6.js"></script>
 		<script type="text/javascript" src="/lib/dat.gui.min.js"></script>
 		<script type="text/javascript" src="/lib/pathseg.js"></script>
 		<script type="text/javascript" src="/lib/path-to-polygon.js"></script>
+		<!-- https://www.lactame.com/lib/image-js/0.21.2/image.min.js -->
+		<script type="text/javascript" src="/lib/image.min.js"></script>
+		<script type="text/javascript" src="/lib/get-input-as-int.js"></script>
+		<script type="text/javascript" src="/lib/apply-threshold.js"></script>
 		<style>
 			svg path[fill="rgb(255,255,255)"] {
 				/* TODO: great as a preview! but need to do in JS too... */
@@ -20,58 +24,20 @@
 		</style>
 	</head>
 	<body>
+		<!--  -->
+		<!--  -->
+		<!--  -->
+		<h2>IMAGE UPLOAD</h2>
+		<!--  -->
+		<!--  -->
+		<!--  -->
+
 		<p>
 			<input type="file" id="image-input" accept="image/png, image/jpeg" />
 		</p>
 		<p>
 			<img id="image-preview" src="/2025-04-03-test-outline-image.png" />
 		</p>
-		<p style="color: magenta">
-			TODO: ADJUST BRIGHTNESS / CONTRAST OF IMAGE BEFORE TRACING
-		</p>
-		<p style="color: magenta">
-			aim should be to get a nice "silhoutte". user control here is very
-			important! for example, try "sample-char-art-02"
-		</p>
-		<a href="https://github.com/image-js/image-js"
-			>https://github.com/image-js/image-js</a
-		>
-		<p><button onClick="traceImage()">Trace Image</button></p>
-		<p>OPTIONS</p>
-		<p>Path omit: <input id="pathomit" type="number" min="0" value="50" /></p>
-		<p>
-			Blur radius:
-			<input id="blurradius" type="number" min="0" max="5" value="2" />
-		</p>
-		<p>
-			Blur delta:
-			<input id="blurdelta" type="number" min="0" max="100" value="20" />
-		</p>
-		<p>
-			Line error threshold:
-			<input id="ltres" type="number" min="1" value="5" />
-		</p>
-		<p>
-			Quadratic split error threshold:
-			<input id="qtres" type="number" min="1" value="5" />
-		</p>
-		<p>
-			Polyline sample frequency:
-			<input
-				id="polylinesamplefrequency"
-				type="number"
-				min="1"
-				max="200"
-				value="40"
-			/>
-		</p>
-		<div id="svgcontainer"></div>
-		<p>FOREGROUND ELEMENTS ONLY</p>
-		<div id="svgcontainer_foreground"></div>
-		<p style="color: magenta">CONVERT PATHS TO POLYGONS</p>
-		<div id="svgcontainer_polygon"></div>
-		<p style="color: magenta">OFFSET PATHS</p>
-		<p style="color: magenta">BOOLEAN ADDITION</p>
 		<script>
 			function onImageSelection(input) {
 				if (input.files && input.files[0]) {
@@ -84,27 +50,61 @@
 					reader.readAsDataURL(input.files[0]);
 				}
 			}
+		</script>
 
-			document
-				.getElementById("image-input")
-				.addEventListener("change", function () {
-					onImageSelection(this);
-				});
+		<!--  -->
+		<!--  -->
+		<!--  -->
+		<h2>IMAGE SILHOUETTING</h2>
+		<!--  -->
+		<!--  -->
+		<!--  -->
+		<script>
+			async function processImage() {
+				// Load the original raw image from a source element
+				const imgElem = document.getElementById("image-preview");
+				// Gather optional settings
+				const threshold = getInputAsInt("threshold") / 100;
+				const radius = getInputAsInt("radius");
+				// Proces the image
+				const processedSrc = await applyThreshold(
+					imgElem.src,
+					threshold,
+					radius
+				);
+				// Load the image into a destination element
+				document.getElementById("processed-image").src = processedSrc;
+			}
+		</script>
 
+		<p>
+			Threshold
+			<input id="threshold" type="number" min="0" max="100" value="50" />
+		</p>
+		<p>
+			Radius
+			<input id="radius" type="number" min="1" max="100" value="1" />
+		</p>
+		<p><button onClick="processImage()">Process image</button></p>
+		<img id="processed-image" />
+
+		<!--  -->
+		<!--  -->
+		<!--  -->
+		<h2>IMAGE TRACING</h2>
+		<!--  -->
+		<!--  -->
+		<!--  -->
+
+		<script>
 			function traceImage() {
 				// NOTE: uses https://github.com/jankovicsandras/imagetracerjs
-				const pathomit = parseInt(document.getElementById("pathomit").value);
-				const ltres = parseInt(document.getElementById("ltres").value);
-				const qtres = parseInt(document.getElementById("qtres").value);
-				const blurradius = parseInt(
-					document.getElementById("blurradius").value
-				);
-				const blurdelta = parseInt(document.getElementById("blurdelta").value);
+				const pathomit = getInputAsInt("pathomit");
+				const ltres = getInputAsInt("ltres");
+				const qtres = getInputAsInt("qtres");
 				// Adding custom palette. This will override numberofcolors.
 				const options = {
 					pathomit,
-					blurradius,
-					blurdelta,
 					ltres,
 					qtres,
 					colorsampling: 0,
@@ -124,19 +124,34 @@
 				 * https://github.com/image-js/image-js
 				 */
 				// Loading an image, tracing with the 'posterized2' option preset, and appending the SVG to an element with id="svgcontainer"
-				const imageElement = document.getElementById("image-preview");
-				const imageSource = imageElement.getAttribute("src");
+				const imageSource = document
+					.getElementById("processed-image")
+					.getAttribute("src");
 				ImageTracer.imageToSVG(
 					imageSource /* input filename / URL */,
 					function (svgstr) {
 						document.getElementById("svgcontainer").innerHTML = "";
 						ImageTracer.appendSVGString(svgstr, "svgcontainer");
-						afterTrace();
 					} /* callback function to run on SVG string result */,
 					options
 				);
 			}
+		</script>
 
+		<p><button onClick="traceImage()">Trace Image</button></p>
+		<p>OPTIONS</p>
+		<p>Path omit: <input id="pathomit" type="number" min="0" value="30" /></p>
+		<p>
+			Line error threshold:
+			<input id="ltres" type="number" min="1" value="2" />
+		</p>
+		<p>
+			Quadratic split error threshold:
+			<input id="qtres" type="number" min="1" value="2" />
+		</p>
+		<div id="svgcontainer"></div>
+
+		<script>
 			function afterTrace() {
 				/**
 				 *
@@ -188,5 +203,23 @@
 				 */
 			}
 		</script>
+		<p><button onClick="afterTrace()">afterTrace()</button></p>
+
+		<p>FOREGROUND ELEMENTS ONLY</p>
+		<div id="svgcontainer_foreground"></div>
+		<p style="color: magenta">CONVERT PATHS TO POLYGONS</p>
+		<p>
+			Polyline sample frequency:
+			<input
+				id="polylinesamplefrequency"
+				type="number"
+				min="1"
+				max="200"
+				value="40"
+			/>
+		</p>
+		<div id="svgcontainer_polygon"></div>
+		<p style="color: magenta">OFFSET PATHS</p>
+		<p style="color: magenta">BOOLEAN ADDITION</p>
 	</body>
 </html>
