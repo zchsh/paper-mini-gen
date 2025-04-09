@@ -47,8 +47,6 @@
 			 *
 			 */
 			function drawUnion(subj_paths, all_clip_paths, scale) {
-				console.log({ subj_paths, all_clip_paths });
-
 				// Scale up for precision, I think?
 				ClipperLib.JS.ScaleUpPaths(subj_paths, scale);
 				for (const clip_paths of all_clip_paths) {
@@ -64,9 +62,8 @@
 				}
 				var subject_fillType = ClipperLib.PolyFillType.pftNonZero;
 				var clip_fillType = ClipperLib.PolyFillType.pftNonZero;
-				const clipType = "Union";
 				const solution_paths = new ClipperLib.Paths();
-				cpr.Execute(clipType, solution_paths, subject_fillType, clip_fillType);
+				cpr.Execute("Union", solution_paths, subject_fillType, clip_fillType);
 				return solution_paths;
 			}
 
@@ -110,6 +107,100 @@
 				renderSolutionAsSvg(solutionPaths, container, scale);
 			}
 
+			const testData = {
+				subj_path: [
+					[
+						{ X: "174.8074459", Y: "48.8263144" },
+						{ X: "195.3074459", Y: "56.3263144" },
+						{ X: "214.736837", Y: "80.5350884" },
+						{ X: "216.736837", Y: "95.5350884" },
+						{ X: "210.546483", Y: "118.0893287" },
+						{ X: "203.046483", Y: "127.5893287" },
+						{ X: "183.4649116", Y: "138.736837" },
+						{ X: "168.4649116", Y: "140.736837" },
+						{ X: "145.9106713", Y: "134.546483" },
+						{ X: "136.4106713", Y: "127.046483" },
+						{ X: "125.263163", Y: "107.4649116" },
+						{ X: "123.263163", Y: "92.4649116" },
+						{ X: "129.453517", Y: "69.9106713" },
+						{ X: "136.953517", Y: "60.4106713" },
+						{ X: "147.0835921", Y: "52.1671843" },
+						{ X: "151.0835921", Y: "50.1671843" },
+						{ X: "174.8074459", Y: "48.8263144" },
+					],
+				],
+				all_clip_paths: [
+					[
+						[
+							{ X: "225.0692879", Y: "62.7752817" },
+							{ X: "229.5692879", Y: "65.2752817" },
+							{ X: "243.4604989", Y: "82.013167" },
+							{ X: "244.4604989", Y: "85.013167" },
+							{ X: "242.2247183", Y: "109.0692879" },
+							{ X: "239.7247183", Y: "113.5692879" },
+							{ X: "222.986833", Y: "127.4604989" },
+							{ X: "219.986833", Y: "128.4604989" },
+							{ X: "195.9307121", Y: "126.2247183" },
+							{ X: "191.4307121", Y: "123.7247183" },
+							{ X: "176.895725", Y: "104.7760688" },
+							{ X: "175.895725", Y: "100.7760688" },
+							{ X: "180.5879959", Y: "76.0628542" },
+							{ X: "183.0879959", Y: "72.5628542" },
+							{ X: "198.013167", Y: "61.5395011" },
+							{ X: "201.013167", Y: "60.5395011" },
+							{ X: "225.0692879", Y: "62.7752817" },
+						],
+					],
+					[
+						[
+							{ X: "104", Y: "89" },
+							{ X: "128", Y: "89" },
+							{ X: "158", Y: "119" },
+							{ X: "158", Y: "135" },
+							{ X: "128", Y: "165" },
+							{ X: "104", Y: "165" },
+							{ X: "74", Y: "135" },
+							{ X: "74", Y: "119" },
+							{ X: "104", Y: "89" },
+						],
+					],
+					[
+						[
+							{ X: "134", Y: "89" },
+							{ X: "193.5", Y: "89" },
+							{ X: "223.1984848", Y: "114.7573593" },
+							{ X: "223.484784", Y: "116.7614539" },
+							{ X: "235.1218496", Y: "163.7945939" },
+							{ X: "221", Y: "196.9807621" },
+							{ X: "221", Y: "226.5" },
+							{ X: "191.8819715", Y: "256.4870326" },
+							{ X: "174.8819715", Y: "256.9870326" },
+							{ X: "170", Y: "256.7321375" },
+							{ X: "166", Y: "257" },
+							{ X: "149", Y: "257" },
+							{ X: "119", Y: "227" },
+							{ X: "119", Y: "160.9807621" },
+							{ X: "104", Y: "135" },
+							{ X: "104", Y: "119" },
+							{ X: "134", Y: "89" },
+						],
+					],
+				],
+			};
+
+			function drawTestUnion(container) {
+				const { subj_path, all_clip_paths } = testData;
+				const scale = 100;
+				const solutionPaths = drawUnion(
+					subj_path,
+					[all_clip_paths[0], all_clip_paths[1]],
+					scale
+				);
+				console.log({ solutionPaths });
+				// Render the solution paths as an SVG
+				renderSolutionAsSvg(solutionPaths, container, scale);
+			}
+
 			function renderSolutionAsSvg(solutionPaths, container, scale) {
 				// Render the solution paths as an SVG
 				console.log(JSON.stringify(solutionPaths));
@@ -126,7 +217,7 @@
 
 			function drawSourceUnion(sourceSvg, destContainer) {
 				const polygons = sourceSvg.querySelectorAll("polygon");
-				let all_subj_paths = [];
+				let subj_path;
 				let all_clip_paths = [];
 				let i = 0;
 				for (const polygon of polygons) {
@@ -144,18 +235,15 @@
 					 * trying i === 1 yields similar result but with next shape
 					 */
 					if (i === 0) {
-						all_subj_paths.push([thesePoints]);
+						subj_path = [thesePoints];
 					} else {
 						all_clip_paths.push([thesePoints]);
 					}
 					i++;
 				}
 				const scale = 100;
-				const solutionPaths = drawUnion(
-					all_subj_paths[0],
-					all_clip_paths,
-					scale
-				);
+				console.log(JSON.stringify({ subj_path, all_clip_paths }));
+				const solutionPaths = drawUnion(subj_path, all_clip_paths, scale);
 				console.log({ solutionPaths });
 				// Render the solution paths as an SVG
 				renderSolutionAsSvg(solutionPaths, destContainer, scale);
@@ -167,6 +255,13 @@
 		This page shows an example of boolean operations on polygons and drawing
 		them using SVG.
 		<div id="svgcontainer_union"></div>
+		<p>Using same tools with demo data</p>
+		<button
+			onClick="drawTestUnion(document.getElementById('svgcontainer_demo'))"
+		>
+			Run test union
+		</button>
+		<div id="svgcontainer_demo"></div>
 		<p>Using same tools on polygons in an SVG</p>
 		<button
 			onClick="drawSourceUnion(document.getElementById('svg_source'), document.getElementById('svgcontainer_svgsource'))"

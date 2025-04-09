@@ -1,0 +1,95 @@
+<html>
+	<head>
+		<title>Demo Boolean Operations</title>
+		<!-- https://github.com/velipso/polybooljs?tab=readme-ov-file -->
+		<script
+			type="text/javascript"
+			src="/lib/polybooljs-1.2.2/dist/polybool.js"
+		></script>
+		<script>
+			const poly1 = {
+				regions: [
+					[
+						[10, 10],
+						[110, 10],
+						[110, 110],
+						[10, 110],
+					],
+					[
+						[20, 20],
+						[20, 100],
+						[100, 100],
+						[100, 20],
+					],
+				],
+				inverted: false,
+			};
+			const poly2 = {
+				regions: [
+					[
+						[50, 50],
+						[150, 50],
+						[150, 150],
+						[50, 150],
+					],
+					[
+						[60, 60],
+						[60, 140],
+						[140, 140],
+						[140, 60],
+					],
+				],
+				inverted: false,
+			};
+
+			function renderPolygonAsSvg(polygon, container) {
+				const maxCoords = polygon.regions.reduce(
+					(allMax, region) => {
+						const maxInRegion = region.reduce(
+							(rmax, coord) => {
+								const [thisX, thisY] = coord;
+								const newMaxX = Math.max(rmax.x, thisX);
+								const newMaxY = Math.max(rmax.y, thisY);
+								console.log({ thisX, thisY, newMaxX, newMaxY });
+								return { x: newMaxX, y: newMaxY };
+							},
+							{ x: 0, y: 0 }
+						);
+						return {
+							x: Math.max(allMax.x, maxInRegion.x),
+							y: Math.max(allMax.y, maxInRegion.y),
+						};
+					},
+					{ x: 0, y: 0 }
+				);
+				var svg = `<svg style="margin-top:10px; margin-right:10px;margin-bottom:10px;background-color:#dddddd" width="${
+					maxCoords.x + 10
+				}" height="${maxCoords.y + 10}">`;
+				for (const region of polygon.regions) {
+					const pointsString = region
+						.map((point) => {
+							const [x, y] = point;
+							return `${x},${y}`;
+						})
+						.join(" ");
+					svg += `<polygon stroke="black" fill="rgba(255,0,0,0.2)" stroke-width="1" points="${pointsString}"/>`;
+				}
+				svg += "</svg>";
+				container.innerHTML = svg;
+			}
+
+			function runUnion() {
+				const result = PolyBool.union(poly1, poly2);
+				console.log({ poly1, poly2, result });
+				renderPolygonAsSvg(poly1, document.getElementById("poly1"));
+				renderPolygonAsSvg(poly2, document.getElementById("poly2"));
+				renderPolygonAsSvg(result, document.getElementById("result"));
+			}
+		</script>
+	</head>
+	<body onload="runUnion()">
+		<div id="poly1"></div>
+		<div id="poly2"></div>
+		<div id="result"></div>
+	</body>
+</html>
