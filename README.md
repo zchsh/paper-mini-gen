@@ -13,8 +13,10 @@ An attempt at making it easier to create printable paper miniatures.
 
 ### Implement boolean addition on traced and offset path
 
-- [ ] Test boolean addition in "toy" file, with two simple shapes
+- [x] Test boolean addition in "toy" file, with two simple shapes
   - Currently a work in progress, in `toy-offset-and-addition.html`
+  - Ended up splitting out to separate files while testing boolean operation libraries
+  - Settled on `polybool`, fruits of labour are in `demo-bool-ops-02.html`
 - [ ] Clean up boolean path addition utilities
 - [ ] Add boolean path addition step to main "index" file
 

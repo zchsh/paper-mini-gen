@@ -3,14 +3,20 @@
 	<head>
 		<title>Paper Mini Gen</title>
 		<link rel="shortcut icon" href="#" />
-		<script type="text/javascript" src="/lib/imagetracer_v1.2.6.js"></script>
-		<script type="text/javascript" src="/lib/dat.gui.min.js"></script>
-		<script type="text/javascript" src="/lib/pathseg.js"></script>
-		<script type="text/javascript" src="/lib/path-to-polygon.js"></script>
+		<!-- IMAGE UPLOAD  -->
+		<script type="text/javascript" src="/lib/on-image-selection.js"></script>
+		<!-- IMAGE SILHOUETTING -->
 		<!-- https://www.lactame.com/lib/image-js/0.21.2/image.min.js -->
 		<script type="text/javascript" src="/lib/image.min.js"></script>
 		<script type="text/javascript" src="/lib/get-input-as-int.js"></script>
 		<script type="text/javascript" src="/lib/apply-threshold.js"></script>
+		<!-- IMAGE TRACING -->
+		<script type="text/javascript" src="/lib/imagetracer_v1.2.6.js"></script>
+		<!-- IMAGE TRACING CLEANUP -->
+		<script type="text/javascript" src="/lib/pathseg.js"></script>
+		<script type="text/javascript" src="/lib/path-to-polygon.js"></script>
+		<!-- TODO: add offset path -->
+		<!-- TODO: add boolean addition -->
 	</head>
 	<body>
 		<!--  -->
@@ -22,24 +28,16 @@
 		<!--  -->
 
 		<p>
-			<input type="file" id="image-input" accept="image/png, image/jpeg" />
+			<input
+				type="file"
+				id="image-input"
+				accept="image/png, image/jpeg"
+				onchange="onImageSelection(this, 'image-preview')"
+			/>
 		</p>
 		<p>
 			<img id="image-preview" src="/sample-char-art-00.jpeg" />
 		</p>
-		<script>
-			function onImageSelection(input) {
-				if (input.files && input.files[0]) {
-					var reader = new FileReader();
-					reader.onload = function (e) {
-						document
-							.getElementById("image-preview")
-							.setAttribute("src", e.target.result);
-					};
-					reader.readAsDataURL(input.files[0]);
-				}
-			}
-		</script>
 
 		<!--  -->
 		<!--  -->
@@ -87,44 +85,47 @@
 
 		<script>
 			function traceImage() {
-				// NOTE: uses https://github.com/jankovicsandras/imagetracerjs
+				/**
+				 * NOTE: uses https://github.com/jankovicsandras/imagetracerjs
+				 */
 				const pathomit = getInputAsInt("pathomit");
 				const ltres = getInputAsInt("ltres");
 				const qtres = getInputAsInt("qtres");
 				// Adding custom palette. This will override numberofcolors.
-				const options = {
-					pathomit,
-					ltres,
-					qtres,
-					colorsampling: 0,
-					colorquantcycles: 1,
-					strokewidth: 0,
-					roundcoords: 2,
-					/**
-					 * Set a custom palette, of:
-					 * - black (foreground shapes)
-					 * - nearly-white (background shapes, will remove in later step)
-					 */
-					pal: [
-						{ r: 0, g: 0, b: 0, a: 255 },
-						{ r: 245, g: 245, b: 245, a: 255 },
-					],
-				};
 				// Loading an image, tracing with the 'posterized2' option preset, and appending the SVG to an element with id="svgcontainer"
 				const imageSource = document
 					.getElementById("processed-image")
 					.getAttribute("src");
+
+				function doneTracingCallback(svgString) {
+					document.getElementById("svgcontainer").innerHTML = "";
+					ImageTracer.appendSVGString(svgString, "svgcontainer");
+				}
 				/**
 				 * TODO: is there a way to trace with straight lines only?
 				 * Could simplify the process dramatically...
 				 */
 				ImageTracer.imageToSVG(
 					imageSource /* input filename / URL */,
-					function (svgstr) {
-						document.getElementById("svgcontainer").innerHTML = "";
-						ImageTracer.appendSVGString(svgstr, "svgcontainer");
-					} /* callback function to run on SVG string result */,
-					options
+					doneTracingCallback,
+					{
+						pathomit,
+						ltres,
+						qtres,
+						colorsampling: 0,
+						colorquantcycles: 1,
+						strokewidth: 0,
+						roundcoords: 2,
+						/**
+						 * Set a custom palette, of:
+						 * - black (foreground shapes)
+						 * - nearly-white (background shapes, will remove in later step)
+						 */
+						pal: [
+							{ r: 0, g: 0, b: 0, a: 255 },
+							{ r: 245, g: 245, b: 245, a: 255 },
+						],
+					}
 				);
 			}
 		</script>
@@ -163,7 +164,6 @@
 				cleanedTraceContainer
 					.querySelectorAll(`path[fill="rgb(245,245,245)"]`)
 					.forEach((e) => e.remove());
-
 				/**
 				 * Convert the foreground paths, which may include curves,
 				 * to polygons, which will consist of straigh lines only.
@@ -214,8 +214,13 @@
 		</script>
 
 		<p style="color: magenta">
-			TODO: haven't started on this, but hopefully will be relatively smooth
-			since we have a polygon with straight lines and points!
+			Started on these. Demos below. Next step is probably integrating them into this main page.
+		</p>
+		<p>
+			<ul>
+				<li><a target="_blank" href="/toy-offset-and-addition">/toy-offset-and-addition</a></li>
+				<li><a target="_blank" href="/demo-bool-ops-02">/demo-bool-ops-02</a></li>
+			</ul>
 		</p>
 	</body>
 </html>

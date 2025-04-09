@@ -1,0 +1,143 @@
+<html>
+	<head>
+		<title>Demo Boolean Operations</title>
+		<!-- https://github.com/velipso/polybooljs?tab=readme-ov-file -->
+		<script
+			type="text/javascript"
+			src="/lib/polybooljs-1.2.2/dist/polybool.js"
+		></script>
+		<script type="text/javascript" src="/lib/render-paths-string.js"></script>
+		<script type="text/javascript" src="/lib/render-polygon-as-svg.js"></script>
+		<script>
+			// const poly1 = {
+			// 	regions: [
+			// 		[
+			// 			[10, 10],
+			// 			[110, 10],
+			// 			[110, 110],
+			// 			[10, 110],
+			// 		],
+			// 		[
+			// 			[100, 20],
+			// 			[100, 100],
+			// 			[20, 100],
+			// 			[20, 20],
+			// 		],
+			// 	],
+			// 	inverted: false,
+			// };
+			// const poly2 = {
+			// 	regions: [
+			// 		[
+			// 			[50, 50],
+			// 			[150, 50],
+			// 			[150, 150],
+			// 			[50, 150],
+			// 		],
+			// 		[
+			// 			[140, 60],
+			// 			[140, 140],
+			// 			[60, 140],
+			// 			[60, 60],
+			// 		],
+			// 	],
+			// 	inverted: false,
+			// };
+
+			function runUnion() {
+				const svgSource = document.getElementById("svg_source");
+				const polygonElems = svgSource.querySelectorAll("polygon");
+				const polygonObjs = [];
+				for (const polygonElem of polygonElems) {
+					polygonObjs.push(getPolygonAsPolyboolObj(polygonElem));
+				}
+				console.log({ polygonObjs });
+				// render each polygon as a kinda debug
+				const polygonDebugContainer = document.getElementById("polygons");
+				/**
+				 * TODO: renderPolygonAsSvg should be refactored.
+				 * Part of it is inferring width and height of resulting SVG...
+				 * but may actually want to explicitly provide those!
+				 * Three different functions happening:
+				 * - inferArtboardDimensions(polygonObj)
+				 * - speculativeWindingOrderFix(polygonObj)
+				 * - renderPathsString() (... already implemented)
+				 * - renderSvg(pathsString) (... for markup and style decisions!)
+				 */
+				for (const polygonObj of polygonObjs) {
+					polygonDebugContainer.innerHTML += renderPolygonAsSvg(polygonObj);
+				}
+				/**
+				 * Union of many shapes, as pulled from examples:
+				 * https://github.com/velipso/polybooljs?tab=readme-ov-file#advanced-example-1
+				 */
+				const unionPolygonObj = unionPolygonObjects(polygonObjs);
+				const unionSvg = renderPolygonAsSvg(unionPolygonObj);
+				document.getElementById("result").innerHTML = unionSvg;
+			}
+
+			function getPolygonAsPolyboolObj(polygonElem) {
+				const points = polygonElem
+					.getAttribute("points")
+					.split(" ")
+					.map((e) => e.trim())
+					.filter((e) => e !== "")
+					.map((e) => {
+						const [xStr, yStr] = e.split(",");
+						return [parseFloat(xStr), parseFloat(yStr)];
+					});
+				return {
+					regions: [points],
+					inverted: false,
+				};
+			}
+
+			function unionPolygonObjects(polygons) {
+				var segments = PolyBool.segments(polygons[0]);
+				for (var i = 1; i < polygons.length; i++) {
+					var seg2 = PolyBool.segments(polygons[i]);
+					var comb = PolyBool.combine(segments, seg2);
+					segments = PolyBool.selectUnion(comb);
+				}
+				return PolyBool.polygon(segments);
+			}
+		</script>
+	</head>
+	<body onload="runUnion()">
+		<svg
+			id="svg_source"
+			width="328"
+			height="312"
+			version="1.1"
+			xmlns="http://www.w3.org/2000/svg"
+			desc="Created with imagetracer.js version 1.2.6"
+		>
+			<polygon
+				points=" 174.8074459,48.8263144 195.3074459,56.3263144 214.736837,80.5350884 216.736837,95.5350884 210.546483,118.0893287 203.046483,127.5893287 183.4649116,138.736837 168.4649116,140.736837 145.9106713,134.546483 136.4106713,127.046483 125.263163,107.4649116 123.263163,92.4649116 129.453517,69.9106713 136.953517,60.4106713 147.0835921,52.1671843 151.0835921,50.1671843 174.8074459,48.8263144"
+				fill="transparent"
+				stroke="rgba(0,0,0,0.4)"
+				stroke-width="2"
+			></polygon>
+			<polygon
+				points=" 225.0692879,62.7752817 229.5692879,65.2752817 243.4604989,82.013167 244.4604989,85.013167 242.2247183,109.0692879 239.7247183,113.5692879 222.986833,127.4604989 219.986833,128.4604989 195.9307121,126.2247183 191.4307121,123.7247183 176.895725,104.7760688 175.895725,100.7760688 180.5879959,76.0628542 183.0879959,72.5628542 198.013167,61.5395011 201.013167,60.5395011 225.0692879,62.7752817"
+				fill="transparent"
+				stroke="rgba(0,0,0,0.4)"
+				stroke-width="2"
+			></polygon>
+			<polygon
+				points=" 104,89 128,89 158,119 158,135 128,165 104,165 74,135 74,119 104,89"
+				fill="transparent"
+				stroke="rgba(0,0,0,0.4)"
+				stroke-width="2"
+			></polygon>
+			<polygon
+				points=" 134,89 193.5,89 223.1984848,114.7573593 223.484784,116.7614539 235.1218496,163.7945939 221,196.9807621 221,226.5 191.8819715,256.4870326 174.8819715,256.9870326 170,256.7321375 166,257 149,257 119,227 119,160.9807621 104,135 104,119 134,89"
+				fill="transparent"
+				stroke="rgba(0,0,0,0.4)"
+				stroke-width="2"
+			></polygon>
+		</svg>
+		<div id="polygons"></div>
+		<div id="result"></div>
+	</body>
+</html>
