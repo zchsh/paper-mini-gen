@@ -13,6 +13,9 @@
 			type="text/javascript"
 		></script>
 		<script type="text/javascript" src="/lib/get-input-as-int.js"></script>
+		<script type="text/javascript" src="/lib/dat.gui.min.js"></script>
+		<script type="text/javascript" src="/lib/pathseg.js"></script>
+		<script type="text/javascript" src="/lib/path-to-polygon.js"></script>
 	</head>
 	<body>
 		<!--  -->
@@ -115,6 +118,43 @@
 		<!--  -->
 
 		<script>
+			function convertOffsetPathsToPolygons(
+				svgSource,
+				svgDestContainer = null
+			) {
+				let svgDest;
+				if (svgDestContainer !== null) {
+					svgDestContainer.innerHTML = svgSource.parentNode.innerHTML;
+					svgDest = svgDestContainer.querySelector("svg");
+				} else {
+					svgDest = svgSource;
+				}
+				// Remove polygon elements, the "not offset" original shapes
+				const polygonElems = svgDest.querySelectorAll("polygon");
+				for (const polygonElem of polygonElems) {
+					polygonElem.remove();
+				}
+				// Convert the newly offset `path` nodes to `polygon`
+				convertPathsToPolygon(svgDest);
+			}
+		</script>
+
+		<button
+			onClick="convertOffsetPathsToPolygons(document.querySelector('#offset-svg svg'), document.querySelector('#offset-svg-polygon'))"
+		>
+			Convert offset paths to polygons
+		</button>
+		<div id="offset-svg-polygon"></div>
+
+		<!--  -->
+		<!--  -->
+		<!--  -->
+		<h2 style="color: magenta">(NOT STARTED) BOOLEAN ADDITION</h2>
+		<!--  -->
+		<!--  -->
+		<!--  -->
+
+		<script>
 			/**
 			 * TODO: look into boolean operations
 			 * Likely need to convert SVG paths to polygons first...
@@ -130,7 +170,8 @@
 			 * If this ends up being super difficult... consider an alternative,
 			 * which might be to use the built-in "group" element.
 			 */
-			function applyAddition(svgSource, svgDestContainer = null) {
+			function booleanAddPolygons(svgSource, svgDestContainer = null) {
+				// Clone the source svg to the destination container
 				let svgDest;
 				if (svgDestContainer !== null) {
 					svgDestContainer.innerHTML = svgSource.parentNode.innerHTML;
@@ -138,29 +179,19 @@
 				} else {
 					svgDest = svgSource;
 				}
-				// Remove any path elements from previous applications
+				// Remove polygon elements, the "not offset" original shapes
 				const polygonElems = svgDest.querySelectorAll("polygon");
 				for (const polygonElem of polygonElems) {
-					polygonElem.remove();
+					console.log(polygonElem);
 				}
-				const pathElems = svgElement.querySelectorAll("path");
-				// TODO: convert the path elements to polygons, with `path-to-polygon`
 			}
 		</script>
 
 		<button
-			onClick="applyAddition(document.querySelector('#offset-svg svg'), document.querySelector('#offset-svg-polygon'))"
+			onClick="booleanAddPolygons(document.querySelector('#offset-svg-polygon svg'), document.querySelector('#offset-polygons-added'))"
 		>
-			Convert offset paths to polygons
+			Boolean add offset polygons
 		</button>
-		<div id="offset-svg-polygon"></div>
-
-		<!--  -->
-		<!--  -->
-		<!--  -->
-		<h2 style="color: magenta">(NOT STARTED) BOOLEAN ADDITION</h2>
-		<!--  -->
-		<!--  -->
-		<!--  -->
+		<div id="offset-polygons-added"></div>
 	</body>
 </html>

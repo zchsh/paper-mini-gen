@@ -1,0 +1,122 @@
+<html>
+	<head>
+		<title>Javascript Clipper Library / Boolean operations / SVG example</title>
+		<script src="/lib/clipper.js"></script>
+		<style>
+			h3 {
+				margin-bottom: 2px;
+			}
+			body,
+			th,
+			td,
+			input,
+			legend,
+			fieldset,
+			p,
+			b,
+			button,
+			select,
+			textarea {
+				font-size: 14px;
+				font-family: Arial, Helvetica, sans-serif;
+			}
+		</style>
+		<script>
+			// Converts Paths to SVG path string
+			// and scales down the coordinates
+			function paths2string(paths, scale) {
+				var svgpath = "",
+					i,
+					j;
+				if (!scale) scale = 1;
+				for (i = 0; i < paths.length; i++) {
+					for (j = 0; j < paths[i].length; j++) {
+						if (!j) svgpath += "M";
+						else svgpath += "L";
+						svgpath += paths[i][j].X / scale + ", " + paths[i][j].Y / scale;
+					}
+					svgpath += "Z";
+				}
+				if (svgpath == "") svgpath = "M0,0";
+				return svgpath;
+			}
+
+			/**
+			 *
+			 *
+			 *
+			 */
+			function drawUnion() {
+				/**
+				 * Set up the subject and clip paths
+				 * TODO: derive subj_paths and clip_paths
+				 * from provided arguments, ie polygon `points` strings?
+				 */
+				var subj_paths = [
+					[
+						{ X: 10, Y: 10 },
+						{ X: 110, Y: 10 },
+						{ X: 110, Y: 110 },
+						{ X: 10, Y: 110 },
+					],
+					[
+						{ X: 20, Y: 20 },
+						{ X: 20, Y: 100 },
+						{ X: 100, Y: 100 },
+						{ X: 100, Y: 20 },
+					],
+				];
+				var clip_paths = [
+					[
+						{ X: 50, Y: 50 },
+						{ X: 150, Y: 50 },
+						{ X: 150, Y: 150 },
+						{ X: 50, Y: 150 },
+					],
+					[
+						{ X: 60, Y: 60 },
+						{ X: 60, Y: 140 },
+						{ X: 140, Y: 140 },
+						{ X: 140, Y: 60 },
+					],
+				];
+
+				// Scale up for precision, I think?
+				var scale = 100;
+				ClipperLib.JS.ScaleUpPaths(subj_paths, scale);
+				ClipperLib.JS.ScaleUpPaths(clip_paths, scale);
+
+				// Not actually sure what all is going on here...
+				// setting up and executing the union, but i gotta dive into details!
+				var cpr = new ClipperLib.Clipper();
+				cpr.AddPaths(subj_paths, ClipperLib.PolyType.ptSubject, true);
+				cpr.AddPaths(clip_paths, ClipperLib.PolyType.ptClip, true);
+				var subject_fillType = ClipperLib.PolyFillType.pftNonZero;
+				var clip_fillType = ClipperLib.PolyFillType.pftNonZero;
+				const clipType = "Union";
+				const solution_paths = new ClipperLib.Paths();
+				cpr.Execute(clipType, solution_paths, subject_fillType, clip_fillType);
+
+				// Render the solution paths as an SVG
+				console.log(JSON.stringify(solution_paths));
+				var svg =
+					'<svg style="margin-top:10px; margin-right:10px;margin-bottom:10px;background-color:#dddddd" width="160" height="160">';
+				svg +=
+					'<path stroke="black" fill="yellow" stroke-width="2" d="' +
+					paths2string(solution_paths, scale) +
+					'"/>';
+				svg += "</svg>";
+				const cont = document.getElementById("svgcontainer_union");
+				cont.innerHTML += svg;
+				cont.innerHTML += "<br>" + clipType;
+			}
+		</script>
+	</head>
+	<body onload="drawUnion()">
+		<h2>Javascript Clipper Library / Boolean operations / SVG example</h2>
+		This page shows an example of boolean operations on polygons and drawing
+		them using SVG.
+		<div id="svgcontainer"></div>
+		<div id="svgcontainer_union"></div>
+	</body>
+</html>
