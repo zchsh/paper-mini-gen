@@ -4,10 +4,15 @@ An attempt at making it easier to create printable paper miniatures.
 
 ## Next steps
 
-- [ ] Add "copy to clipboard" for final SVG
+- [x] Add "copy to clipboard" for final SVG
   - Obvs not really the final svg yet... but it's a start
 - [ ] Consider layout for paper mini outline SVG
   - Copying your offset-and-union'd SVG into Figma to play around seems right
+  - Bottom of "character", _after offset_, should serve as the bottom position. The blank space doesn't usually look floaty. This could be adjusted though, maybe a user override at some point.
+  - Smooth path just slightly _before_ offset? May help avoid "sword point" issue... maybe there's an offset setting though?
+  - "Three circles" layout seems best. Middle circle is the table-facing base. The half-circles adjacent to the middle circle form the sky-facing base when folded. The additional outer semi-circles anchor the character's offset shape to the base
+  - Function to keep _only_ the "outer shape" seems like it'd be useful. Otherwise, you could end up with "interior cutouts" that really aren't feasible to cut out. Usually this is mitigated by the offset though... maybe there's a user option to leave this in.
+  - 3D preview of the assembled paper mini would be rad
 
 ### Explore path smoothing AFTER boolean addition
 
@@ -37,3 +42,8 @@ An attempt at making it easier to create printable paper miniatures.
   - maybe let them be dragged around, even rotated?
   - nah... seems to make more sense to have this as a separate tool
   - character mini generator should render to `.svg`, or to `.jpeg` or `.png`. The exported asset can then be placed and duplicated in other programs (eg Figma). If I happen to want to create an HTML-based standalone program that lets you arrange imported `.svg`, `.png`, and `.jpeg` files on a page, that might be cool. But, can be completely separate from the "paper minis" generator.
+
+## Inspiration
+
+- <https://www.youtube.com/watch?v=ehjWZRPq9JA>
+- Printable chess could be a good spin-off

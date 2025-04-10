@@ -375,5 +375,37 @@
 			Apply boolean union
 		</button>
 		<div id="svgcontainer_booleanunion"></div>
+
+		<!--  -->
+		<!--  -->
+		<!--  -->
+		<h2>Copy to Clipboard</h2>
+		<!--  -->
+		<!--  -->
+		<!--  -->
+
+		<script>
+			async function copyTextToClipboard(text) {
+				const blobText = new Blob([text], { type: "text/plain" });
+				const data = [
+					new ClipboardItem({
+						["text/plain"]: blobText,
+					}),
+				];
+				navigator.clipboard.write(data).then(
+					() => {},
+					() => {
+						alert("Copy to clipboard failed for some reason.");
+					}
+				);
+			}
+		</script>
+
+		<p>This serves as the "export" function... for now at least!</p>
+		<button
+			onClick="copyTextToClipboard(document.getElementById('svgcontainer_booleanunion').innerHTML)"
+		>
+			Copy to clipboard
+		</button>
 	</body>
 </html>
