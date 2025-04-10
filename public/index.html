@@ -15,6 +15,16 @@
 		<!-- IMAGE TRACING CLEANUP -->
 		<script type="text/javascript" src="/lib/pathseg.js"></script>
 		<script type="text/javascript" src="/lib/path-to-polygon.js"></script>
+		<!-- OFFSET PATH -->
+		<script src="/lib/bezier.js" type="text/javascript"></script>
+		<script
+			src="https://microsoft.github.io/maker.js/target/js/browser.maker.js"
+			type="text/javascript"
+		></script>
+		<script
+			src="https://danmarshall.github.io/svg-path-outline/browser/index.js"
+			type="text/javascript"
+		></script>
 		<!-- TODO: add offset path -->
 		<!-- TODO: add boolean addition -->
 	</head>
@@ -64,6 +74,7 @@
 			}
 		</script>
 
+		<!-- TODO: maybe just maybe use CSS filters to "preview" threshold changes? -->
 		<p>
 			Threshold
 			<input id="threshold" type="number" min="0" max="100" value="50" />
@@ -143,6 +154,14 @@
 		</p>
 		<div id="svgcontainer"></div>
 
+		<!--  -->
+		<!--  -->
+		<!--  -->
+		<h2>CLEANUP TRACE</h2>
+		<!--  -->
+		<!--  -->
+		<!--  -->
+
 		<script>
 			function cleanupTrace() {
 				/**
@@ -187,7 +206,6 @@
 			}
 		</script>
 
-		<h2>CLEANUP TRACE</h2>
 		<ul>
 			<li>Retain "foreground" elements only</li>
 			<li>Convert curves lines to straight lines</li>
@@ -195,15 +213,118 @@
 		<p><button onClick="cleanupTrace()">cleanupTrace()</button></p>
 		<div id="svgcontainer_cleanup"></div>
 
-		<h2 style="color: magenta">~~~WIP BELOW~~~</h2>
-		<h2 style="color: magenta">OFFSET PATH & BOOLEAN ADDITION</h2>
+		<!--  -->
+		<!--  -->
+		<!--  -->
+		<h2>PATH OFFSET</h2>
+		<!--  -->
+		<!--  -->
+		<!--  -->
+
+		<script>
+			/* https://danmarshall.github.io/svg-path-outline/ */
+			var spo = require("svg-path-outline");
+
+			function buildSvgNode(n, v) {
+				n = document.createElementNS("http://www.w3.org/2000/svg", n);
+				for (var p in v) n.setAttributeNS(null, p, v[p]);
+				return n;
+			}
+
+			function applyOffset(svgSource, svgDestContainer = null) {
+				let svgDest;
+				if (svgDestContainer !== null) {
+					svgDestContainer.innerHTML = svgSource.parentNode.innerHTML;
+					svgDest = svgDestContainer.querySelector("svg");
+				} else {
+					svgDest = svgSource;
+				}
+				const offset = getInputAsInt("offset");
+				// Remove any path elements from previous applications
+				const pathElems = svgDest.querySelectorAll("path");
+				for (const pathElem of pathElems) {
+					pathElem.remove();
+				}
+				// From each polygon element, generate an offset path element
+				const polygonElems = svgDest.querySelectorAll("polygon");
+				for (const polygonElem of polygonElems) {
+					const polygonData = polygonElem.getAttribute("points");
+					const outlineData = spo(polygonData, offset, { tagName: "polygon" });
+					const outlinePath = buildSvgNode("path", {
+						d: outlineData,
+						fill: "rgba(255,0,0,0.4)",
+					});
+					svgDest.appendChild(outlinePath);
+				}
+				/**
+				 * TODO: maybe modify the viewBox and the width and height of the SVG?
+				 * Otherwise, large offset values can result in cut-off shapes,
+				 * as the offset shape can expand beyond the original SVG bounds.
+				 *
+				 * Example, for 10 units offset...
+				 * go from viewBox "0 0 100 100", width 100, height 100,
+				 * to viewBox "-10 -10 110 110", width 120, height 120
+				 */
+			}
+		</script>
+
+		<script>
+			function convertOffsetPathsToPolygons(
+				svgSource,
+				svgDestContainer = null
+			) {
+				let svgDest;
+				if (svgDestContainer !== null) {
+					svgDestContainer.innerHTML = svgSource.parentNode.innerHTML;
+					svgDest = svgDestContainer.querySelector("svg");
+				} else {
+					svgDest = svgSource;
+				}
+				// Remove polygon elements, the "not offset" original shapes
+				const polygonElems = svgDest.querySelectorAll("polygon");
+				for (const polygonElem of polygonElems) {
+					polygonElem.remove();
+				}
+				// Convert the newly offset `path` nodes to `polygon`
+				convertPathsToPolygon(svgDest);
+			}
+		</script>
+
+		<p>
+			Offset:
+			<input id="offset" type="number" min="0" max="100" value="30" />
+		</p>
+		<button
+			onClick="applyOffset(document.querySelector('#svgcontainer_cleanup svg'), document.querySelector('#svgcontainer_offset')); convertOffsetPathsToPolygons(document.querySelector('#svgcontainer_offset svg'))"
+		>
+			Apply offset
+		</button>
+		<div id="svgcontainer_offset"></div>
+
+		<h2 style="color: magenta">OFFSET PATH</h2>
 
 		<script>
 			/**
 			 * TODO: look into path offset (not stroke?)
 			 * This looks promising: https://danmarshall.github.io/svg-path-outline/
 			 */
+		</script>
 
+		<p style="color: magenta">
+			Started on this. Demo below. Next step is probably integrating into this
+			main page.
+		</p>
+		<ul>
+			<li>
+				<a target="_blank" href="/toy-offset-and-addition"
+					>/toy-offset-and-addition</a
+				>
+			</li>
+		</ul>
+
+		<h2 style="color: magenta">BOOLEAN ADDITION</h2>
+
+		<script>
 			/**
 			 * TODO: look into boolean operations
 			 * Likely need to convert SVG paths to polygons first...
@@ -214,13 +335,11 @@
 		</script>
 
 		<p style="color: magenta">
-			Started on these. Demos below. Next step is probably integrating them into this main page.
+			Started on this. Demo below. Next step is probably integrating into this
+			main page.
 		</p>
-		<p>
-			<ul>
-				<li><a target="_blank" href="/toy-offset-and-addition">/toy-offset-and-addition</a></li>
-				<li><a target="_blank" href="/demo-bool-ops-02">/demo-bool-ops-02</a></li>
-			</ul>
-		</p>
+		<ul>
+			<li><a target="_blank" href="/demo-bool-ops-02">/demo-bool-ops-02</a></li>
+		</ul>
 	</body>
 </html>
