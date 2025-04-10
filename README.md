@@ -4,24 +4,16 @@ An attempt at making it easier to create printable paper miniatures.
 
 ## Next steps
 
-### Implement offset on traced path
-
-- [x] Test path offset in "toy" file, with two simple shapes
-  - Done in `toy-offset-and-addition.html`
-- [ ] Clean up offset path utilities
-- [ ] Add path offset step to main "index" file
-
-### Implement boolean addition on traced and offset path
-
-- [x] Test boolean addition in "toy" file, with two simple shapes
-  - Currently a work in progress, in `toy-offset-and-addition.html`
-  - Ended up splitting out to separate files while testing boolean operation libraries
-  - Settled on `polybool`, fruits of labour are in `demo-bool-ops-02.html`
-- [ ] Clean up boolean path addition utilities
-- [ ] Add boolean path addition step to main "index" file
+- [ ] Add "copy to clipboard" for final SVG
+  - Obvs not really the final svg yet... but it's a start
+- [ ] Consider layout for paper mini outline SVG
+  - Copying your offset-and-union'd SVG into Figma to play around seems right
 
 ### Explore path smoothing AFTER boolean addition
 
+- <https://www.smoothsvg.com/> is a starting point
+  - this was the first search result, could probably dive deeper
+- also this: <https://stackoverflow.com/a/28722732>
 - Want it to be easy to cut out the shapes
 - Path smoothing of some kind might help with that
 
