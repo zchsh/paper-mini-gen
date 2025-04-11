@@ -14,6 +14,7 @@ Next step is to make some final-layout-related steps _after_ the current boolean
   - Existing function `render-polygon-as-path-svg.js` renders `<path />` elements... we want to render `<polygon />` instead!
   - In general... seems like it'd be nice to get to `<polygon />` compatible lists of points at some point early in the process... and then use `render-polygon-as-svg.js` as an _optional_ way to preview the data that's been created.
   - Once this is done... could in theory start declaring actual consts, eg `polygonsTracedImage = ...`, and not have to write-into and read-from `<svg />` elements as is currently being done.
+  - 2025-04-11 at 17:29 - started in `render-polygon-points-string.js`
 
 - [ ] Write (or find) a function to flip a set of x,y points vertically (ie on the horizontal axis)
 - [ ] Create a new SVG with all your polygons to add
