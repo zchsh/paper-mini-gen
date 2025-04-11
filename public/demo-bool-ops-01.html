@@ -7,7 +7,10 @@
 			src="/lib/polybooljs-1.2.2/dist/polybool.js"
 		></script>
 		<script type="text/javascript" src="/lib/render-paths-string.js"></script>
-		<script type="text/javascript" src="/lib/render-polygon-as-svg.js"></script>
+		<script
+			type="text/javascript"
+			src="/lib/render-polygon-as-path-svg.js"
+		></script>
 		<script>
 			const poly1 = {
 				regions: [
@@ -47,10 +50,12 @@
 			function runUnion() {
 				const result = PolyBool.union(poly1, poly2);
 				console.log({ poly1, poly2, result });
-				document.getElementById("poly1").innerHTML = renderPolygonAsSvg(poly1);
-				document.getElementById("poly2").innerHTML = renderPolygonAsSvg(poly2);
+				document.getElementById("poly1").innerHTML =
+					renderPolygonAsPathSvg(poly1);
+				document.getElementById("poly2").innerHTML =
+					renderPolygonAsPathSvg(poly2);
 				document.getElementById("result").innerHTML =
-					renderPolygonAsSvg(result);
+					renderPolygonAsPathSvg(result);
 			}
 		</script>
 	</head>

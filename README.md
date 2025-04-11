@@ -6,12 +6,15 @@ An attempt at making it easier to create printable paper miniatures.
 
 Next step is to make some final-layout-related steps _after_ the current boolean addition
 
-- [ ] Convert the boolean-added shape to a polygon
-  - We'll need to boolean-add it again, so needs to be a polygon
-  - Is it already a polygon? Maybe this is already done?
-  - 2025-04-11 at 10:20 - we already have polygon _points_, but `render-polygon-as-svg` converts to a `<path />`... Maybe there's a way to render a `<polygon />` instead? This could simplify some upstream code too.
-- [ ] Write (or find) a function to create x,y points for a circular polygon, `n` number of sides
+- [x] Write (or find) a function to create x,y points for a circular polygon, `n` number of sides
   - Good candidate for tests etc
+  - 2025-04-11 at 17:17 - got the `toy-circular-polygon.html` file prototyped in, which uses `createCircularPolygon`
+
+- [ ] Write new function `render-polygon-as-svg.js`
+  - Existing function `render-polygon-as-path-svg.js` renders `<path />` elements... we want to render `<polygon />` instead!
+  - In general... seems like it'd be nice to get to `<polygon />` compatible lists of points at some point early in the process... and then use `render-polygon-as-svg.js` as an _optional_ way to preview the data that's been created.
+  - Once this is done... could in theory start declaring actual consts, eg `polygonsTracedImage = ...`, and not have to write-into and read-from `<svg />` elements as is currently being done.
+
 - [ ] Write (or find) a function to flip a set of x,y points vertically (ie on the horizontal axis)
 - [ ] Create a new SVG with all your polygons to add
   - Three circular polygons, for the base and stuff

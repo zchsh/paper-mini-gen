@@ -9,7 +9,7 @@
  * @param {*} polygon
  * @returns
  */
-function renderPolygonAsSvg(polygon) {
+function renderPolygonAsPathSvg(polygon) {
 	const maxCoords = polygon.regions.reduce(
 		(allMax, region) => {
 			const maxInRegion = region.reduce(

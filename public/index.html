@@ -28,7 +28,10 @@
 			src="/lib/polybooljs-1.2.2/dist/polybool.js"
 		></script>
 		<script type="text/javascript" src="/lib/render-paths-string.js"></script>
-		<script type="text/javascript" src="/lib/render-polygon-as-svg.js"></script>
+		<script
+			type="text/javascript"
+			src="/lib/render-polygon-as-path-svg.js"
+		></script>
 	</head>
 	<body>
 		<!--  -->
@@ -336,7 +339,7 @@
 				 */
 				const unionPolygonObj = unionPolygonObjects(polygonObjs);
 				/**
-				 * TODO: renderPolygonAsSvg should be refactored.
+				 * TODO: renderPolygonAsPathSvg should be refactored.
 				 * Part of it is inferring width and height of resulting SVG...
 				 * but may actually want to explicitly provide those!
 				 * Three different functions happening:
@@ -345,7 +348,7 @@
 				 * - renderPathsString() (... already implemented)
 				 * - renderSvg(pathsString) (... for markup and style decisions!)
 				 */
-				const unionSvg = renderPolygonAsSvg(unionPolygonObj);
+				const unionSvg = renderPolygonAsPathSvg(unionPolygonObj);
 				svgDestContainer.innerHTML = unionSvg;
 			}
 

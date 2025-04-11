@@ -7,7 +7,10 @@
 			src="/lib/polybooljs-1.2.2/dist/polybool.js"
 		></script>
 		<script type="text/javascript" src="/lib/render-paths-string.js"></script>
-		<script type="text/javascript" src="/lib/render-polygon-as-svg.js"></script>
+		<script
+			type="text/javascript"
+			src="/lib/render-polygon-as-path-svg.js"
+		></script>
 		<script>
 			// const poly1 = {
 			// 	regions: [
@@ -55,7 +58,7 @@
 				// render each polygon as a kinda debug
 				const polygonDebugContainer = document.getElementById("polygons");
 				/**
-				 * TODO: renderPolygonAsSvg should be refactored.
+				 * TODO: renderPolygonAsPathSvg should be refactored.
 				 * Part of it is inferring width and height of resulting SVG...
 				 * but may actually want to explicitly provide those!
 				 * Three different functions happening:
@@ -65,14 +68,14 @@
 				 * - renderSvg(pathsString) (... for markup and style decisions!)
 				 */
 				for (const polygonObj of polygonObjs) {
-					polygonDebugContainer.innerHTML += renderPolygonAsSvg(polygonObj);
+					polygonDebugContainer.innerHTML += renderPolygonAsPathSvg(polygonObj);
 				}
 				/**
 				 * Union of many shapes, as pulled from examples:
 				 * https://github.com/velipso/polybooljs?tab=readme-ov-file#advanced-example-1
 				 */
 				const unionPolygonObj = unionPolygonObjects(polygonObjs);
-				const unionSvg = renderPolygonAsSvg(unionPolygonObj);
+				const unionSvg = renderPolygonAsPathSvg(unionPolygonObj);
 				document.getElementById("result").innerHTML = unionSvg;
 			}
 

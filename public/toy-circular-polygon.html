@@ -8,7 +8,10 @@
 		></script>
 		<script type="text/javascript" src="/lib/get-input-as-int.js"></script>
 		<script type="text/javascript" src="/lib/render-paths-string.js"></script>
-		<script type="text/javascript" src="/lib/render-polygon-as-svg.js"></script>
+		<script
+			type="text/javascript"
+			src="/lib/render-polygon-as-path-svg.js"
+		></script>
 	</head>
 	<body>
 		<!--  -->
@@ -21,10 +24,21 @@
 
 		<script>
 			function renderCircularPolygon(targetContainer) {
-				const polygonPoints = createCircularPolygon(30, 8, [30, 30]);
+				const radius = getInputAsInt("radius");
+				/**
+				 * TODO: would be neat to programatically calculate the
+				 * number of points, based on some tolerance for "smoothness",
+				 * being the angle between different points.
+				 * Requires more math than I care to do right now.
+				 */
+				const numpoints = getInputAsInt("numpoints");
+				const polygonPoints = createCircularPolygon(radius, numpoints, [
+					radius + 10,
+					radius + 10,
+				]);
 				/**
 				 * TODO: in the case where there's exactly one region, we don't
-				 * really need the multi-region approach in renderPolygonAsSvg...
+				 * really need the multi-region approach in renderPolygonAsPathSvg...
 				 * Instead, we could join points into a `points` string
 				 * (space-separated array of comma-separated x,y pairs)
 				 * and render a simple polygon shape instead of a path.
@@ -32,14 +46,15 @@
 				 * In addition, we could probably improve the `viewBox` and bounds logic.
 				 * Remove padding, get the viewbox right.
 				 */
-				const svgString = renderPolygonAsSvg({ regions: [polygonPoints] });
+				const svgString = renderPolygonAsPathSvg({ regions: [polygonPoints] });
 				targetContainer.innerHTML = svgString;
 			}
 		</script>
-		<!-- <p>
-		 Radius:
-			<input id="radius" type="number" min="1" max="100" value="30" />
-		</p> -->
+		<p>
+			Radius:
+			<input type="number" id="radius" min="10" max="300" value="72" />
+			<input id="numpoints" type="number" min="1" max="100" value="48" />
+		</p>
 		<button
 			onClick="renderCircularPolygon(document.getElementById('demo-circular-polygon'))"
 		>
