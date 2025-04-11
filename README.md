@@ -9,6 +9,7 @@ Next step is to make some final-layout-related steps _after_ the current boolean
 - [ ] Convert the boolean-added shape to a polygon
   - We'll need to boolean-add it again, so needs to be a polygon
   - Is it already a polygon? Maybe this is already done?
+  - 2025-04-11 at 10:20 - we already have polygon _points_, but `render-polygon-as-svg` converts to a `<path />`... Maybe there's a way to render a `<polygon />` instead? This could simplify some upstream code too.
 - [ ] Write (or find) a function to create x,y points for a circular polygon, `n` number of sides
   - Good candidate for tests etc
 - [ ] Write (or find) a function to flip a set of x,y points vertically (ie on the horizontal axis)

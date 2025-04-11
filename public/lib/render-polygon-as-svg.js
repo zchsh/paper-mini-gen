@@ -28,6 +28,7 @@ function renderPolygonAsSvg(polygon) {
 		},
 		{ x: 0, y: 0 }
 	);
+	console.log({ maxCoords });
 	var svgString = `<svg style="margin-top:10px; margin-right:10px;margin-bottom:10px;background-color:#dddddd" width="${
 		maxCoords.x + 10
 	}" height="${maxCoords.y + 10}">`;

@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Toy - Circular Polygons</title>
+		<script
+			type="text/javascript"
+			src="/lib/create-circular-polygon.js"
+		></script>
+		<script type="text/javascript" src="/lib/get-input-as-int.js"></script>
+		<script type="text/javascript" src="/lib/render-paths-string.js"></script>
+		<script type="text/javascript" src="/lib/render-polygon-as-svg.js"></script>
+	</head>
+	<body>
+		<!--  -->
+		<!--  -->
+		<!--  -->
+		<h2>RENDER CIRCULAR POLYGON</h2>
+		<!--  -->
+		<!--  -->
+		<!--  -->
+
+		<script>
+			function renderCircularPolygon(targetContainer) {
+				const polygonPoints = createCircularPolygon(30, 8, [30, 30]);
+				/**
+				 * TODO: in the case where there's exactly one region, we don't
+				 * really need the multi-region approach in renderPolygonAsSvg...
+				 * Instead, we could join points into a `points` string
+				 * (space-separated array of comma-separated x,y pairs)
+				 * and render a simple polygon shape instead of a path.
+				 *
+				 * In addition, we could probably improve the `viewBox` and bounds logic.
+				 * Remove padding, get the viewbox right.
+				 */
+				const svgString = renderPolygonAsSvg({ regions: [polygonPoints] });
+				targetContainer.innerHTML = svgString;
+			}
+		</script>
+		<!-- <p>
+		 Radius:
+			<input id="radius" type="number" min="1" max="100" value="30" />
+		</p> -->
+		<button
+			onClick="renderCircularPolygon(document.getElementById('demo-circular-polygon'))"
+		>
+			Render polygon
+		</button>
+		<div id="demo-circular-polygon"></div>
+	</body>
+</html>
