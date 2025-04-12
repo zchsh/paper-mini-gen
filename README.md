@@ -10,11 +10,21 @@ Next step is to make some final-layout-related steps _after_ the current boolean
   - Good candidate for tests etc
   - 2025-04-11 at 17:17 - got the `toy-circular-polygon.html` file prototyped in, which uses `createCircularPolygon`
 
-- [ ] Write new function `render-polygon-as-svg.js`
-  - Existing function `render-polygon-as-path-svg.js` renders `<path />` elements... we want to render `<polygon />` instead!
+- [x] Consider writing new function `render-polygon-as-svg.js`
+  - Existing function `render-polygon-as-path-svg.js` renders `<path />` elements... we want to stick to polygons though?
   - In general... seems like it'd be nice to get to `<polygon />` compatible lists of points at some point early in the process... and then use `render-polygon-as-svg.js` as an _optional_ way to preview the data that's been created.
   - Once this is done... could in theory start declaring actual consts, eg `polygonsTracedImage = ...`, and not have to write-into and read-from `<svg />` elements as is currently being done.
   - 2025-04-11 at 17:29 - started in `render-polygon-points-string.js`
+  - 2025-04-11 at 17:39 - wait, unions could result in multiple closed shapes... but `<polygon />` can represent only a single closed shape, I think? I do need to worry about fill, and winding order... so rendering to `<path />` rather than `<polygon />` is not only _fine_, it's _necessary_.
+  - 2025-04-11 at 17:56 - Instead of worrying about what I'm _rendering_, I should just worry about the data format that'll be used throughout the process after the initial trace-and-polygonize. I think the `polygon` object format makes sense, where `polygon` is an array of `region` entries, and a `region` entry is an array of points. Exterior rings (filled shapes) and interior rings (holes) are distinguished by the clockwise-ness of their points. Exterior rings are counterclockwise, and interior rings are clockwise ([ref](https://datatracker.ietf.org/doc/html/rfc7946#section-3.1.6))
+
+- [ ] Write toy file for copying `<svg />`
+- [ ] Write toy file for copying `<svg />` with embedded image
+
+- [ ] Convert workflow so `<svg />` is a "render" step, not a middleman step
+  - First step that generates `polygon` data should store it in a `const`
+  - Subsequent steps should read from the previous step's `const`
+  - The use of `<svg />` elements should be a "render" or "preview" step not necessary for the whole page to work
 
 - [ ] Write (or find) a function to flip a set of x,y points vertically (ie on the horizontal axis)
 - [ ] Create a new SVG with all your polygons to add
