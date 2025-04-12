@@ -44,10 +44,11 @@ function renderPolygonsAsPathSvg(polygons, viewBox) {
 	 * Render the SVG string
 	 */
 	const [minX, minY, svgWidth, svgHeight] = viewBox;
-	var svgString = `<svg style="margin-top:10px; margin-right:10px;margin-bottom:10px;background-color:#dddddd" width="${svgWidth}" height="${svgHeight}" viewBox="${minX} ${minY} ${svgWidth} ${svgHeight}">`;
+	console.log({ minX, minY, svgWidth, svgHeight });
+	var svgString = `<svg width="${svgWidth}" height="${svgHeight}" viewBox="${minX} ${minY} ${svgWidth} ${svgHeight}">`;
 	svgString += pathStrings
 		.map((pathString) => {
-			return `<path stroke="black" fill-rule="nonzero" fill="yellow" stroke-width="2" d="${pathString}"/>`;
+			return `<path stroke="rgba(255,0,255,0.7)" fill-rule="nonzero" fill="rgba(255,0,255,0.3)" stroke-width="1" d="${pathString}"/>`;
 		})
 		.join("\n");
 	svgString += "</svg>";

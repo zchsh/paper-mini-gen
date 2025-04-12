@@ -10,55 +10,51 @@
 		<script src="/demo-flatten-svg/render-polygons-as-path-svg.js"></script>
 		<script>
 			function demoFlattenSvg() {
-				// Clone the "before" SVG
-				document.getElementById("svg_after_container").innerHTML =
-					document.getElementById("svg_before_container").innerHTML;
-				const svgElem = document.querySelector("#svg_after_container svg");
-				// Retain only the "foreground" paths.
+				// Define a function to remove nodes, so we can drop background shapes
 				function removeNodes(container, queryString) {
 					container.querySelectorAll(queryString).forEach((e) => e.remove());
 				}
-				removeNodes(svg_after_container, `path[fill="rgb(245,245,245)"]`);
+				// Select the source SVG element
+				const beforeSvgElem = document.querySelector(
+					"#svg_before_container svg"
+				);
 				/**
-				 * Flatten the `<path />` elements in the SVG
+				 * Note: we expect the source SVG element to have every `<path />`
+				 * within the SVG wrapped in a `<g>` element with a unique `id`.
+				 * During the flattening process, a single `<path />` can yield
+				 * multiple output `paths`, for example a complex shape with cutouts.
 				 *
-				 * TODO: flattening seems to work, yields arrays of points...
-				 * but doesn't seem to support complex shapes! All "regions" from
-				 * all "paths" are returned in a single flattened array of points,
-				 * it seems.
+				 * TODO: write a function that wraps every `<path />` in an SVG
+				 * in its own `<g>` element. Alternately...
 				 *
-				 * As far as I can tell, the `flattenSVG` library does not provide
-				 * any way to fix this. But, it does recognize "group IDs". So:
-				 *
-				 * - Wrap every individual `<path />` element in its own `<g id={idx}/>`
-				 * - Then, yields `paths` results with group id values
+				 * TODO: refactor `flatten-svg/dist` to meet your needs here, should
+				 * return paths grouped in some way by their source `<path />`,
+				 * rather than flattened into a single array. (This seems a bit)
 				 */
-				const paths = flattenSVG(svgElem);
+				// Flatten the SVG into an array of paths
+				const paths = flattenSVG(beforeSvgElem);
+				/**
+				 * Iterate over the returned paths
+				 */
 				const polygons = [];
 				let regions = [];
 				let currentGroupId = null;
 				for (const path of paths) {
 					const { groupId, points } = path;
-					if (
-						(typeof groupId === "string" && groupId === currentGroupId) ||
-						currentGroupId === null
-					) {
+					const isFirstIteration = currentGroupId === null;
+					const hasGroupId = typeof groupId === "string";
+					const hasGroupIdMatch = hasGroupId && groupId === currentGroupId;
+					if (isFirstIteration || hasGroupIdMatch) {
 						regions.push(points);
-						// if (currentGroupId === null) {
-						// 	// Special case for first iteration
-						// 	regions.push(points);
-						// } else {
-						// 	// Otherwise, adding to a group. All regions past the first one
-						// 	// are expected to be "holes". So, reverse the points, to
-						// 	// affect winding order. (Not actually sure this is fully
-						// 	// correct... but it works for my purposes!)
-						// 	regions.push(points.reverse());
-						// }
 					} else {
+						// Push the existing regions to a polygon
 						polygons.push({ regions });
+						// Reset regions, we're starting a new polygon
 						regions = [];
+						// Push the points from this path as a region in the new polygon
 						regions.push(points);
 					}
+					// Update the groupId
 					currentGroupId = groupId;
 				}
 				// Push the in-progress region (not yet pushed, cause there was no
@@ -66,8 +62,17 @@
 				polygons.push({ regions });
 				//
 				const svgString = renderPolygonAsPathSvg(polygons[3]);
-				const svgStringAll = renderPolygonsAsPathSvg(polygons);
-				document.getElementById("svg_after_container").innerHTML = svgString;
+
+				let viewBoxString = beforeSvgElem.getAttribute("viewBox");
+				if (!viewBoxString) {
+					const svgWidth = beforeSvgElem.getAttribute("width");
+					const svgHeight = beforeSvgElem.getAttribute("height");
+					viewBoxString = `0 0 ${svgWidth} ${svgHeight}`;
+				}
+				const viewBox = viewBoxString.split(" ").map((s) => parseFloat(s));
+
+				const svgStringAll = renderPolygonsAsPathSvg(polygons, viewBox);
+				// document.getElementById("svg_after_container").innerHTML = svgString;
 				document.getElementById("svg_afterall_container").innerHTML =
 					svgStringAll;
 			}
@@ -75,7 +80,7 @@
 	</head>
 	<body onload="demoFlattenSvg()">
 		<div style="display: flex">
-			<div id="svg_before_container">
+			<div id="svg_before_container" style="border: 1px solid gray">
 				<svg
 					width="344"
 					height="328"
@@ -135,9 +140,7 @@
 					></path> -->
 				</svg>
 			</div>
-
-			<div id="svg_after_container"></div>
-			<div id="svg_afterall_container"></div>
+			<div id="svg_afterall_container" style="border: 1px solid gray"></div>
 		</div>
 	</body>
 </html>
