@@ -23,7 +23,11 @@ Next step is to make some final-layout-related steps _after_ the current boolean
   - 2025-04-12 at 10:28 - took a bit of finagling, but have a manually copied in, hard-coded base64 dataUrl working! Still wanna get the `toy-copy-svg-with-embed.html` file set up so that it grabs the image source from the `#image-preview` `<img />` element's `src` property.
   - 2025-04-12 at 11:02 - got this working with image upload
 
-- [ ] Convert workflow so `<svg />` is a "render" step, not a middleman step
+- [ ] Covert `cleanupTrace()` workflow so `<svg />` is a "render" step, not a pass-the-data step
+  - Note that previous `ImageTracer` step seems to yield an SVG string... gonna leave that for now
+  - Docs on `ImageTracer` for later: <https://github.com/jankovicsandras/imagetracerjs>
+
+- [ ] Review full workflow so that `<svg />` is a "render" step, not a middleman step
   - First step that generates `polygon` data should store it in a `const`
   - Subsequent steps should read from the previous step's `const`
   - The use of `<svg />` elements should be a "render" or "preview" step not necessary for the whole page to work
@@ -41,13 +45,19 @@ Next step is to make some final-layout-related steps _after_ the current boolean
 
 ### Later
 
+#### Improve curved-to-straight-line conversion
+
+- Current algorithm grabs all the points, no nuance between the points of an arc
+- Maybe ideal scenario: same as now, but for any curved _segments_, convert to straight lines based on some _angle tolerance_
+  - This same "angle tolerance" principle is what i want for `create-circular-polygon` as well....
+
 #### Explore image masking
 
 - [ ] Would be nice to be able to mask image
   - Doing this in the `<svg>`-approved way probably makes sense
   - Use the offset mask, I think, same outline as what'll get cut out
 
-#### Explore path smoothing AFTER boolean addition
+#### Explore path smoothing after boolean addition
 
 - [ ] Explore path smoothing, so scissors-based cutout is easier
   - <https://www.smoothsvg.com/> is a starting point
