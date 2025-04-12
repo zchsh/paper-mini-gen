@@ -19,8 +19,9 @@ Next step is to make some final-layout-related steps _after_ the current boolean
   - 2025-04-11 at 17:56 - Instead of worrying about what I'm _rendering_, I should just worry about the data format that'll be used throughout the process after the initial trace-and-polygonize. I think the `polygon` object format makes sense, where `polygon` is an array of `region` entries, and a `region` entry is an array of points. Exterior rings (filled shapes) and interior rings (holes) are distinguished by the clockwise-ness of their points. Exterior rings are counterclockwise, and interior rings are clockwise ([ref](https://datatracker.ietf.org/doc/html/rfc7946#section-3.1.6))
 
 - [x] Write toy file for copying `<svg />`
-- [ ] Write toy file for copying `<svg />` with embedded image
+- [x] Write toy file for copying `<svg />` with embedded image
   - 2025-04-12 at 10:28 - took a bit of finagling, but have a manually copied in, hard-coded base64 dataUrl working! Still wanna get the `toy-copy-svg-with-embed.html` file set up so that it grabs the image source from the `#image-preview` `<img />` element's `src` property.
+  - 2025-04-12 at 11:02 - got this working with image upload
 
 - [ ] Convert workflow so `<svg />` is a "render" step, not a middleman step
   - First step that generates `polygon` data should store it in a `const`
