@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Toy - Copy SVG to clipboard</title>
+		<script
+			type="text/javascript"
+			src="/lib/copy-text-to-clipboard.js"
+		></script>
+	</head>
+	<body>
+		<div id="svgcontainer">
+			<svg
+				style="
+					margin-top: 10px;
+					margin-right: 10px;
+					margin-bottom: 10px;
+					background-color: #dddddd;
+				"
+				width="254.2856118"
+				height="267"
+			>
+				<path
+					stroke="black"
+					fill="yellow"
+					stroke-width="2"
+					d="M244.2856118, 88.9920863L243.2856118, 84.4920863L220.5079137, 61.7143882L216.0079137, 60.7143882L200.69326706875881, 61.9563416431067L197.0668278, 57.4952224L197.0646229, 57.4941556L181.5690327, 49.9962894L157.9662968, 48.9101247L149.9662968, 51.9101247L135.3716821, 63.6119666L127.8716821, 75.1119666L125.53577506561193, 89.01481851745615L125.5, 89L105.5, 89L84.2850646, 97.7885287L82.7885287, 99.2850646L74, 120.5L74, 133.5L82.7867966, 154.7132034L82.7885294, 154.7149361L84.2850646, 156.2114713L105.5, 165L119, 165L119, 225.5L127.7885294, 246.7149361L129.2850646, 248.2114713L150.5, 257L164.5, 257L170, 256.4915242L175.5, 257L189.5, 257L210.7149361, 248.2114706L212.2114713, 246.7149354L221, 225.5L221, 196.3771551L234.1872842, 164.0644077L224.61769790333113, 123.79239870151855L241.8543007, 109.1417203L242.8543007, 106.6417203Z"
+				></path>
+			</svg>
+		</div>
+		<button
+			onClick="copyTextToClipboard(document.getElementById('svgcontainer').innerHTML)"
+		>
+			Copy SVG to clipboard
+		</button>
+	</body>
+</html>
