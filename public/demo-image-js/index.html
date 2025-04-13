@@ -1,9 +1,11 @@
+<!DOCTYPE html>
 <html>
 	<head>
 		<!-- https://www.lactame.com/lib/image-js/0.21.2/image.min.js -->
-		<script type="text/javascript" src="/lib/image.min.js"></script>
-		<script type="text/javascript" src="/lib/get-input-as-int.js"></script>
-		<script type="text/javascript" src="/lib/apply-threshold.js"></script>
+		<script src="/demo-image-js/image.min.js"></script>
+		<script src="/demo-image-js/get-input-as-int.js"></script>
+		<script src="/demo-image-js/apply-threshold.js"></script>
+		<script src="/demo-image-js/get-fallback-threshold.js"></script>
 	</head>
 	<body>
 		<p>OPTIONS</p>
@@ -16,10 +18,11 @@
 			<input id="radius" type="number" min="1" max="100" value="1" />
 		</p>
 		<p><button onClick="processImage()">Adjust Image</button></p>
-		<img
+		<!-- <img
 			id="raw-image"
 			src="https://www.lactame.com/github/image-js/image-js/3073b80c7d626196cb669f9d617f491a8338ca66/test/img/taxi/original.jpeg"
-		/>
+		/> -->
+		<img id="raw-image" src="/sample-char-art-00-large.jpeg" />
 		<img id="processed-image" />
 
 		<script>
@@ -27,7 +30,10 @@
 				// Load the original raw image from a source element
 				const imgElem = document.getElementById("raw-image");
 				// Gather optional settings
-				const threshold = getInputAsInt("threshold") / 100;
+				const thresholdInput = getInputAsInt("threshold") / 100;
+				// TODO: grab
+				const thresholdFallback = await getFallbackThreshold(imgElem.src);
+				const threshold = thresholdInput || thresholdFallback;
 				const radius = getInputAsInt("radius");
 				// Proces the image
 				const processedSrc = await applyThreshold(
