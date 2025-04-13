@@ -71,6 +71,7 @@ Next step is to make some final-layout-related steps _after_ the current boolean
   - also this: <https://stackoverflow.com/a/28722732>
   - Want it to be easy to cut out the shapes
   - Path smoothing of some kind might help with that
+  - 2025-04-13 at 18:05 - stubbedin `demo-smooth-to-polyline`
 
 #### Revisit image processing
 

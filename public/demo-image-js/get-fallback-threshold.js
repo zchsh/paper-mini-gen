@@ -1,11 +1,11 @@
-function getLuminosity(rgbaValues) {
-	const [R, G, B, A] = rgbaValues;
-	const rgbLuminosity = 0.2126 * R + 0.7152 * G + 0.0722 * B;
-	return (rgbLuminosity * (A / 255.0)) / 2.55;
-}
-
 async function getFallbackThreshold(imgSrc) {
 	let image = await IJS.Image.load(imgSrc);
+	const cornerPixels = getCornerPixels(image);
+	const THRESHOLD_BUFFER = 15;
+	return getApproxBackgroundLuminosity(cornerPixels) - THRESHOLD_BUFFER;
+}
+
+function getCornerPixels(image) {
 	const width = image.width;
 	const height = image.height;
 	const lastX = width - 1;
@@ -19,27 +19,24 @@ async function getFallbackThreshold(imgSrc) {
 	const cornerPixels = cornerPixelsCoords.map(([x, y]) => {
 		return image.getPixelXY(x, y);
 	});
-	const cornerLuminosities = cornerPixels.map((p) => getLuminosity(p));
-	/**
-	 * TODO:
-	 * - filter out any invalid corner luminosities (must be number, not NaN)
-	 * - get average of two _max_ valid corner luminosities (assume light mode)
-	 * - subtract... 15 maybe? (100 → 85)
-	 * - return as the fallback
-	 */
-	console.log({ cornerPixels, cornerLuminosities });
-	return 80;
-	// return (
-	// 	image
-	// 		// Pad the image, to avoid blur issues near image boundaries
-	// 		.pad({ size: radius * 2, algorithm: "set", color: [255, 255, 255, 255] })
-	// 		// Apply the blur
-	// 		.gaussianFilter({ radius })
-	// 		// Convert to grayscale
-	// 		.grey()
-	// 		// Convert to black-and-white using a threshold mask
-	// 		.mask({ threshold })
-	// 		// Cast to a data URL that can be used as an <img> src
-	// 		.toDataURL()
-	// );
+	return cornerPixels;
+}
+
+function getApproxBackgroundLuminosity(cornerPixels) {
+	const cornerLuminosities = [...cornerPixels, [128, 128, 128, 255]]
+		.map((p) => getLuminosity(p))
+		.filter((l) => typeof l === "number" && !isNaN(l))
+		.sort();
+	const cornerLuminositiesTwoLargest = cornerLuminosities.slice(0, 2);
+	const cornerLuminositiesAverage =
+		cornerLuminositiesTwoLargest.reduce((acc, entry) => {
+			return acc + entry;
+		}, 0) / cornerLuminositiesTwoLargest.length;
+	return cornerLuminositiesAverage;
+}
+
+function getLuminosity(rgbaValues) {
+	const [R, G, B, A] = rgbaValues;
+	const rgbLuminosity = 0.2126 * R + 0.7152 * G + 0.0722 * B;
+	return (rgbLuminosity * (A / 255.0)) / 2.55;
 }

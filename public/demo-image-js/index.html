@@ -2,38 +2,27 @@
 <html>
 	<head>
 		<!-- https://www.lactame.com/lib/image-js/0.21.2/image.min.js -->
+		<!-- IMAGE UPLOAD  -->
+		<script src="/demo-image-js/on-image-selection.js"></script>
 		<script src="/demo-image-js/image.min.js"></script>
 		<script src="/demo-image-js/get-input-as-int.js"></script>
 		<script src="/demo-image-js/apply-threshold.js"></script>
 		<script src="/demo-image-js/get-fallback-threshold.js"></script>
-	</head>
-	<body>
-		<p>OPTIONS</p>
-		<p>
-			Threshold
-			<input id="threshold" type="number" min="0" max="100" value="50" />
-		</p>
-		<p>
-			Radius
-			<input id="radius" type="number" min="1" max="100" value="1" />
-		</p>
-		<p><button onClick="processImage()">Adjust Image</button></p>
-		<!-- <img
-			id="raw-image"
-			src="https://www.lactame.com/github/image-js/image-js/3073b80c7d626196cb669f9d617f491a8338ca66/test/img/taxi/original.jpeg"
-		/> -->
-		<img id="raw-image" src="/sample-char-art-00-large.jpeg" />
-		<img id="processed-image" />
-
+		<script>
+			function resetSettings() {
+				document.getElementById("threshold").value = 0;
+				document.getElementById("radius").value = 5;
+			}
+		</script>
 		<script>
 			async function processImage() {
 				// Load the original raw image from a source element
 				const imgElem = document.getElementById("raw-image");
 				// Gather optional settings
 				const thresholdInput = getInputAsInt("threshold") / 100;
-				// TODO: grab
-				const thresholdFallback = await getFallbackThreshold(imgElem.src);
-				const threshold = thresholdInput || thresholdFallback;
+				const thresholdAuto = (await getFallbackThreshold(imgElem.src)) / 100.0;
+				const threshold = thresholdInput || thresholdAuto;
+				console.log({ thresholdAuto, thresholdInput, threshold });
 				const radius = getInputAsInt("radius");
 				// Proces the image
 				const processedSrc = await applyThreshold(
@@ -45,5 +34,39 @@
 				document.getElementById("processed-image").src = processedSrc;
 			}
 		</script>
+	</head>
+	<body onload="resetSettings(); processImage()">
+		<!--  -->
+		<!--  -->
+		<!--  -->
+		<h2>IMAGE PROCESSING</h2>
+		<!--  -->
+		<!--  -->
+		<!--  -->
+
+		<p>
+			<input
+				type="file"
+				id="image-input"
+				accept="image/png, image/jpeg"
+				onchange="onImageSelection(this, 'raw-image', () => {
+					processImage()
+				})"
+			/>
+		</p>
+		<p>
+			Threshold (zero means auto)
+			<input id="threshold" type="number" min="0" max="100" value="0" />
+		</p>
+		<p>
+			Radius
+			<input id="radius" type="number" min="1" max="100" value="5" />
+		</p>
+		<p><button onClick="processImage()">Apply silhouette</button></p>
+
+		<div style="display: flex; align-items: center">
+			<img id="raw-image" src="/sample-char-art-00-large.jpeg" />
+			<img id="processed-image" />
+		</div>
 	</body>
 </html>
