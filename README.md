@@ -23,7 +23,7 @@ Next step is to make some final-layout-related steps _after_ the current boolean
   - 2025-04-12 at 10:28 - took a bit of finagling, but have a manually copied in, hard-coded base64 dataUrl working! Still wanna get the `toy-copy-svg-with-embed.html` file set up so that it grabs the image source from the `#image-preview` `<img />` element's `src` property.
   - 2025-04-12 at 11:02 - got this working with image upload
 
-- [ ] Continue work on `demo-image-js` file
+- [x] Continue work on `demo-image-js` file
   - In particular, finish implementing `get-fallback-threshold`
   - Add image upload to this demo
   - Immediately after an image is uploaded, start with new "fallback threshold"
