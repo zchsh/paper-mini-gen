@@ -23,7 +23,7 @@ async function getFallbackThreshold(imgSrc) {
 	/**
 	 * TODO:
 	 * - filter out any invalid corner luminosities (must be number, not NaN)
-	 * - get average of valid corner luminosities
+	 * - get average of two _max_ valid corner luminosities (assume light mode)
 	 * - subtract... 15 maybe? (100 → 85)
 	 * - return as the fallback
 	 */
