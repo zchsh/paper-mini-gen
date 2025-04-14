@@ -23,7 +23,7 @@ function getCornerPixels(image) {
 }
 
 function getApproxBackgroundLuminosity(cornerPixels) {
-	const cornerLuminosities = [...cornerPixels, [128, 128, 128, 255]]
+	const cornerLuminosities = [...cornerPixels]
 		.map((p) => getLuminosity(p))
 		.filter((l) => typeof l === "number" && !isNaN(l))
 		.sort();
@@ -38,5 +38,7 @@ function getApproxBackgroundLuminosity(cornerPixels) {
 function getLuminosity(rgbaValues) {
 	const [R, G, B, A] = rgbaValues;
 	const rgbLuminosity = 0.2126 * R + 0.7152 * G + 0.0722 * B;
-	return (rgbLuminosity * (A / 255.0)) / 2.55;
+	// If we have full transparency, we should treat that as pure white
+	const transparentLuminosity = 255 - A;
+	return Math.max(rgbLuminosity, transparentLuminosity) / 2.55;
 }

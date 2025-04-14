@@ -10,7 +10,7 @@
 		<script src="/demo-image-js/get-fallback-threshold.js"></script>
 		<script>
 			function resetSettings() {
-				document.getElementById("threshold").value = 0;
+				document.getElementById("threshold").value = 100;
 				document.getElementById("radius").value = 5;
 			}
 		</script>
@@ -19,15 +19,22 @@
 				// Load the original raw image from a source element
 				const imgElem = document.getElementById("raw-image");
 				// Gather optional settings
-				const thresholdInput = getInputAsInt("threshold") / 100;
-				const thresholdAuto = (await getFallbackThreshold(imgElem.src)) / 100.0;
-				const threshold = thresholdInput || thresholdAuto;
-				console.log({ thresholdAuto, thresholdInput, threshold });
+				const thresholdInput = getInputAsInt("threshold");
+				const useAuto = thresholdInput === 100;
+				const thresholdAuto = await getFallbackThreshold(imgElem.src);
+				const threshold = useAuto ? thresholdAuto : thresholdInput;
 				const radius = getInputAsInt("radius");
-				// Proces the image
+				// Process the image
+				/**
+				 * TODO: for transparent images,
+				 * apply a white background before processing.
+				 *
+				 * Maybe helpful link:
+				 * https://github.com/image-js/image-js/issues/485#issuecomment-508472868
+				 */
 				const processedSrc = await applyThreshold(
 					imgElem.src,
-					threshold,
+					threshold / 100.0,
 					radius
 				);
 				// Load the image into a destination element
@@ -54,18 +61,19 @@
 				})"
 			/>
 		</p>
+		<h3>Tweaks</h3>
 		<p>
-			Threshold (zero means auto)
-			<input id="threshold" type="number" min="0" max="100" value="0" />
+			Threshold (100 means auto)
+			<input id="threshold" type="number" min="0" max="100" value="100" />
 		</p>
 		<p>
 			Radius
 			<input id="radius" type="number" min="1" max="100" value="5" />
 		</p>
-		<p><button onClick="processImage()">Apply silhouette</button></p>
+		<p><button onClick="processImage()">Apply tweaks</button></p>
 
 		<div style="display: flex; align-items: center">
-			<img id="raw-image" src="/sample-char-art-00-large.jpeg" />
+			<img id="raw-image" src="/sample-taxi-transparent.png" />
 			<img id="processed-image" />
 		</div>
 	</body>
