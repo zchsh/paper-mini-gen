@@ -22,10 +22,12 @@
 				const thresholdInput = getInputAsInt("threshold");
 				const useAuto = thresholdInput === 100;
 				/**
-				 * TODO: for transparent images,
-				 * apply a white background before processing.
+				 * TODO (later): for transparent images,
+				 * somehow apply a white background before processing?
 				 * This should happen before auto-threshold, and before
 				 * applyThreshold as well.
+				 *
+				 * Until then, only support `.jpg`, not `.png`?
 				 *
 				 * Maybe helpful link:
 				 * https://github.com/image-js/image-js/issues/485#issuecomment-508472868
