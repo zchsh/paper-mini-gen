@@ -51,6 +51,14 @@ Next step is to make some final-layout-related steps _after_ the current boolean
 
 ### Later
 
+#### Use JavaScript modules
+
+- <https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Modules>
+
+#### Stub in documentation
+
+- <https://documentation.js.org/>
+
 #### Improve curved-to-straight-line conversion
 
 - Current algorithm grabs all the points, no nuance between the points of an arc

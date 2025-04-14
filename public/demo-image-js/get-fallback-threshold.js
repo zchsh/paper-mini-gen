@@ -1,6 +1,5 @@
-async function getFallbackThreshold(imgSrc) {
-	let image = await IJS.Image.load(imgSrc);
-	const cornerPixels = getCornerPixels(image);
+async function getFallbackThreshold(loadedImage) {
+	const cornerPixels = getCornerPixels(loadedImage);
 	const THRESHOLD_BUFFER = 15;
 	return getApproxBackgroundLuminosity(cornerPixels) - THRESHOLD_BUFFER;
 }
@@ -35,10 +34,14 @@ function getApproxBackgroundLuminosity(cornerPixels) {
 	return cornerLuminositiesAverage;
 }
 
+/**
+ * NOTE: we don't handle luminosity for transparent images.
+ *
+ * @param {*} rgbaValues
+ * @returns
+ */
 function getLuminosity(rgbaValues) {
 	const [R, G, B, A] = rgbaValues;
 	const rgbLuminosity = 0.2126 * R + 0.7152 * G + 0.0722 * B;
-	// If we have full transparency, we should treat that as pure white
-	const transparentLuminosity = 255 - A;
-	return Math.max(rgbLuminosity, transparentLuminosity) / 2.55;
+	return rgbLuminosity / 2.55;
 }

@@ -2,13 +2,12 @@
  * Given an image source, a threshold value, and a blur radius value,
  * Return a processed image source.
  *
- * @param {string} imgSrc
+ * @param {*} image Image object loaded with imageJS
  * @param {number} threshold
  * @param {number} radius
  * @returns {string}
  */
-async function applyThreshold(imgSrc, threshold, radius) {
-	let image = await IJS.Image.load(imgSrc);
+async function applyThreshold(image, threshold, radius) {
 	return (
 		image
 			// Pad the image, to avoid blur issues near image boundaries

@@ -21,19 +21,22 @@
 				// Gather optional settings
 				const thresholdInput = getInputAsInt("threshold");
 				const useAuto = thresholdInput === 100;
-				const thresholdAuto = await getFallbackThreshold(imgElem.src);
-				const threshold = useAuto ? thresholdAuto : thresholdInput;
-				const radius = getInputAsInt("radius");
-				// Process the image
 				/**
 				 * TODO: for transparent images,
 				 * apply a white background before processing.
+				 * This should happen before auto-threshold, and before
+				 * applyThreshold as well.
 				 *
 				 * Maybe helpful link:
 				 * https://github.com/image-js/image-js/issues/485#issuecomment-508472868
 				 */
+				let image = await IJS.Image.load(imgElem.src);
+				const thresholdAuto = await getFallbackThreshold(image);
+				const threshold = useAuto ? thresholdAuto : thresholdInput;
+				const radius = getInputAsInt("radius");
+				// Process the image
 				const processedSrc = await applyThreshold(
-					imgElem.src,
+					image,
 					threshold / 100.0,
 					radius
 				);
@@ -73,7 +76,7 @@
 		<p><button onClick="processImage()">Apply tweaks</button></p>
 
 		<div style="display: flex; align-items: center">
-			<img id="raw-image" src="/sample-taxi-transparent.png" />
+			<img id="raw-image" src="/sample-char-art-01-small.jpeg" />
 			<img id="processed-image" />
 		</div>
 	</body>
