@@ -91,7 +91,7 @@ function traceExecute(imgElemId, svgContainerId) {
 			colorsampling: 0,
 			colorquantcycles: 1,
 			strokewidth: 0,
-			roundcoords: 2,
+			roundcoords: 3,
 			/**
 			 * Set a custom palette, of:
 			 * - black (foreground shapes)

@@ -7,10 +7,11 @@
 		<script src="/js-modules/modules/03-trace/imagetracer_v1.2.6.js"></script>
 		<!-- TRACE CLEANUP -->
 		<script src="/js-modules/modules/03-trace/flatten-svg/path-data-polyfill.js"></script>
-		<!-- TODO: the three scripts below this comment could be modules -->
+		<!-- TODO: the TRACE CLEANUP scripts below this comment could be modules -->
 		<script src="/js-modules/modules/03-trace/flatten-svg/svg-to-paths.js"></script>
-		<script src="/js-modules/modules/03-trace/render-paths-string.js"></script>
 		<script src="/js-modules/modules/03-trace/render-polygons-as-path-svg.js"></script>
+		<!-- OFFSET -->
+		<!-- TODO: add scripts -->
 		<!-- main module -->
 		<script type="module" src="/js-modules/main.js"></script>
 		<!-- main execution -->
@@ -57,7 +58,7 @@
 			<img id="processed-image" />
 		</div>
 
-		<h3>Tweaks</h3>
+		<h3>Silhouette tweaks</h3>
 		<p>
 			Threshold (100 means auto)
 			<input id="threshold" type="number" min="0" max="100" value="100" />
@@ -67,22 +68,35 @@
 			<input id="radius" type="number" min="1" max="100" value="5" />
 		</p>
 		<p>
-			<button onClick="runAll()">Apply tweaks</button>
+			<button onClick="runAll()">Apply silhouette tweaks</button>
 		</p>
 
 		<!--  -->
 		<!--  -->
 		<!--  -->
-		<h2 style="color: magenta">TRACE</h2>
+		<h2>TRACE</h2>
 		<!--  -->
 		<!--  -->
 		<!--  -->
 
 		<div id="trace-svg"></div>
-		<h3>Tweaks</h3>
+		<h3>Trace tweaks</h3>
 		<p>Path omit: <input id="pathomit" type="number" min="0" value="30" /></p>
 		<p>
-			<button onClick="runAll()">Apply tweaks</button>
+			<button onClick="runAll()">Apply trace tweaks</button>
+		</p>
+
+		<!--  -->
+		<!--  -->
+		<!--  -->
+		<h2 style="color: magenta">OFFSET</h2>
+		<!--  -->
+		<!--  -->
+		<!--  -->
+
+		<p>
+			TODO: add offset, based on
+			<a href="/toy-offset-and-addition">/toy-offset-and-addition</a>
 		</p>
 	</body>
 </html>

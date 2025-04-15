@@ -11,6 +11,7 @@ Next step is to keep working on `js-modules` setup.
   - Note that previous `ImageTracer` step seems to yield an SVG string... gonna leave that for now
   - Docs on `ImageTracer` for later: <https://github.com/jankovicsandras/imagetracerjs>
   - This step should yield a set of regions compatible with `<polygon />` shapes
+
 - [ ] Add `04-offset` step to `js-modules` setup
   - Takes the traced silhouette as input
   - In this step, the traced polygon(s) should have their paths offset
@@ -18,6 +19,7 @@ Next step is to keep working on `js-modules` setup.
   - The offset tool I'm using yields paths with curves... these need to be flattened
   - `demo-flatten-svg` was my latest bit of work and exploration on the flattening front
   - This step should yield a set of regions compatible with `<polygon />` shapes
+
 - [ ] Add `05-arrange` step to `js-modules` setup
   - Takes the offset silhouette polygons as input
   - Should add three circular polygons, for the base and stuff
@@ -25,17 +27,20 @@ Next step is to keep working on `js-modules` setup.
   - Two of your boolean-offset polygons, one of the flipped vertically
   - [ ] Write (or find) a function to flip a set of x,y points vertically (ie on the horizontal axis)
   - This step should yield a set of regions compatible with `<polygon />` shapes
+
 - [ ] Add `06-union` step to `js-modules` setup
   - Takes the arranges polygon-compatible shapes as input
   - Executes a boolean addition on all the input shapes
   - This step should yield a set of regions compatible with `<polygon />` shapes
   - This step yields the outline of the paper mini (ideally one shape, may be more than one)
-    - Could grab the largest area shape?
+    - Could grab the largest area shape? Meh, many shapes is fine. Can use small feature filter at `trace` stage.
+
 - [ ] Add `07-layout` step to `js-modules` setup
   - Takes the set of points for the outline of the paper mini as input
   - Renders those points into an SVG (note, may have cutout regions, will use `<path />`)
   - Embeds the original image into the SVG, at the correct position (and z-index!)
   - This step should yield SVG artwork
+
 - [ ] Add `08-export` step to `js-modules` setup
   - Allow copying the final SVG to the clipboard (paste into Figma!)
 
