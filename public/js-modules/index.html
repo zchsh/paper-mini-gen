@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<!-- IMAGE-JS - could try to figure out how to include as a module? -->
+		<script src="/js-modules/modules/02-silhouette/image.min.js"></script>
+		<script type="module" src="/js-modules/main.js"></script>
+	</head>
+	<body onload="traceResetSettings(); traceExecute()">
+		<!--  -->
+		<!--  -->
+		<!--  -->
+		<h2>UPLOAD</h2>
+		<!--  -->
+		<!--  -->
+		<!--  -->
+
+		<p>
+			<input
+				type="file"
+				id="image-input"
+				accept="image/png, image/jpeg"
+				onchange="onImageSelection(this, 'raw-image', () => {
+					traceExecute()
+				})"
+			/>
+		</p>
+
+		<!--  -->
+		<!--  -->
+		<!--  -->
+		<h2>SILHOUETTE</h2>
+		<!--  -->
+		<!--  -->
+		<!--  -->
+
+		<div style="display: flex; align-items: center">
+			<img id="raw-image" src="/sample-char-art-01-small.jpeg" />
+			<img id="processed-image" />
+		</div>
+
+		<h3>Tweaks</h3>
+		<p>
+			Threshold (100 means auto)
+			<input id="threshold" type="number" min="0" max="100" value="100" />
+		</p>
+		<p>
+			Radius
+			<input id="radius" type="number" min="1" max="100" value="5" />
+		</p>
+		<p><button onClick="traceExecute()">Apply tweaks</button></p>
+	</body>
+</html>

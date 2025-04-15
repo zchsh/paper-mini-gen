@@ -51,6 +51,17 @@ Next step is to make some final-layout-related steps _after_ the current boolean
 
 ### Later
 
+#### Support transparent images
+
+- one approach is make a threshold mask based on the alpha channel, then apply that mask
+- eg <https://github.com/image-js/image-js?tab=readme-ov-file#paint-a-mask>
+- tried before with `sample-taxi-transparent.png`, in `demo-image-js`
+- may be worth exploring alternatives to `image-js`... (?)
+
+#### Update image-js version
+
+- currently on `0.37.0` ish - <https://github.com/image-js/image-js>
+
 #### Use JavaScript modules
 
 - <https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Modules>
