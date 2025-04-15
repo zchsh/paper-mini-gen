@@ -1,13 +1,16 @@
 <!DOCTYPE html>
 <html>
 	<head>
-		<!-- IMAGE-JS - could try to figure out how to include as a module? -->
+		<!-- SILHOUETTE - could try to figure out how to include as a module? -->
 		<script src="/js-modules/modules/02-silhouette/image.min.js"></script>
-		<!-- IMAGE-TRACER - could try to figure out how to include as a module? -->
+		<!-- TRACE - could try to figure out how to include as a module? -->
 		<script src="/js-modules/modules/03-trace/imagetracer_v1.2.6.js"></script>
-		<!-- TODO: can the below be made into modules? -->
-		<script src="/js-modules/modules/03-trace/pathseg.js"></script>
-		<script src="/js-modules/modules/03-trace/path-to-polygon.js"></script>
+		<!-- TRACE CLEANUP -->
+		<script src="/js-modules/modules/03-trace/flatten-svg/path-data-polyfill.js"></script>
+		<!-- TODO: the three scripts below this comment could be modules -->
+		<script src="/js-modules/modules/03-trace/flatten-svg/svg-to-paths.js"></script>
+		<script src="/js-modules/modules/03-trace/render-paths-string.js"></script>
+		<script src="/js-modules/modules/03-trace/render-polygons-as-path-svg.js"></script>
 		<!-- main module -->
 		<script type="module" src="/js-modules/main.js"></script>
 		<!-- main execution -->

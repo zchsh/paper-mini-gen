@@ -27,6 +27,12 @@ async function silhouetteExecute(imgSrcId, imgDestId) {
 	const inputElem = document.getElementById(imgSrcId);
 	const outputElem = document.getElementById(imgDestId);
 	// Execute
+	/**
+	 * TODO: should maybe pad the silhouette image extra?
+	 * That way, we'd account for `offset` in one go.
+	 * Might make later calculations related to placing the original
+	 * image correctly a little easier.
+	 */
 	outputElem.src = await processImage(inputElem.src, radius, threshold);
 }
 window.silhouetteExecute = silhouetteExecute;
@@ -34,14 +40,15 @@ window.silhouetteExecute = silhouetteExecute;
 /**
  * TRACE
  *
- * TODO: in `doneTracingCallback`, should take the SVG string, and parse out
- * the path's points somehow... and flatten and get polygon points?
- * Then return the points from the function, so they can be passed
- * to whatever other utilities come up?
- *
  * TODO: improve curve flattening.
  * Have `demo-flatten-svg` for this.
- * Use 00 example.
+ * Note that flattenSvg takes in an SVG element.
+ * So, probably fine to keep existing workflow of writing to SVG element.
+ *
+ * If you ever get concerned about visible thrash, you could
+ * run the whole process in a hidden SVG element, I think... falttenSvg
+ * seems to walk the DOM, doesn't seem to rely on the element being
+ * visibly rendered.
  */
 function traceExecute(imgElemId, svgContainerId) {
 	console.log("traceExecute");
@@ -121,21 +128,61 @@ function cleanupTrace(svgContainerElem) {
 	/**
 	 * Convert the foreground paths, which may include curves,
 	 * to polygons, which will consist of straigh lines only.
-	 *
-	 * The current approach is swiped from:
-	 * https://betravis.github.io/shape-tools/path-to-polygon/
-	 *
-	 * That being said, it doesn't seem to do _any_ sampling along
-	 * curves... instead it only keeps the control points. Maybe
-	 * it'd be possible to improve the tracing further by combining
-	 * the "retain all control points" approach with a
-	 * "sample along the line" approach... perhaps sampling along
-	 * the line only for curved segments? This is a deep dive though,
-	 * and certainly not something I intend to try to tackle at this time.
-	 * More the sample-along-the-line approach:
-	 * https://phrogz.net/SVG/convert_path_to_polygon.xhtml
-	 * And there's a very naive implementation in:
-	 * `basic-point-at-length.html` (in this repo)
 	 */
-	convertPathsToPolygon(svgContainerElem.querySelector("svg"));
+	// Flatten the SVG into an array of paths
+	const svgElem = svgContainerElem.querySelector("svg");
+	const paths = flattenSVG(svgElem);
+	/**
+	 * Iterate over the returned paths,
+	 * to produce an array of polygons.
+	 * Each polygon may have many regions (eg shapes with cutouts).
+	 *
+	 * Regions may mean filled or un-filled areas, something to do with
+	 * winding order, I don't fully get it but so far it works...
+	 */
+	const polygons = [];
+	let regions = [];
+	let currentGroupId = null;
+	for (const path of paths) {
+		/**
+		 * TODO: is groupId still needed here?
+		 * Have not implemented any kind of group assignment...
+		 * But somehow things still seem to work?
+		 */
+		const { groupId, points } = path;
+		const isFirstIteration = currentGroupId === null;
+		const hasGroupId = typeof groupId === "string";
+		const hasGroupIdMatch = hasGroupId && groupId === currentGroupId;
+		if (isFirstIteration || hasGroupIdMatch) {
+			regions.push(points);
+		} else {
+			// Push the existing regions to a polygon
+			polygons.push({ regions });
+			// Reset regions, we're starting a new polygon
+			regions = [];
+			// Push the points from this path as a region in the new polygon
+			regions.push(points);
+		}
+		// Update the groupId
+		currentGroupId = groupId;
+	}
+	// Push the in-progress region (not yet pushed, cause there was no
+	// different groupID to follow it and cause it to be pushed)
+	polygons.push({ regions });
+
+	/**
+	 * TODO: the `polygons` variable has the polygon data
+	 * that might be appropriate to pass to the next step!
+	 */
+
+	let viewBoxString = svgElem.getAttribute("viewBox");
+	if (!viewBoxString) {
+		const svgWidth = svgElem.getAttribute("width");
+		const svgHeight = svgElem.getAttribute("height");
+		viewBoxString = `0 0 ${svgWidth} ${svgHeight}`;
+	}
+	const viewBox = viewBoxString.split(" ").map((s) => parseFloat(s));
+	const svgStringAll = renderPolygonsAsPathSvg(polygons, viewBox);
+	//
+	svgContainerElem.innerHTML = svgStringAll;
 }

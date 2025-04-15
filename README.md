@@ -6,7 +6,7 @@ An attempt at making it easier to create printable paper miniatures.
 
 Next step is to keep working on `js-modules` setup.
 
-- [ ] Add `03-trace` step to `js-modules` setup
+- [x] Add `03-trace` step to `js-modules` setup
   - Takes the silhouette image as input
   - Note that previous `ImageTracer` step seems to yield an SVG string... gonna leave that for now
   - Docs on `ImageTracer` for later: <https://github.com/jankovicsandras/imagetracerjs>
