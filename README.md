@@ -4,50 +4,40 @@ An attempt at making it easier to create printable paper miniatures.
 
 ## Next steps
 
-Next step is to make some final-layout-related steps _after_ the current boolean addition
+Next step is to keep working on `js-modules` setup.
 
-- [x] Write (or find) a function to create x,y points for a circular polygon, `n` number of sides
-  - Good candidate for tests etc
-  - 2025-04-11 at 17:17 - got the `toy-circular-polygon.html` file prototyped in, which uses `createCircularPolygon`
-
-- [x] Consider writing new function `render-polygon-as-svg.js`
-  - Existing function `render-polygon-as-path-svg.js` renders `<path />` elements... we want to stick to polygons though?
-  - In general... seems like it'd be nice to get to `<polygon />` compatible lists of points at some point early in the process... and then use `render-polygon-as-svg.js` as an _optional_ way to preview the data that's been created.
-  - Once this is done... could in theory start declaring actual consts, eg `polygonsTracedImage = ...`, and not have to write-into and read-from `<svg />` elements as is currently being done.
-  - 2025-04-11 at 17:29 - started in `render-polygon-points-string.js`
-  - 2025-04-11 at 17:39 - wait, unions could result in multiple closed shapes... but `<polygon />` can represent only a single closed shape, I think? I do need to worry about fill, and winding order... so rendering to `<path />` rather than `<polygon />` is not only _fine_, it's _necessary_.
-  - 2025-04-11 at 17:56 - Instead of worrying about what I'm _rendering_, I should just worry about the data format that'll be used throughout the process after the initial trace-and-polygonize. I think the `polygon` object format makes sense, where `polygon` is an array of `region` entries, and a `region` entry is an array of points. Exterior rings (filled shapes) and interior rings (holes) are distinguished by the clockwise-ness of their points. Exterior rings are counterclockwise, and interior rings are clockwise ([ref](https://datatracker.ietf.org/doc/html/rfc7946#section-3.1.6))
-
-- [x] Write toy file for copying `<svg />`
-- [x] Write toy file for copying `<svg />` with embedded image
-  - 2025-04-12 at 10:28 - took a bit of finagling, but have a manually copied in, hard-coded base64 dataUrl working! Still wanna get the `toy-copy-svg-with-embed.html` file set up so that it grabs the image source from the `#image-preview` `<img />` element's `src` property.
-  - 2025-04-12 at 11:02 - got this working with image upload
-
-- [x] Continue work on `demo-image-js` file
-  - In particular, finish implementing `get-fallback-threshold`
-  - Add image upload to this demo
-  - Immediately after an image is uploaded, start with new "fallback threshold"
-  - Set that "fallback threshold" in a number input. User can then adjust that input & re-render
-
-- [ ] Covert `cleanupTrace()` workflow so `<svg />` is a "render" step, not a pass-the-data step
+- [ ] Add `03-trace` step to `js-modules` setup
+  - Takes the silhouette image as input
   - Note that previous `ImageTracer` step seems to yield an SVG string... gonna leave that for now
   - Docs on `ImageTracer` for later: <https://github.com/jankovicsandras/imagetracerjs>
-
-- [ ] Review full workflow so that `<svg />` is a "render" step, not a middleman step
-  - First step that generates `polygon` data should store it in a `const`
-  - Subsequent steps should read from the previous step's `const`
-  - The use of `<svg />` elements should be a "render" or "preview" step not necessary for the whole page to work
-
-- [ ] Write (or find) a function to flip a set of x,y points vertically (ie on the horizontal axis)
-- [ ] Create a new SVG with all your polygons to add
-  - Three circular polygons, for the base and stuff
+  - This step should yield a set of regions compatible with `<polygon />` shapes
+- [ ] Add `04-offset` step to `js-modules` setup
+  - Takes the traced silhouette as input
+  - In this step, the traced polygon(s) should have their paths offset
+  - `toy-offset-and-addition` contains the latest bits of work on the offset front (ignore the addition part)
+  - The offset tool I'm using yields paths with curves... these need to be flattened
+  - `demo-flatten-svg` was my latest bit of work and exploration on the flattening front
+  - This step should yield a set of regions compatible with `<polygon />` shapes
+- [ ] Add `05-arrange` step to `js-modules` setup
+  - Takes the offset silhouette polygons as input
+  - Should add three circular polygons, for the base and stuff
+  - See `lib/create-circular-polygon.js`. Convert to module!
   - Two of your boolean-offset polygons, one of the flipped vertically
-- [ ] Run the boolean union on the above SVG
-- [ ] Test copy-to-clipboard of new SVG
-- [ ] Try embedding an image into a random spot in the new SVG
-- [ ] Test copy-to-clipboard of new SVG with image
-- [ ] Try embedding the correct image into a random spot in the new SVG
-- [ ] Try embedding the correct image into the correct spot in the new SVG
+  - [ ] Write (or find) a function to flip a set of x,y points vertically (ie on the horizontal axis)
+  - This step should yield a set of regions compatible with `<polygon />` shapes
+- [ ] Add `06-union` step to `js-modules` setup
+  - Takes the arranges polygon-compatible shapes as input
+  - Executes a boolean addition on all the input shapes
+  - This step should yield a set of regions compatible with `<polygon />` shapes
+  - This step yields the outline of the paper mini (ideally one shape, may be more than one)
+    - Could grab the largest area shape?
+- [ ] Add `07-layout` step to `js-modules` setup
+  - Takes the set of points for the outline of the paper mini as input
+  - Renders those points into an SVG (note, may have cutout regions, will use `<path />`)
+  - Embeds the original image into the SVG, at the correct position (and z-index!)
+  - This step should yield SVG artwork
+- [ ] Add `08-export` step to `js-modules` setup
+  - Allow copying the final SVG to the clipboard (paste into Figma!)
 
 ### Later
 
