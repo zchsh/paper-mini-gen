@@ -3,9 +3,27 @@
 	<head>
 		<!-- IMAGE-JS - could try to figure out how to include as a module? -->
 		<script src="/js-modules/modules/02-silhouette/image.min.js"></script>
+		<!-- IMAGE-TRACER - could try to figure out how to include as a module? -->
+		<script src="/js-modules/modules/03-trace/imagetracer_v1.2.6.js"></script>
+		<!-- TODO: can the below be made into modules? -->
+		<script src="/js-modules/modules/03-trace/pathseg.js"></script>
+		<script src="/js-modules/modules/03-trace/path-to-polygon.js"></script>
+		<!-- main module -->
 		<script type="module" src="/js-modules/main.js"></script>
+		<!-- main execution -->
+		<script>
+			async function runAll() {
+				await silhouetteExecute("raw-image", "processed-image");
+				await traceExecute("processed-image", "trace-svg");
+			}
+
+			async function resetAndRunAll() {
+				silhouetteResetSettings();
+				await runAll();
+			}
+		</script>
 	</head>
-	<body onload="traceResetSettings(); traceExecute()">
+	<body onload="resetAndRunAll()">
 		<!--  -->
 		<!--  -->
 		<!--  -->
@@ -19,9 +37,7 @@
 				type="file"
 				id="image-input"
 				accept="image/png, image/jpeg"
-				onchange="onImageSelection(this, 'raw-image', () => {
-					traceExecute()
-				})"
+				onchange="onImageSelection(this, 'raw-image', resetAndRunAll)"
 			/>
 		</p>
 
@@ -34,7 +50,7 @@
 		<!--  -->
 
 		<div style="display: flex; align-items: center">
-			<img id="raw-image" src="/sample-char-art-01-small.jpeg" />
+			<img id="raw-image" src="/sample-char-art-00.jpeg" />
 			<img id="processed-image" />
 		</div>
 
@@ -47,6 +63,23 @@
 			Radius
 			<input id="radius" type="number" min="1" max="100" value="5" />
 		</p>
-		<p><button onClick="traceExecute()">Apply tweaks</button></p>
+		<p>
+			<button onClick="runAll()">Apply tweaks</button>
+		</p>
+
+		<!--  -->
+		<!--  -->
+		<!--  -->
+		<h2 style="color: magenta">TRACE</h2>
+		<!--  -->
+		<!--  -->
+		<!--  -->
+
+		<div id="trace-svg"></div>
+		<h3>Tweaks</h3>
+		<p>Path omit: <input id="pathomit" type="number" min="0" value="30" /></p>
+		<p>
+			<button onClick="runAll()">Apply tweaks</button>
+		</p>
 	</body>
 </html>
