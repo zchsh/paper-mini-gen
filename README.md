@@ -20,12 +20,16 @@ Next step is to keep working on `js-modules` setup.
   - `demo-flatten-svg` was my latest bit of work and exploration on the flattening front
   - This step should yield a set of regions compatible with `<polygon />` shapes
 
+- [ ] Write (or find) a function to flip a set of x,y points vertically (ie on the horizontal axis)
+  - Maybe looking at <https://g.js.org/ref/mirror.html> could be good?
+  - Could also look into <https://maker.js.org/docs/intermediate-drawing/>. Already used for offset. Has mirror function... so maybe that's a good way to go?
+  - Probably makes sense to start by stubbing `demo-vertical-mirror`
+
 - [ ] Add `05-arrange` step to `js-modules` setup
   - Takes the offset silhouette polygons as input
   - Should add three circular polygons, for the base and stuff
   - See `lib/create-circular-polygon.js`. Convert to module!
   - Two of your boolean-offset polygons, one of the flipped vertically
-  - [ ] Write (or find) a function to flip a set of x,y points vertically (ie on the horizontal axis)
   - This step should yield a set of regions compatible with `<polygon />` shapes
 
 - [ ] Add `06-union` step to `js-modules` setup
