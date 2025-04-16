@@ -12,7 +12,7 @@ Next step is to keep working on `js-modules` setup.
   - Docs on `ImageTracer` for later: <https://github.com/jankovicsandras/imagetracerjs>
   - This step should yield a set of regions compatible with `<polygon />` shapes
 
-- [ ] Add `04-offset` step to `js-modules` setup
+- [x] Add `04-offset` step to `js-modules` setup
   - Takes the traced silhouette as input
   - In this step, the traced polygon(s) should have their paths offset
   - `toy-offset-and-addition` contains the latest bits of work on the offset front (ignore the addition part)
