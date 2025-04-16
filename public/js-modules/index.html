@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html>
 	<head>
+		<!-- COMMON -->
+		<script src="/js-modules/modules/00-common/render-polygons-as-path-svg.js"></script>
 		<!-- SILHOUETTE - could try to figure out how to include as a module? -->
 		<script src="/js-modules/modules/02-silhouette/image.min.js"></script>
 		<!-- TRACE - could try to figure out how to include as a module? -->
@@ -9,16 +11,28 @@
 		<script src="/js-modules/modules/03-trace/flatten-svg/path-data-polyfill.js"></script>
 		<!-- TODO: the TRACE CLEANUP scripts below this comment could be modules -->
 		<script src="/js-modules/modules/03-trace/flatten-svg/svg-to-paths.js"></script>
-		<script src="/js-modules/modules/03-trace/render-polygons-as-path-svg.js"></script>
 		<!-- OFFSET -->
-		<!-- TODO: add scripts -->
+		<script src="/js-modules/modules/04-offset/browser.maker.js"></script>
+		<script src="/js-modules/modules/04-offset/svg-path-outline.js"></script>
+		<script src="/js-modules/modules/04-offset/apply-offset.js"></script>
+		<script src="/js-modules/modules/04-offset/flatten-svg-to-paths.js"></script>
+		<script src="/js-modules/modules/04-offset/parse-svg-viewbox.js"></script>
 		<!-- main module -->
 		<script type="module" src="/js-modules/main.js"></script>
 		<!-- main execution -->
 		<script>
+			/**
+			 * TODO: allow runAll() to start from specific step.
+			 * Eg, when adjusting `offset`, should re-run from `applyOffset()`
+			 * onwards, everything before is already done.
+			 */
 			async function runAll() {
 				await silhouetteExecute("raw-image", "processed-image");
-				await traceExecute("processed-image", "trace-svg");
+				const result = await traceExecute("processed-image", "trace-svg");
+
+				const svgSourceContainer = document.getElementById("trace-svg");
+				const svgSource = svgSourceContainer.querySelector("svg");
+				applyOffset("trace-svg", "offset-svg");
 			}
 
 			async function resetAndRunAll() {
@@ -89,14 +103,17 @@
 		<!--  -->
 		<!--  -->
 		<!--  -->
-		<h2 style="color: magenta">OFFSET</h2>
+		<h2>OFFSET</h2>
 		<!--  -->
 		<!--  -->
 		<!--  -->
 
+		<div id="offset-svg"></div>
+		<h3>Trace tweaks</h3>
 		<p>
-			TODO: add offset, based on
-			<a href="/toy-offset-and-addition">/toy-offset-and-addition</a>
+			Offset:
+			<input id="offset" type="number" min="0" max="100" value="30" />
 		</p>
+		<button onClick="runAll()">Apply offset tweaks</button>
 	</body>
 </html>

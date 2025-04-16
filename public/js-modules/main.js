@@ -50,59 +50,62 @@ window.silhouetteExecute = silhouetteExecute;
  * seems to walk the DOM, doesn't seem to rely on the element being
  * visibly rendered.
  */
-function traceExecute(imgElemId, svgContainerId) {
-	console.log("traceExecute");
-	/**
-	 * NOTE: uses https://github.com/jankovicsandras/imagetracerjs
-	 */
-	const pathomit = getInputAsInt("pathomit");
-	// Adding custom palette. This will override numberofcolors.
-	// Loading an image, tracing with the 'posterized2' option preset, and appending the SVG to an element with id=svgContainerId
-	const imageSource = document.getElementById(imgElemId).getAttribute("src");
-	/**
-	 * Set up function to run after tracing is complete
-	 * TODO: this could be an argument to traceExecute()?
-	 *
-	 * @param {*} svgString
-	 */
-	function doneTracingCallback(svgString) {
-		const svgContainerElem = document.getElementById(svgContainerId);
+async function traceExecute(imgElemId, svgContainerId) {
+	return new Promise((resolve, reject) => {
 		/**
-		 * TODO: does `ImageTracer` really need to be used here?
-		 * Could you just do:
-		 * svgContainerElem.innerHTML = svgString;
+		 * NOTE: uses https://github.com/jankovicsandras/imagetracerjs
 		 */
-		svgContainerElem.innerHTML = "";
-		ImageTracer.appendSVGString(svgString, svgContainerId);
-		// Clean up SVG
-		cleanupTrace(svgContainerElem);
-	}
-	/**
-	 * TODO: is there a way to trace with straight lines only?
-	 * Could simplify the process dramatically...
-	 */
-	ImageTracer.imageToSVG(
-		imageSource /* input filename / URL */,
-		doneTracingCallback,
-		{
-			pathomit,
-			ltres: 1,
-			qtres: 1,
-			colorsampling: 0,
-			colorquantcycles: 1,
-			strokewidth: 0,
-			roundcoords: 3,
+		const pathomit = getInputAsInt("pathomit");
+		// Adding custom palette. This will override numberofcolors.
+		// Loading an image, tracing with the 'posterized2' option preset, and appending the SVG to an element with id=svgContainerId
+		const imageSource = document.getElementById(imgElemId).getAttribute("src");
+		/**
+		 * Set up function to run after tracing is complete
+		 * TODO: this could be an argument to traceExecute()?
+		 *
+		 * @param {*} svgString
+		 */
+		function doneTracingCallback(svgString) {
+			const svgContainerElem = document.getElementById(svgContainerId);
 			/**
-			 * Set a custom palette, of:
-			 * - black (foreground shapes)
-			 * - nearly-white (background shapes, will remove in later step)
+			 * TODO: does `ImageTracer` really need to be used here?
+			 * Could you just do:
+			 * svgContainerElem.innerHTML = svgString;
 			 */
-			pal: [
-				{ r: 0, g: 0, b: 0, a: 255 },
-				{ r: 245, g: 245, b: 245, a: 255 },
-			],
+			svgContainerElem.innerHTML = "";
+			ImageTracer.appendSVGString(svgString, svgContainerId);
+			// Clean up SVG
+			cleanupTrace(svgContainerElem);
+			//
+			resolve(svgString);
 		}
-	);
+		/**
+		 * TODO: is there a way to trace with straight lines only?
+		 * Could simplify the process dramatically...
+		 */
+		ImageTracer.imageToSVG(
+			imageSource /* input filename / URL */,
+			doneTracingCallback,
+			{
+				pathomit,
+				ltres: 1,
+				qtres: 1,
+				colorsampling: 0,
+				colorquantcycles: 1,
+				strokewidth: 0,
+				roundcoords: 3,
+				/**
+				 * Set a custom palette, of:
+				 * - black (foreground shapes)
+				 * - nearly-white (background shapes, will remove in later step)
+				 */
+				pal: [
+					{ r: 0, g: 0, b: 0, a: 255 },
+					{ r: 245, g: 245, b: 245, a: 255 },
+				],
+			}
+		);
+	});
 }
 window.traceExecute = traceExecute;
 

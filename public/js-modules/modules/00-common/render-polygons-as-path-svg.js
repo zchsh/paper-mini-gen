@@ -35,16 +35,15 @@ function renderPolygonsAsPathSvg(polygons, viewBox) {
 			},
 			{ minX: null, minY: null, maxX: null, maxY: null }
 		);
-		const svgWidth = maxX - minX + 20;
-		const svgHeight = maxY - minY + 20;
-		viewBox = [minX - 10, minY - 10, svgWidth, svgHeight];
+		const svgWidth = maxX - minX;
+		const svgHeight = maxY - minY;
+		viewBox = [minX, minY, svgWidth, svgHeight];
 	}
 
 	/**
 	 * Render the SVG string
 	 */
 	const [minX, minY, svgWidth, svgHeight] = viewBox;
-	console.log({ minX, minY, svgWidth, svgHeight });
 	var svgString = `<svg width="${svgWidth}" height="${svgHeight}" viewBox="${minX} ${minY} ${svgWidth} ${svgHeight}">`;
 	svgString += pathStrings
 		.map((pathString) => {
