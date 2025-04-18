@@ -4,6 +4,8 @@ import { getInputAsInt } from "/js-modules/modules/00-common/get-input-as-int.js
 import { onImageSelection } from "/js-modules/modules/01-upload/on-image-selection.js";
 // SILHOUETTE
 import { processImage } from "/js-modules/modules/02-silhouette/process-image.js";
+// ARRANGE
+import { visitPoints } from "/js-modules/modules/05-arrange/visit-points.js";
 
 /**
  * UPLOAD
@@ -178,14 +180,81 @@ function cleanupTrace(svgContainerElem) {
 	 * that might be appropriate to pass to the next step!
 	 */
 
-	let viewBoxString = svgElem.getAttribute("viewBox");
-	if (!viewBoxString) {
-		const svgWidth = svgElem.getAttribute("width");
-		const svgHeight = svgElem.getAttribute("height");
-		viewBoxString = `0 0 ${svgWidth} ${svgHeight}`;
-	}
-	const viewBox = viewBoxString.split(" ").map((s) => parseFloat(s));
+	const viewBox = parseSvgViewbox(svgElem);
 	const svgStringAll = renderPolygonsAsPathSvg(polygons, viewBox);
 	//
 	svgContainerElem.innerHTML = svgStringAll;
 }
+
+/**
+ * OFFSET
+ *
+ * TODO: not shown here cause I couldn't figure out imports and stuff.
+ * Might be worth figuring that out so you can clean things up a bit.
+ */
+
+/**
+ * ARRANGEMENT
+ *
+ * TODO: finish and clean up below
+ */
+function arrangeForUnion(polygons, targetContainer) {
+	const allPoints = polygons.map((p) => p.regions.flat()).flat();
+	const { minX, minY, maxX, maxY } = getBoundingPoints(allPoints);
+	console.log({ minX, minY, maxX, maxY });
+	const boundingHeight = maxY - minY;
+	const boundingCenterX = (minX + maxX) / 2;
+
+	const originalBottom = minY + boundingHeight;
+
+	// Add some circular polygons for the base and stuff
+	const baseSize = 72;
+	const circleBase = {
+		regions: [
+			createCircularPolygon(baseSize / 2, 12, [
+				boundingCenterX,
+				originalBottom + baseSize,
+			]),
+		],
+	};
+	const circleBaseTop = {
+		regions: [
+			createCircularPolygon(72 / 2, 12, [boundingCenterX, originalBottom]),
+		],
+	};
+	const circleBaseBottom = {
+		regions: [
+			createCircularPolygon(72 / 2, 12, [
+				boundingCenterX,
+				originalBottom + baseSize * 2,
+			]),
+		],
+	};
+
+	// Add a reflected duplicate for the "other side"
+
+	const reflected = visitPoints(polygons, ([x, y]) => {
+		return [x, y * -1];
+	});
+
+	const translated = visitPoints(reflected, ([x, y]) => {
+		const offset = originalBottom * 2 + baseSize * 2;
+		return [x, y + offset];
+	});
+
+	console.log({ polygons, circleBase });
+	const arrangedPolygons = [
+		...polygons,
+		...translated,
+		circleBase,
+		circleBaseTop,
+		circleBaseBottom,
+	];
+
+	const svgStringArranged = renderPolygonsAsPathSvg(arrangedPolygons);
+	targetContainer.innerHTML = svgStringArranged;
+
+	return arrangedPolygons;
+}
+
+window.arrangeForUnion = arrangeForUnion;

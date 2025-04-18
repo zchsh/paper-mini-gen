@@ -50,6 +50,8 @@ function applyOffset(svgSourceContainerId, svgDestContainerId = null) {
 	const svgStringAll = renderPolygonsAsPathSvg(polygons, viewBoxModded);
 	//
 	svgDest.parentNode.innerHTML = svgStringAll;
+
+	return polygons;
 }
 
 window.applyOffset = applyOffset;

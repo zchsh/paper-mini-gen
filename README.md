@@ -20,10 +20,16 @@ Next step is to keep working on `js-modules` setup.
   - `demo-flatten-svg` was my latest bit of work and exploration on the flattening front
   - This step should yield a set of regions compatible with `<polygon />` shapes
 
+- [x] Write a function to visit points, and do something to do those points
+  - Could try translate first?
+
 - [ ] Write (or find) a function to flip a set of x,y points vertically (ie on the horizontal axis)
   - Maybe looking at <https://g.js.org/ref/mirror.html> could be good?
   - Could also look into <https://maker.js.org/docs/intermediate-drawing/>. Already used for offset. Has mirror function... so maybe that's a good way to go?
   - Probably makes sense to start by stubbing `demo-vertical-mirror`
+  - 2025-04-17 at 22:16 - meh, already have an approach here I think... if I think about this as "reflect a single point about some line", that seems more feasible to DIY. and that "line" can be the horizontal line that passes through the bottom-most point (max Y i think?) of the polygon itself (or, could be centre point?)
+  - Example algorithm: <https://www.mathwarehouse.com/transformations/reflections-in-math.php>
+  - Note: for _winding order_, may need to _reverse points_ after the flip is done
 
 - [ ] Add `05-arrange` step to `js-modules` setup
   - Takes the offset silhouette polygons as input

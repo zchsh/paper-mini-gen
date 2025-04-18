@@ -23,18 +23,7 @@ function renderPolygonsAsPathSvg(polygons, viewBox) {
 	 */
 	if (!viewBox) {
 		const allPoints = polygons.map((p) => p.regions.flat()).flat();
-		const { minX, minY, maxX, maxY } = allPoints.reduce(
-			(acc, point) => {
-				const [x, y] = point;
-				return {
-					minX: acc.minX === null ? x : Math.min(acc.minX, x),
-					minY: acc.minY === null ? y : Math.min(acc.minY, y),
-					maxX: acc.maxX === null ? x : Math.max(acc.maxX, x),
-					maxY: acc.maxY === null ? y : Math.max(acc.maxY, y),
-				};
-			},
-			{ minX: null, minY: null, maxX: null, maxY: null }
-		);
+		const { minX, minY, maxX, maxY } = getBoundingPoints(allPoints);
 		const svgWidth = maxX - minX;
 		const svgHeight = maxY - minY;
 		viewBox = [minX, minY, svgWidth, svgHeight];
