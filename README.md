@@ -56,6 +56,10 @@ Next step is to keep working on `js-modules` setup.
 
 ### Later
 
+#### Look into performance
+
+- Seems way worse on my M1 laptop than on M1 mac mini... why?
+
 #### Support transparent images
 
 - one approach is make a threshold mask based on the alpha channel, then apply that mask
