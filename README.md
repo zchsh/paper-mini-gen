@@ -38,6 +38,7 @@ Next step is to keep working on `js-modules` setup.
   - Two of your boolean-offset polygons, one of the flipped vertically
   - This step should yield a set of regions compatible with `<polygon />` shapes
   - 2025-04-25 - implemented scaling!
+  - 2025-04-25 - implemented xy tweaks
 
 - [ ] Add `06-union` step to `js-modules` setup
   - Takes the arranges polygon-compatible shapes as input
