@@ -198,7 +198,21 @@ function cleanupTrace(svgContainerElem) {
  *
  * TODO: finish and clean up below
  */
-function arrangeForUnion(polygons, targetContainer) {
+function arrangeForUnion(rawPolygons, targetContainer) {
+	// Determine the scale factor to meet the target height in mm
+	const PIXELS_PER_INCH = 72;
+	const MM_PER_INCH = 25.4;
+	const rawPoints = rawPolygons.map((p) => p.regions.flat()).flat();
+	const rawBoundingBox = getBoundingPoints(rawPoints);
+	const rawHeight = rawBoundingBox.maxY - rawBoundingBox.minY;
+	const rawHeightMm = (rawHeight / PIXELS_PER_INCH) * MM_PER_INCH;
+	const heightInputMm = getInputAsInt("heightMm");
+	// Scale the polygons about the 0,0 origin
+	const scale = heightInputMm / rawHeightMm;
+	const polygons = visitPoints(rawPolygons, ([x, y]) => {
+		return [x * scale, y * scale];
+	});
+
 	const allPoints = polygons.map((p) => p.regions.flat()).flat();
 	const { minX, minY, maxX, maxY } = getBoundingPoints(allPoints);
 	console.log({ minX, minY, maxX, maxY });
@@ -232,11 +246,9 @@ function arrangeForUnion(polygons, targetContainer) {
 	};
 
 	// Add a reflected duplicate for the "other side"
-
 	const reflected = visitPoints(polygons, ([x, y]) => {
 		return [x, y * -1];
 	});
-
 	const translated = visitPoints(reflected, ([x, y]) => {
 		const offset = originalBottom * 2 + baseSize * 2;
 		return [x, y + offset];

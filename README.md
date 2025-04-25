@@ -23,7 +23,7 @@ Next step is to keep working on `js-modules` setup.
 - [x] Write a function to visit points, and do something to do those points
   - Could try translate first?
 
-- [ ] Write (or find) a function to flip a set of x,y points vertically (ie on the horizontal axis)
+- [x] Write (or find) a function to flip a set of x,y points vertically (ie on the horizontal axis)
   - Maybe looking at <https://g.js.org/ref/mirror.html> could be good?
   - Could also look into <https://maker.js.org/docs/intermediate-drawing/>. Already used for offset. Has mirror function... so maybe that's a good way to go?
   - Probably makes sense to start by stubbing `demo-vertical-mirror`
@@ -37,6 +37,7 @@ Next step is to keep working on `js-modules` setup.
   - See `lib/create-circular-polygon.js`. Convert to module!
   - Two of your boolean-offset polygons, one of the flipped vertically
   - This step should yield a set of regions compatible with `<polygon />` shapes
+  - 2025-04-25 - implemented scaling!
 
 - [ ] Add `06-union` step to `js-modules` setup
   - Takes the arranges polygon-compatible shapes as input
