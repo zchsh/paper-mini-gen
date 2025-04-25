@@ -215,7 +215,7 @@ function arrangeForUnion(rawPolygons, targetContainer) {
 
 	const allPoints = polygons.map((p) => p.regions.flat()).flat();
 	const { minX, minY, maxX, maxY } = getBoundingPoints(allPoints);
-	console.log({ minX, minY, maxX, maxY });
+
 	const boundingHeight = maxY - minY;
 	const boundingCenterX = (minX + maxX) / 2;
 
@@ -254,10 +254,21 @@ function arrangeForUnion(rawPolygons, targetContainer) {
 		return [x, y + offset];
 	});
 
+	// Add X and Y offset
+	const arrangeOffsetX = getInputAsInt("arrangeOffsetX");
+	const arrangeOffsetY = getInputAsInt("arrangeOffsetY");
+	console.log({ arrangeOffsetX, arrangeOffsetY });
+	const translatedOffset = visitPoints(translated, ([x, y]) => {
+		return [x + arrangeOffsetX, y + arrangeOffsetY];
+	});
+	const polygonsOffset = visitPoints(polygons, ([x, y]) => {
+		return [x + arrangeOffsetX, y - arrangeOffsetY];
+	});
+
 	console.log({ polygons, circleBase });
 	const arrangedPolygons = [
-		...polygons,
-		...translated,
+		...polygonsOffset,
+		...translatedOffset,
 		circleBase,
 		circleBaseTop,
 		circleBaseBottom,

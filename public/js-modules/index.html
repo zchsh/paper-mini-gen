@@ -137,11 +137,15 @@
 			Height in mm (1 inch ~= 25 mm)
 			<input id="heightMm" type="number" min="5" max="100" value="35" />
 		</p>
-		<p>
-			<ul style="color: magenta;">
-				<li>TODO: add "X" position adjustment ("center"?)</li>
-				<li>TODO: add "Y" position adjustment ("float"?)</li>
-			</ul>
+		<p style="color: magenta;">
+			X offset in pixels ("center")
+			<input id="arrangeOffsetX" type="number" min="-100" max="100" value="0" />
+		</p>
+		<p style="color: magenta;">
+			Y offset in pixels ("float") 
+			<!-- TODO: max should be based on "base size". For now, have done
+			     base size (72) divided by 4 -->
+			<input id="arrangeOffsetY" type="number" min="0" max="18" value="0" />
 		</p>
 		<button onClick="runAll()">Apply arrangement tweaks</button>
 	</body>
