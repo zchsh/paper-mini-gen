@@ -31,7 +31,7 @@ Next step is to keep working on `js-modules` setup.
   - Example algorithm: <https://www.mathwarehouse.com/transformations/reflections-in-math.php>
   - Note: for _winding order_, may need to _reverse points_ after the flip is done
 
-- [ ] Add `05-arrange` step to `js-modules` setup
+- [x] Add `05-arrange` step to `js-modules` setup
   - Takes the offset silhouette polygons as input
   - Should add three circular polygons, for the base and stuff
   - See `lib/create-circular-polygon.js`. Convert to module!
@@ -40,6 +40,7 @@ Next step is to keep working on `js-modules` setup.
   - 2025-04-25 - implemented scaling!
   - 2025-04-25 - implemented xy tweaks
   - 2025-04-25 - added base overlap
+  - 2025-04-25 at 17:59 - wrapping up this step for now
 
 - [ ] Add `06-union` step to `js-modules` setup
   - Takes the arranges polygon-compatible shapes as input
