@@ -39,6 +39,7 @@ Next step is to keep working on `js-modules` setup.
   - This step should yield a set of regions compatible with `<polygon />` shapes
   - 2025-04-25 - implemented scaling!
   - 2025-04-25 - implemented xy tweaks
+  - 2025-04-25 - added base overlap
 
 - [ ] Add `06-union` step to `js-modules` setup
   - Takes the arranges polygon-compatible shapes as input

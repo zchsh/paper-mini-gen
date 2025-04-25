@@ -21,12 +21,18 @@ function renderPolygonsAsPathSvg(polygons, viewBox) {
 	 * Derive a fallback viewBox... mostly pretty silly,
 	 * should likely use viewBox etc from existing SVG element.
 	 */
-	if (!viewBox) {
+	if (!Array.isArray(viewBox)) {
 		const allPoints = polygons.map((p) => p.regions.flat()).flat();
 		const { minX, minY, maxX, maxY } = getBoundingPoints(allPoints);
-		const svgWidth = maxX - minX;
-		const svgHeight = maxY - minY;
-		viewBox = [minX, minY, svgWidth, svgHeight];
+		const viewBoxPadding = typeof viewBox === "number" ? viewBox : 0;
+		const svgWidth = maxX - minX + viewBoxPadding * 2;
+		const svgHeight = maxY - minY + viewBoxPadding * 2;
+		viewBox = [
+			minX - viewBoxPadding,
+			minY - viewBoxPadding,
+			svgWidth,
+			svgHeight,
+		];
 	}
 
 	/**

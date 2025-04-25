@@ -2,7 +2,7 @@ export function visitPoints(polygons, visitFunction) {
 	return polygons.map((p) => visitPointsPolygon(p, visitFunction));
 }
 
-function visitPointsPolygon(polygon, visitFunction) {
+export function visitPointsPolygon(polygon, visitFunction) {
 	return {
 		...polygon,
 		regions: polygon.regions.map((region) => {

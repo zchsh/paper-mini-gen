@@ -5,7 +5,10 @@ import { onImageSelection } from "/js-modules/modules/01-upload/on-image-selecti
 // SILHOUETTE
 import { processImage } from "/js-modules/modules/02-silhouette/process-image.js";
 // ARRANGE
-import { visitPoints } from "/js-modules/modules/05-arrange/visit-points.js";
+import {
+	visitPoints,
+	visitPointsPolygon,
+} from "/js-modules/modules/05-arrange/visit-points.js";
 
 /**
  * UPLOAD
@@ -223,61 +226,79 @@ function arrangeForUnion(rawPolygons, targetContainer) {
 
 	// Add some circular polygons for the base and stuff
 	const baseSize = 72;
+	const baseOverlap = Math.ceil(baseSize / 10);
 	const circleBase = {
 		regions: [
-			createCircularPolygon(baseSize / 2, 12, [
+			createCircularPolygon(baseSize / 2, 24, [
 				boundingCenterX,
-				originalBottom + baseSize,
+				originalBottom + baseSize - baseOverlap,
 			]),
 		],
 	};
 	const circleBaseTop = {
 		regions: [
-			createCircularPolygon(72 / 2, 12, [boundingCenterX, originalBottom]),
+			createCircularPolygon(72 / 2, 24, [boundingCenterX, originalBottom]),
 		],
 	};
 	const circleBaseBottom = {
 		regions: [
-			createCircularPolygon(72 / 2, 12, [
+			createCircularPolygon(72 / 2, 24, [
 				boundingCenterX,
-				originalBottom + baseSize * 2,
+				originalBottom + (baseSize - baseOverlap) * 2,
 			]),
 		],
 	};
 
 	// Add a reflected duplicate for the "other side"
-	const reflected = visitPoints(polygons, ([x, y]) => {
+	const rawReflection = visitPoints(polygons, ([x, y]) => {
 		return [x, y * -1];
 	});
-	const translated = visitPoints(reflected, ([x, y]) => {
-		const offset = originalBottom * 2 + baseSize * 2;
+	const polygonsReflected = visitPoints(rawReflection, ([x, y]) => {
+		const offset = originalBottom * 2 + (baseSize - baseOverlap) * 2;
 		return [x, y + offset];
 	});
 
-	// Add X and Y offset
+	// Add X and Y offset. Note that we move the "base" pieces,
+	// and leave the original piece in place.
+	/**
+	 * TODO: neat idea... what if you found the "center of mass"
+	 * of the incoming polygon, and used that as a "base" offset?
+	 * The input offset would be applied on top of that "base" offset.
+	 * As-is, polygons are centered based on bounding boxes... which is
+	 * a little bit different!
+	 */
 	const arrangeOffsetX = getInputAsInt("arrangeOffsetX");
 	const arrangeOffsetY = getInputAsInt("arrangeOffsetY");
-	console.log({ arrangeOffsetX, arrangeOffsetY });
-	const translatedOffset = visitPoints(translated, ([x, y]) => {
-		return [x + arrangeOffsetX, y + arrangeOffsetY];
-	});
-	const polygonsOffset = visitPoints(polygons, ([x, y]) => {
-		return [x + arrangeOffsetX, y - arrangeOffsetY];
-	});
 
-	console.log({ polygons, circleBase });
 	const arrangedPolygons = [
-		...polygonsOffset,
-		...translatedOffset,
-		circleBase,
-		circleBaseTop,
-		circleBaseBottom,
+		...polygons,
+		...translatePolygons(polygonsReflected, [0, arrangeOffsetY * 2]),
+		translatePolygon(circleBaseTop, [arrangeOffsetX * -1, arrangeOffsetY]),
+		translatePolygon(circleBase, [arrangeOffsetX * -1, arrangeOffsetY]),
+		translatePolygon(circleBaseBottom, [arrangeOffsetX * -1, arrangeOffsetY]),
 	];
 
-	const svgStringArranged = renderPolygonsAsPathSvg(arrangedPolygons);
+	const viewBoxPadding = 9; // 1/8 inch
+	const svgStringArranged = renderPolygonsAsPathSvg(
+		arrangedPolygons,
+		viewBoxPadding
+	);
 	targetContainer.innerHTML = svgStringArranged;
 
 	return arrangedPolygons;
+}
+
+function translatePolygons(polygons, offset) {
+	console.log({ polygons, offset });
+	return polygons.map((polygon) => {
+		return translatePolygon(polygon, offset);
+	});
+}
+
+function translatePolygon(polygon, offset) {
+	return visitPointsPolygon(polygon, ([x, y]) => {
+		return [x + offset[0], y + offset[1]];
+	});
 }
 
 window.arrangeForUnion = arrangeForUnion;
