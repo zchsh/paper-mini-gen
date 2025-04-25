@@ -22,7 +22,7 @@ function createCircularPolygon(radius, pointCount, centerPoint = [0, 0]) {
 	const points = [];
 	const angleIncrement = (2.0 * Math.PI) / pointCount;
 
-	console.log({ pointCount, angleIncrement });
+	// console.log({ pointCount, angleIncrement });
 
 	// Create the polygon around [0,0]
 	for (let i = 0; i < pointCount; i++) {

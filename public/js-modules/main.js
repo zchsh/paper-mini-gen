@@ -289,7 +289,6 @@ function arrangeForUnion(rawPolygons, targetContainer) {
 }
 
 function translatePolygons(polygons, offset) {
-	console.log({ polygons, offset });
 	return polygons.map((polygon) => {
 		return translatePolygon(polygon, offset);
 	});
@@ -302,3 +301,14 @@ function translatePolygon(polygon, offset) {
 }
 
 window.arrangeForUnion = arrangeForUnion;
+
+/**
+ * UNION
+ *
+ * TODO: finish and clean up below
+ */
+function applyUnion() {
+	console.log("TODO: implement the applyUnion	 function");
+}
+
+window.applyUnion = applyUnion;

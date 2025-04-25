@@ -25,9 +25,19 @@
 		<!-- main execution -->
 		<script>
 			/**
-			 * TODO: allow runAll() to start from specific step.
+			 * TODO: refactor so runAll() can start from specific step.
 			 * Eg, when adjusting `offset`, should re-run from `applyOffset()`
 			 * onwards, everything before is already done.
+			 *
+			 * In fact, there'd even be sub-steps. Eg, when adjusting the "offset"
+			 * in the "arrange" phase, really only need to re-run PART of a step.
+			 * That level of optimization could come later... but may be worth
+			 * thinking through, when you're deciding exactly HOW to refactor.
+			 * Maybe the answer is just... if you want to break a single step
+			 * down into two parts, then maybe that step should really be two steps.
+			 * And for the "arrange" step at least, seems totally fine to do a little
+			 * extra redundant math WITHIN the step... it'll be wasteful but
+			 * fast anyways.
 			 */
 			async function runAll() {
 				await silhouetteExecute("raw-image", "processed-image");
@@ -40,6 +50,10 @@
 					polygons_offset,
 					document.getElementById("arrange-container")
 				);
+				/**
+				 * TODO: implement union step here!
+				 */
+				const polygons_union = applyUnion();
 			}
 
 			async function resetAndRunAll() {
@@ -126,7 +140,7 @@
 		<!--  -->
 		<!--  -->
 		<!--  -->
-		<h2 style="color: magenta">ARRANGE</h2>
+		<h2>ARRANGE</h2>
 		<!--  -->
 		<!--  -->
 		<!--  -->
