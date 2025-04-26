@@ -43,18 +43,39 @@
 			 * fast anyways.
 			 */
 			async function runAll() {
-				await silhouetteExecute("raw-image", "processed-image");
+				const [paddingBeforeTrace, imgWidth, imgHeight] =
+					await silhouetteExecute("raw-image", "processed-image");
 				const result = await traceExecute("processed-image", "trace-svg");
 
 				const svgSourceContainer = document.getElementById("trace-svg");
 				const svgSource = svgSourceContainer.querySelector("svg");
-				const polygons_offset = applyOffset("trace-svg", "offset-svg");
-				const polygons_arranged = arrangeForUnion(
-					polygons_offset,
-					document.getElementById("arrange-container")
+				const [polygons_offset, offset] = applyOffset(
+					"trace-svg",
+					"offset-svg"
 				);
+				const [polygons_arranged, scale, baseSize, baseOverlap] =
+					arrangeForUnion(
+						polygons_offset,
+						document.getElementById("arrange-container")
+					);
 				const polygons_union = applyUnion(polygons_arranged, "union-container");
-				applyLayout(polygons_union, "layout-container");
+				// TODO: grab polygon width and height, probs from "arrange for union"
+				const polygonWidth = 100;
+				const polygonHeight = 100;
+				await applyLayout(
+					polygons_union,
+					{
+						scale,
+						paddingBeforeTrace,
+						imgWidth,
+						imgHeight,
+						polygonHeight,
+						polygonWidth,
+						baseSize,
+						baseOverlap,
+					},
+					"layout-container"
+				);
 			}
 
 			async function resetAndRunAll() {

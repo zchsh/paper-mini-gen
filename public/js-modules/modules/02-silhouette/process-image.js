@@ -33,5 +33,7 @@ export async function processImage(imgSrc, radius, threshold) {
 		radius
 	);
 	// Load the image into a destination element
-	return processedSrc;
+	const width = image.width;
+	const height = image.height;
+	return [processedSrc, width, height];
 }

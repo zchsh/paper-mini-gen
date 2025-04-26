@@ -51,7 +51,7 @@ function applyOffset(svgSourceContainerId, svgDestContainerId = null) {
 	//
 	svgDest.parentNode.innerHTML = svgStringAll;
 
-	return polygons;
+	return [polygons, offset];
 }
 
 window.applyOffset = applyOffset;

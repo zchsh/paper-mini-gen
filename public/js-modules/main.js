@@ -38,7 +38,14 @@ async function silhouetteExecute(imgSrcId, imgDestId) {
 	 * Might make later calculations related to placing the original
 	 * image correctly a little easier.
 	 */
-	outputElem.src = await processImage(inputElem.src, radius, threshold);
+	const [processedSrc, width, height] = await processImage(
+		inputElem.src,
+		radius,
+		threshold
+	);
+	outputElem.src = processedSrc;
+	const paddingBeforeTrace = radius * 2;
+	return [paddingBeforeTrace, width, height];
 }
 window.silhouetteExecute = silhouetteExecute;
 
@@ -285,7 +292,7 @@ function arrangeForUnion(rawPolygons, targetContainer) {
 	);
 	targetContainer.innerHTML = svgStringArranged;
 
-	return arrangedPolygons;
+	return [arrangedPolygons, scale, baseSize, baseOverlap];
 }
 
 function translatePolygons(polygons, offset) {
@@ -308,8 +315,6 @@ window.arrangeForUnion = arrangeForUnion;
  * TODO: finish and clean up below
  */
 function applyUnion(polygonObjs, renderId, debugId01, debugId02) {
-	console.log({ polygonObjs });
-
 	// Debug individual shapes
 	if (debugId01) {
 		const container = document.getElementById(debugId01);
@@ -360,13 +365,59 @@ window.applyUnion = applyUnion;
  * - [ ] adjust image location (may need more args)
  * - [ ] add dotted lines
  */
-async function applyLayout(polygonObj, renderId) {
-	const svgString = renderPolygonsAsPathSvg([polygonObj], 9);
+async function applyLayout(
+	polygonObj,
+	{
+		paddingBeforeTrace,
+		scale,
+		offset,
+		imgWidth,
+		imgHeight,
+		polygonWidth,
+		polygonHeight,
+		baseSize,
+		baseOverlap,
+	},
+	renderId
+) {
+	const svgString = renderPolygonsAsPathSvg([polygonObj], 100);
 	document.getElementById(renderId).innerHTML = svgString;
 	const svgElem = document.getElementById(renderId).querySelector("svg");
 	const imageElem = document.getElementById("raw-image");
+	/**
+	 * NOTE: offset affects viewBox, not the SVG element... so may
+	 * be fine to ignore?
+	 *
+	 * As far as I can tell, may be fine to leave at 0,0?
+	 */
+	console.log({
+		paddingBeforeTrace,
+		scale,
+		offset,
+		imgWidth,
+		imgHeight,
+		polygonWidth,
+		polygonHeight,
+		baseSize,
+		baseOverlap,
+	});
 	// Embed the image into the SVG
-	await embedImageIntoSvg(imageElem, svgElem);
+	// const imgTopOffset = paddingBeforeTrace / scale;
+	const scaledPadding = paddingBeforeTrace * scale;
+	const imgTopX = scaledPadding;
+	const imgTopY = scaledPadding;
+	await embedImageIntoSvg(imageElem, svgElem, scale, {
+		transform: `translate(${imgTopX},${imgTopY})`,
+		style: "opacity: 0.5;",
+	});
+	const imgBottomX = scaledPadding; // TODO: actually do this
+	const imgBottomScaleYOffset = -1 * (imgHeight * scale);
+	const imgBottomBaseOffset = -1 * (baseSize * 2 - baseOverlap * 2);
+	const imgBottomY = 0 + imgBottomBaseOffset + imgBottomScaleYOffset;
+	await embedImageIntoSvg(imageElem, svgElem, scale, {
+		transform: `scale(1,-1) translate(${imgBottomX},${imgBottomY})`,
+		style: "opacity: 0.5;",
+	});
 }
 
 function toDataUrl(url) {
@@ -396,17 +447,23 @@ function buildSvgNode(nodeType, values) {
 	return node;
 }
 
-async function embedImageIntoSvg(imageElem, svgElem) {
+async function embedImageIntoSvg(
+	imageElem,
+	svgElem,
+	scale,
+	moreAttributes = {}
+) {
 	const imgSrc = imageElem.getAttribute("src");
 	const imgDataUrl = await toDataUrl(imgSrc);
 	const imgHeight = imageElem.naturalHeight;
 	const imgWidth = imageElem.naturalWidth;
 	const imgNode = buildSvgNode("image", {
-		width: imgWidth / 2,
-		height: imgHeight / 2,
-		x: 20,
-		y: 20,
+		width: imgWidth * scale,
+		height: imgHeight * scale,
+		x: 0,
+		y: 0,
 		"xlink:href": imgDataUrl,
+		...moreAttributes,
 	});
 	svgElem.insertBefore(imgNode, svgElem.firstChild);
 }
