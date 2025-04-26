@@ -20,6 +20,8 @@
 		<script src="/js-modules/modules/04-offset/parse-svg-viewbox.js"></script>
 		<!-- ARRANGE -->
 		<script src="/js-modules/modules/05-arrange/create-circular-polygon.js"></script>
+		<!-- UNION -->
+		<script src="/js-modules/modules/06-union/polybooljs-1.2.2/dist/polybool.js"></script>
 		<!-- main module -->
 		<script type="module" src="/js-modules/main.js"></script>
 		<!-- main execution -->
@@ -46,14 +48,11 @@
 				const svgSourceContainer = document.getElementById("trace-svg");
 				const svgSource = svgSourceContainer.querySelector("svg");
 				const polygons_offset = applyOffset("trace-svg", "offset-svg");
-				const polygons_translated = arrangeForUnion(
+				const polygons_arranged = arrangeForUnion(
 					polygons_offset,
 					document.getElementById("arrange-container")
 				);
-				/**
-				 * TODO: implement union step here!
-				 */
-				const polygons_union = applyUnion();
+				const polygons_union = applyUnion(polygons_arranged, "union-container");
 			}
 
 			async function resetAndRunAll() {
@@ -170,10 +169,16 @@
 		<!--  -->
 		<!--  -->
 		<!--  -->
+		<div id="union-shapes-debug"></div>
+		<div id="union-arrange-debug"></div>
 		<div id="union-container"></div>
 		<h3>Union tweaks</h3>
 		<ul style="color: magenta">
-			<li>TODO: start implementing union step</li>
+			<li>TODO: add copy-svg-to-clipboard (generic?)</li>
+			<li>
+				TODO: start on next step - layout, with the original image, dotted
+				lines, etc.
+			</li>
 		</ul>
 		<button onClick="runAll()">Apply union tweaks</button>
 	</body>
