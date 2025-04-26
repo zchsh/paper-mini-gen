@@ -53,15 +53,19 @@
 					"trace-svg",
 					"offset-svg"
 				);
-				const [polygons_arranged, scale, baseSize, baseOverlap] =
-					arrangeForUnion(
-						polygons_offset,
-						document.getElementById("arrange-container")
-					);
+				const [
+					polygons_arranged,
+					scale,
+					baseSize,
+					baseOverlap,
+					boundingWidth,
+					boundingHeight,
+				] = arrangeForUnion(
+					polygons_offset,
+					document.getElementById("arrange-container")
+				);
 				const polygons_union = applyUnion(polygons_arranged, "union-container");
 				// TODO: grab polygon width and height, probs from "arrange for union"
-				const polygonWidth = 100;
-				const polygonHeight = 100;
 				await applyLayout(
 					polygons_union,
 					{
@@ -69,8 +73,8 @@
 						paddingBeforeTrace,
 						imgWidth,
 						imgHeight,
-						polygonHeight,
-						polygonWidth,
+						boundingHeight,
+						boundingWidth,
 						baseSize,
 						baseOverlap,
 					},

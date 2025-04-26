@@ -227,6 +227,7 @@ function arrangeForUnion(rawPolygons, targetContainer) {
 	const { minX, minY, maxX, maxY } = getBoundingPoints(allPoints);
 
 	const boundingHeight = maxY - minY;
+	const boundingWidth = maxX - minX;
 	const boundingCenterX = (minX + maxX) / 2;
 
 	const originalBottom = minY + boundingHeight;
@@ -292,7 +293,14 @@ function arrangeForUnion(rawPolygons, targetContainer) {
 	);
 	targetContainer.innerHTML = svgStringArranged;
 
-	return [arrangedPolygons, scale, baseSize, baseOverlap];
+	return [
+		arrangedPolygons,
+		scale,
+		baseSize,
+		baseOverlap,
+		boundingWidth,
+		boundingHeight,
+	];
 }
 
 function translatePolygons(polygons, offset) {
@@ -373,14 +381,14 @@ async function applyLayout(
 		offset,
 		imgWidth,
 		imgHeight,
-		polygonWidth,
-		polygonHeight,
+		boundingWidth,
+		boundingHeight,
 		baseSize,
 		baseOverlap,
 	},
 	renderId
 ) {
-	const svgString = renderPolygonsAsPathSvg([polygonObj], 100);
+	const svgString = renderPolygonsAsPathSvg([polygonObj], 9);
 	document.getElementById(renderId).innerHTML = svgString;
 	const svgElem = document.getElementById(renderId).querySelector("svg");
 	const imageElem = document.getElementById("raw-image");
@@ -396,8 +404,8 @@ async function applyLayout(
 		offset,
 		imgWidth,
 		imgHeight,
-		polygonWidth,
-		polygonHeight,
+		boundingWidth,
+		boundingHeight,
 		baseSize,
 		baseOverlap,
 	});
@@ -407,17 +415,71 @@ async function applyLayout(
 	const imgTopX = scaledPadding;
 	const imgTopY = scaledPadding;
 	await embedImageIntoSvg(imageElem, svgElem, scale, {
-		transform: `translate(${imgTopX},${imgTopY})`,
+		// transform: `translate(${imgTopX},${imgTopY})`,
+		x: imgTopX,
+		y: imgTopY,
 		style: "opacity: 0.5;",
+		// mask: "url(#testmask)",
+		"clip-path": "url(#testclip)",
 	});
-	const imgBottomX = scaledPadding; // TODO: actually do this
+	const imgBottomX = scaledPadding;
+	const polygonHeightOffset = -1 * boundingHeight;
 	const imgBottomScaleYOffset = -1 * (imgHeight * scale);
-	const imgBottomBaseOffset = -1 * (baseSize * 2 - baseOverlap * 2);
-	const imgBottomY = 0 + imgBottomBaseOffset + imgBottomScaleYOffset;
+	const imgBottomBaseOffset = -2 * (baseSize - baseOverlap);
+	const imgBottomY =
+		polygonHeightOffset + imgBottomBaseOffset + imgBottomScaleYOffset;
 	await embedImageIntoSvg(imageElem, svgElem, scale, {
 		transform: `scale(1,-1) translate(${imgBottomX},${imgBottomY})`,
 		style: "opacity: 0.5;",
 	});
+	/**
+	 * MASKING / CLIPPATH EXPERIMENTS BELOW
+	 */
+	const rectNode = buildSvgNode("rect", {
+		width: 100,
+		height: 100,
+		x: 0,
+		y: 0,
+		fill: "rgba(255,0,0,0.444)",
+	});
+	const maskNode = buildSvgNode("mask", {
+		id: "testmask",
+	});
+	maskNode.appendChild(
+		buildSvgNode("rect", {
+			width: 100,
+			height: 100,
+			x: 0,
+			y: 0,
+			fill: "white",
+		})
+	);
+	svgElem.insertBefore(maskNode, svgElem.firstChild);
+	svgElem.appendChild(rectNode);
+	svgElem.appendChild(
+		buildSvgNode("circle", {
+			cx: 65,
+			cy: 85,
+			r: 40,
+			fill: "rgba(0,0, 255,0.44)",
+			mask: "url(#testmask)",
+		})
+	);
+	const clipPathNode = buildSvgNode("clipPath", {
+		id: "testclip",
+	});
+	clipPathNode.appendChild(
+		buildSvgNode("rect", {
+			width: 100,
+			height: 100,
+			x: 0,
+			y: 0,
+			fill: "white",
+		})
+	);
+	svgElem.insertBefore(clipPathNode, svgElem.firstChild);
+
+	// svgElem.appendChild(maskNode);
 }
 
 function toDataUrl(url) {
