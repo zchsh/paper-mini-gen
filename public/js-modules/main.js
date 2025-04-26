@@ -388,16 +388,44 @@ async function applyLayout(
 	},
 	renderId
 ) {
-	const svgString = renderPolygonsAsPathSvg([polygonObj], 9);
-	document.getElementById(renderId).innerHTML = svgString;
-	const svgElem = document.getElementById(renderId).querySelector("svg");
-	const imageElem = document.getElementById("raw-image");
-	/**
-	 * NOTE: offset affects viewBox, not the SVG element... so may
-	 * be fine to ignore?
-	 *
-	 * As far as I can tell, may be fine to leave at 0,0?
-	 */
+	const viewBox = getFallbackViewBox([polygonObj], 9);
+	const pathStrings = [polygonObj].map((polygon) => {
+		return renderPolygonAsPathString(polygon);
+	});
+
+	// Set up the SVG node
+	const [minX, minY, svgWidth, svgHeight] = viewBox;
+	const svgNode = buildSvgNode("svg", {
+		width: svgWidth,
+		height: svgHeight,
+		viewBox: `${minX} ${minY} ${svgWidth} ${svgHeight}`,
+	});
+
+	// Set up path nodes, representing the traced, offset, & union'd shapes
+	const debugUnionNodes = pathStrings.map((pathString) => {
+		return buildSvgNode("path", {
+			stroke: "rgba(255,0,255,0.7)",
+			"fill-rule": "nonzero",
+			fill: "rgba(255,0,255,0.3)",
+			"stroke-width": 1,
+			d: pathString,
+		});
+	});
+
+	// Set up a clip-path, using the union'd shape
+	const unionClipPath = buildSvgNode("clipPath", {
+		id: "unionclip",
+	});
+	unionClipPath.append(
+		...pathStrings.map((pathString) => {
+			return buildSvgNode("path", {
+				"fill-rule": "nonzero",
+				fill: "white",
+				d: pathString,
+			});
+		})
+	);
+
 	console.log({
 		paddingBeforeTrace,
 		scale,
@@ -409,77 +437,56 @@ async function applyLayout(
 		baseSize,
 		baseOverlap,
 	});
-	// Embed the image into the SVG
-	// const imgTopOffset = paddingBeforeTrace / scale;
+	/**
+	 * Grab the image element, embed into the SVG
+	 */
+	const imageElem = document.getElementById("raw-image");
 	const scaledPadding = paddingBeforeTrace * scale;
 	const imgTopX = scaledPadding;
 	const imgTopY = scaledPadding;
-	await embedImageIntoSvg(imageElem, svgElem, scale, {
-		// transform: `translate(${imgTopX},${imgTopY})`,
+	const imgTopNode = await getImageNode(imageElem, scale, {
 		x: imgTopX,
 		y: imgTopY,
-		style: "opacity: 0.5;",
-		// mask: "url(#testmask)",
-		"clip-path": "url(#testclip)",
+		style: "opacity: 1;",
+		"clip-path": "url(#unionclip)",
 	});
 	const imgBottomX = scaledPadding;
-	const polygonHeightOffset = -1 * boundingHeight;
-	const imgBottomScaleYOffset = -1 * (imgHeight * scale);
-	const imgBottomBaseOffset = -2 * (baseSize - baseOverlap);
+	const polygonHeightOffset = -1.0 * boundingHeight;
+	const imgBottomScaleYOffset = -1.0 * (imgHeight * scale);
+	const imgBottomBaseOffset = -2.0 * (baseSize - baseOverlap);
 	const imgBottomY =
-		polygonHeightOffset + imgBottomBaseOffset + imgBottomScaleYOffset;
-	await embedImageIntoSvg(imageElem, svgElem, scale, {
-		transform: `scale(1,-1) translate(${imgBottomX},${imgBottomY})`,
-		style: "opacity: 0.5;",
+		polygonHeightOffset +
+		imgBottomBaseOffset +
+		imgBottomScaleYOffset -
+		scaledPadding -
+		1; // TODO: why the heck is this needed? meh, seems to be... for now.
+	const imgBottomNode = await getImageNode(imageElem, scale, {
+		transform: `scale(1,-1) translate(0,${imgBottomY})`,
+		x: imgBottomX,
+		y: scaledPadding,
+		style: "opacity: 1;",
+		"clip-path": "url(#unionclip)",
 	});
 	/**
-	 * MASKING / CLIPPATH EXPERIMENTS BELOW
+	 * Build and render the SVG
 	 */
-	const rectNode = buildSvgNode("rect", {
-		width: 100,
-		height: 100,
-		x: 0,
-		y: 0,
-		fill: "rgba(255,0,0,0.444)",
-	});
-	const maskNode = buildSvgNode("mask", {
-		id: "testmask",
-	});
-	maskNode.appendChild(
+	svgNode.appendChild(
 		buildSvgNode("rect", {
-			width: 100,
-			height: 100,
-			x: 0,
-			y: 0,
-			fill: "white",
+			width: svgWidth,
+			height: svgHeight,
+			x: minX,
+			y: minY,
+			fill: "rgba(255,0,255,0.5)",
 		})
 	);
-	svgElem.insertBefore(maskNode, svgElem.firstChild);
-	svgElem.appendChild(rectNode);
-	svgElem.appendChild(
-		buildSvgNode("circle", {
-			cx: 65,
-			cy: 85,
-			r: 40,
-			fill: "rgba(0,0, 255,0.44)",
-			mask: "url(#testmask)",
-		})
-	);
-	const clipPathNode = buildSvgNode("clipPath", {
-		id: "testclip",
-	});
-	clipPathNode.appendChild(
-		buildSvgNode("rect", {
-			width: 100,
-			height: 100,
-			x: 0,
-			y: 0,
-			fill: "white",
-		})
-	);
-	svgElem.insertBefore(clipPathNode, svgElem.firstChild);
+	svgNode.appendChild(imgTopNode);
+	svgNode.appendChild(imgBottomNode);
+	svgNode.appendChild(unionClipPath);
+	svgNode.append(...debugUnionNodes);
 
-	// svgElem.appendChild(maskNode);
+	const renderElem = document.getElementById(renderId);
+	renderElem.innerHTML = "";
+	renderElem.appendChild(svgNode);
 }
 
 function toDataUrl(url) {
@@ -509,9 +516,9 @@ function buildSvgNode(nodeType, values) {
 	return node;
 }
 
-async function embedImageIntoSvg(
+async function getImageNode(
 	imageElem,
-	svgElem,
+	// svgElem,
 	scale,
 	moreAttributes = {}
 ) {
@@ -527,7 +534,8 @@ async function embedImageIntoSvg(
 		"xlink:href": imgDataUrl,
 		...moreAttributes,
 	});
-	svgElem.insertBefore(imgNode, svgElem.firstChild);
+	return imgNode;
+	// svgElem.insertBefore(imgNode, svgElem.firstChild);
 }
 
 window.applyLayout = applyLayout;
