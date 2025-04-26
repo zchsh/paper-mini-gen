@@ -4,6 +4,7 @@
 		<!-- COMMON -->
 		<script src="/js-modules/modules/00-common/render-polygons-as-path-svg.js"></script>
 		<script src="/js-modules/modules/00-common/get-bounding-points.js"></script>
+		<script src="/js-modules/modules/00-common/copy-text-to-clipboard.js"></script>
 		<!-- SILHOUETTE - could try to figure out how to include as a module? -->
 		<script src="/js-modules/modules/02-silhouette/image.min.js"></script>
 		<!-- TRACE - could try to figure out how to include as a module? -->
@@ -53,6 +54,7 @@
 					document.getElementById("arrange-container")
 				);
 				const polygons_union = applyUnion(polygons_arranged, "union-container");
+				applyLayout(polygons_union, "layout-container");
 			}
 
 			async function resetAndRunAll() {
@@ -165,21 +167,46 @@
 		<!--  -->
 		<!--  -->
 		<!--  -->
-		<h2 style="color: magenta">UNION</h2>
+		<h2>UNION</h2>
 		<!--  -->
 		<!--  -->
 		<!--  -->
-		<div id="union-shapes-debug"></div>
-		<div id="union-arrange-debug"></div>
+		<!-- <div id="union-shapes-debug"></div> -->
+		<!-- <div id="union-arrange-debug"></div> -->
 		<div id="union-container"></div>
-		<h3>Union tweaks</h3>
+
+		<!--  -->
+		<!--  -->
+		<!--  -->
+		<h2 style="color: magenta">LAYOUT</h2>
+		<!--  -->
+		<!--  -->
+		<!--  -->
+
+		<div id="layout-container"></div>
+		<h3>Layout tweaks</h3>
 		<ul style="color: magenta">
-			<li>TODO: add copy-svg-to-clipboard (generic?)</li>
-			<li>
-				TODO: start on next step - layout, with the original image, dotted
-				lines, etc.
+			<li style="color: black">
+				embed single original image in the copy-able SVG, any location
 			</li>
+			<li>TODO: add reflected original image</li>
+			<li>TODO: adjust positioning of embedded original images</li>
+			<li>
+				TODO: test with more complex shapes, eg with "holes". have noticed
+				sometimes "offset" fails, eg for "sample-char-art-01-small", need to
+				investigate why. larger blur radius seems to help... maybe has to do
+				with path complexity? maybe path smoothing could be applied immediately
+				after the trace step? it does seem like path smoothing would be a nice
+				addition.
+			</li>
+			<li>TODO: clean up styles of union shape, for cutting outline</li>
+			<li>TODO: add dotted lines</li>
 		</ul>
-		<button onClick="runAll()">Apply union tweaks</button>
+		<button
+			onClick="copyTextToClipboard(document.getElementById('layout-container').innerHTML)"
+		>
+			Copy Layout SVG to clipboard
+		</button>
+		<button onClick="runAll()">Apply layout tweaks</button>
 	</body>
 </html>

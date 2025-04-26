@@ -348,3 +348,67 @@ function unionPolygonObjects(polygons) {
 }
 
 window.applyUnion = applyUnion;
+
+/**
+ * TODO: implement layout
+ *
+ * - [ ] refactor to prepare to compose a single SVG from many shapes
+         (currently, we get an SVG string... but we want to put
+				 multiple elements in the same SVG...)
+ * - [ ] update SVG styling of polygon object
+ * - [ ] add original image, in any location
+ * - [ ] adjust image location (may need more args)
+ * - [ ] add dotted lines
+ */
+async function applyLayout(polygonObj, renderId) {
+	const svgString = renderPolygonsAsPathSvg([polygonObj], 9);
+	document.getElementById(renderId).innerHTML = svgString;
+	const svgElem = document.getElementById(renderId).querySelector("svg");
+	const imageElem = document.getElementById("raw-image");
+	// Embed the image into the SVG
+	await embedImageIntoSvg(imageElem, svgElem);
+}
+
+function toDataUrl(url) {
+	return new Promise((resolve, reject) => {
+		fetch(url)
+			.then((response) => response.blob())
+			.then((blob) => {
+				const reader = new FileReader();
+				reader.onloadend = () => resolve(reader.result);
+				reader.onerror = reject;
+				reader.readAsDataURL(blob);
+			});
+	});
+}
+
+function buildSvgNode(nodeType, values) {
+	const node = document.createElementNS("http://www.w3.org/2000/svg", nodeType);
+	for (const key in values) {
+		const namespace =
+			key === "xlink:href" ? "http://www.w3.org/1999/xlink" : null;
+		if (namespace !== null) {
+			node.setAttributeNS(namespace, key, values[key]);
+		} else {
+			node.setAttribute(key, values[key]);
+		}
+	}
+	return node;
+}
+
+async function embedImageIntoSvg(imageElem, svgElem) {
+	const imgSrc = imageElem.getAttribute("src");
+	const imgDataUrl = await toDataUrl(imgSrc);
+	const imgHeight = imageElem.naturalHeight;
+	const imgWidth = imageElem.naturalWidth;
+	const imgNode = buildSvgNode("image", {
+		width: imgWidth / 2,
+		height: imgHeight / 2,
+		x: 20,
+		y: 20,
+		"xlink:href": imgDataUrl,
+	});
+	svgElem.insertBefore(imgNode, svgElem.firstChild);
+}
+
+window.applyLayout = applyLayout;
