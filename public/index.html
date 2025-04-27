@@ -1,43 +1,196 @@
 <!DOCTYPE html>
 <html>
 	<head>
-		<title>Paper Mini Gen</title>
-		<link rel="shortcut icon" href="#" />
-		<!-- IMAGE UPLOAD  -->
-		<script type="text/javascript" src="/lib/on-image-selection.js"></script>
-		<!-- IMAGE SILHOUETTING -->
-		<!-- https://www.lactame.com/lib/image-js/0.21.2/image.min.js -->
-		<script type="text/javascript" src="/lib/image.min.js"></script>
-		<script type="text/javascript" src="/lib/get-input-as-int.js"></script>
-		<script type="text/javascript" src="/lib/apply-threshold.js"></script>
-		<!-- IMAGE TRACING -->
-		<script type="text/javascript" src="/lib/imagetracer_v1.2.6.js"></script>
-		<!-- IMAGE TRACING CLEANUP -->
-		<script type="text/javascript" src="/lib/pathseg.js"></script>
-		<script type="text/javascript" src="/lib/path-to-polygon.js"></script>
-		<!-- OFFSET PATH -->
-		<script src="/lib/bezier.js" type="text/javascript"></script>
-		<script src="/lib/browser.maker.js" type="text/javascript"></script>
-		<script
-			src="/lib/svg-path-outline.browser.js"
-			type="text/javascript"
-		></script>
-		<!-- BOOLEAN ADDITION -->
-		<script
-			type="text/javascript"
-			src="/lib/polybooljs-1.2.2/dist/polybool.js"
-		></script>
-		<script type="text/javascript" src="/lib/render-paths-string.js"></script>
-		<script
-			type="text/javascript"
-			src="/lib/render-polygon-as-path-svg.js"
-		></script>
+		<!-- COMMON -->
+		<script src="/js-modules/modules/00-common/render-polygons-as-path-svg.js"></script>
+		<script src="/js-modules/modules/00-common/get-bounding-points.js"></script>
+		<script src="/js-modules/modules/00-common/copy-text-to-clipboard.js"></script>
+		<!-- SILHOUETTE - could try to figure out how to include as a module? -->
+		<script src="/js-modules/modules/02-silhouette/image.min.js"></script>
+		<!-- TRACE - could try to figure out how to include as a module? -->
+		<script src="/js-modules/modules/03-trace/imagetracer_v1.2.6.js"></script>
+		<!-- TRACE CLEANUP -->
+		<script src="/js-modules/modules/03-trace/flatten-svg/path-data-polyfill.js"></script>
+		<!-- TODO: the TRACE CLEANUP scripts below this comment could be modules -->
+		<script src="/js-modules/modules/03-trace/flatten-svg/svg-to-paths.js"></script>
+		<!-- OFFSET -->
+		<script src="/js-modules/modules/04-offset/browser.maker.js"></script>
+		<script src="/js-modules/modules/04-offset/svg-path-outline.js"></script>
+		<script src="/js-modules/modules/04-offset/apply-offset.js"></script>
+		<script src="/js-modules/modules/04-offset/flatten-svg-to-paths.js"></script>
+		<script src="/js-modules/modules/04-offset/parse-svg-viewbox.js"></script>
+		<!-- ARRANGE -->
+		<script src="/js-modules/modules/05-arrange/create-circular-polygon.js"></script>
+		<!-- UNION -->
+		<script src="/js-modules/modules/06-union/polybooljs-1.2.2/dist/polybool.js"></script>
+		<!-- main module -->
+		<script type="module" src="/js-modules/main.js"></script>
+		<!-- main execution -->
+		<script>
+			/**
+			 * TODO: refactor so runAll() can start from specific step.
+			 * Eg, when adjusting `offset`, should re-run from `applyOffset()`
+			 * onwards, everything before is already done.
+			 *
+			 * In fact, there'd even be sub-steps. Eg, when adjusting the "offset"
+			 * in the "arrange" phase, really only need to re-run PART of a step.
+			 * That level of optimization could come later... but may be worth
+			 * thinking through, when you're deciding exactly HOW to refactor.
+			 * Maybe the answer is just... if you want to break a single step
+			 * down into two parts, then maybe that step should really be two steps.
+			 * And for the "arrange" step at least, seems totally fine to do a little
+			 * extra redundant math WITHIN the step... it'll be wasteful but
+			 * fast anyways.
+			 */
+			async function runAll() {
+				const imgResizeMax = 400;
+				const [paddingBeforeTrace, imgWidth, imgHeight] =
+					await silhouetteExecute("raw-image", "processed-image", imgResizeMax);
+				const result = await traceExecute("processed-image", "trace-svg");
+
+				const svgSourceContainer = document.getElementById("trace-svg");
+				const svgSource = svgSourceContainer.querySelector("svg");
+				const [polygons_offset, offset] = applyOffset(
+					"trace-svg",
+					"offset-svg"
+				);
+				const {
+					polygons_arranged,
+					scale,
+					baseSize,
+					baseOverlap,
+					boundingWidth,
+					boundingHeight,
+					boundingBox,
+					arrangeOffset,
+					baseCenters,
+				} = arrangeForUnion(
+					polygons_offset,
+					document.getElementById("arrange-container")
+				);
+				const polygons_union = applyUnion(polygons_arranged, "union-container");
+				// TODO: grab polygon width and height, probs from "arrange for union"
+				await applyLayout(
+					polygons_union,
+					{
+						scale,
+						imgResizeMax,
+						paddingBeforeTrace,
+						imgWidth,
+						imgHeight,
+						arrangeOffset,
+						boundingHeight,
+						boundingWidth,
+						boundingBox,
+						baseSize,
+						baseOverlap,
+						baseCenters,
+					},
+					"layout-container"
+				);
+			}
+
+			async function resetAndRunAll() {
+				silhouetteResetSettings();
+				await runAll();
+			}
+		</script>
+		<style>
+			body {
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+			}
+
+			.raw-image-container {
+				width: 400px;
+				height: 400px;
+			}
+
+			.raw-image-container img {
+				width: 100%;
+				height: 100%;
+				object-fit: contain;
+			}
+
+			.note {
+				font-style: italic;
+				max-width: 30em;
+				margin: 0 auto;
+				text-align: center;
+			}
+		</style>
+		<script>
+			function updateImage(newImageSrc, settings = {}) {
+				const rawImageElement = document.getElementById("raw-image");
+				rawImageElement.src = newImageSrc;
+				rawImageElement.onload = async () => {
+					// Update settings
+					console.log({ settings });
+					for (const [key, value] of Object.entries(settings)) {
+						console.log({ key, value });
+						document.getElementById(key).value = value;
+					}
+					await runAll();
+				};
+			}
+		</script>
 	</head>
-	<body>
+	<body
+		onload="updateImage('/sample-char-art-00.jpeg', {
+		heightMm: 30,
+		radius: 5,
+		arrangeOffsetX: -5
+	})"
+	>
+		<h1>Paper Miniature Generator</h1>
+		<div
+			style="
+				max-width: 30em;
+				padding: 2em;
+				border: 1px solid magenta;
+				border-radius: 8px;
+			"
+		>
+			<p style="color: magenta; font-weight: bold; text-align: center">
+				PLEASE NOTE
+			</p>
+			<p>
+				This tool is a rough work in progress. It works with a pretty narrow
+				range of images. Uploaded images:
+			</p>
+			<ul>
+				<li>
+					MUST have blank background.
+					<a href="https://www.remove.bg/">https://www.remove.bg/</a> is a quick
+					way to remove a background from an image (you'll have to convert to
+					JPEG after though).
+				</li>
+				<li>
+					MUST be a JPEG. If you have a PNG, you can use whatever tool you're
+					most familiar with on your computer, or a quick online tool like
+					<a href="https://convertio.co/png-jpeg/">Convertio</a>.
+				</li>
+				<li>
+					SHOULD be not-too-big. Under 100 kB is ideal. If you want an online
+					image resizing tool, many have annoying ads, but
+					<a href="https://www.adobe.com/express/feature/image/resize"
+						>Adobe Express's resize tool</a
+					>
+					can be refreshing because it's just one giant ad for Adobe.
+				</li>
+			</ul>
+			<p>
+				EVEN IF you have an image that perfectly meets all these criteria, you
+				will likely still need to twiddle some knobs to get this tool to work.
+				Thanks for your patience!
+			</p>
+		</div>
+
 		<!--  -->
 		<!--  -->
 		<!--  -->
-		<h2>IMAGE UPLOAD</h2>
+		<h2>UPLOAD</h2>
 		<!--  -->
 		<!--  -->
 		<!--  -->
@@ -47,365 +200,210 @@
 				type="file"
 				id="image-input"
 				accept="image/png, image/jpeg"
-				onchange="onImageSelection(this, 'image-preview')"
+				onchange="onImageSelection(this, 'raw-image', resetAndRunAll)"
 			/>
 		</p>
+
+		<p>Or choose an example:</p>
+
 		<p>
-			<img id="image-preview" src="/sample-char-art-00.jpeg" />
+			<button
+				onclick="updateImage('/sample-char-art-00.jpeg', {
+				heightMm: 30,
+				radius: 5,
+				arrangeOffsetX: -5,
+				offset: 30
+			})"
+			>
+				sample-char-art-00.jpeg
+			</button>
+			<button
+				onclick="updateImage('/sample-char-art-01.jpeg', {
+				heightMm: 35,
+				radius: 6,
+				arrangeOffsetX: -5,
+				offset: 30
+			})"
+			>
+				sample-char-art-01.jpeg
+			</button>
+			<button
+				onclick="updateImage('/sample-char-art-02.jpeg', {
+			heightMm: 25,
+			radius:7,
+			arrangeOffsetX: 0,
+			offset: 30
+		})"
+			>
+				sample-char-art-02.jpeg
+			</button>
+			<button
+				onclick="updateImage('/sample-char-art-03.jpeg', {
+		heightMm: 35,
+		radius: 6,
+		arrangeOffsetX: 0,
+		offset: 30,
+		threshold: 90
+	})"
+			>
+				sample-char-art-03.jpeg
+			</button>
 		</p>
 
 		<!--  -->
 		<!--  -->
 		<!--  -->
-		<h2>IMAGE SILHOUETTING</h2>
+		<h2>SILHOUETTE</h2>
 		<!--  -->
 		<!--  -->
 		<!--  -->
-		<script>
-			async function processImage() {
-				// Load the original raw image from a source element
-				const imgElem = document.getElementById("image-preview");
-				// Gather optional settings
-				const threshold = getInputAsInt("threshold") / 100;
-				const radius = getInputAsInt("radius");
-				// Proces the image
-				const processedSrc = await applyThreshold(
-					imgElem.src,
-					threshold,
-					radius
-				);
-				// Load the image into a destination element
-				document.getElementById("processed-image").src = processedSrc;
-			}
-		</script>
 
-		<!-- TODO: maybe just maybe use CSS filters to "preview" threshold changes? -->
+		<p class="note">
+			NOTE: it may take a minute for image processing to run and update the
+			silhouette image.
+		</p>
+		<div style="height: 1em"></div>
+		<div style="display: flex; align-items: center">
+			<div class="raw-image-container">
+				<img id="raw-image" src="/sample-char-art-00.jpeg" />
+			</div>
+			<img id="processed-image" />
+		</div>
+
+		<h3>Silhouette tweaks</h3>
 		<p>
-			Threshold
-			<input id="threshold" type="number" min="0" max="100" value="50" />
+			Threshold (100 means auto)
+			<input id="threshold" type="number" min="0" max="100" value="100" />
 		</p>
 		<p>
-			Radius
-			<input id="radius" type="number" min="1" max="100" value="1" />
-		</p>
-		<p><button onClick="processImage()">Process image</button></p>
-		<img id="processed-image" />
-
-		<!--  -->
-		<!--  -->
-		<!--  -->
-		<h2>IMAGE TRACING</h2>
-		<!--  -->
-		<!--  -->
-		<!--  -->
-
-		<script>
-			function traceImage() {
-				/**
-				 * NOTE: uses https://github.com/jankovicsandras/imagetracerjs
-				 */
-				const pathomit = getInputAsInt("pathomit");
-				const ltres = getInputAsInt("ltres");
-				const qtres = getInputAsInt("qtres");
-				// Adding custom palette. This will override numberofcolors.
-				// Loading an image, tracing with the 'posterized2' option preset, and appending the SVG to an element with id="svgcontainer"
-				const imageSource = document
-					.getElementById("processed-image")
-					.getAttribute("src");
-
-				function doneTracingCallback(svgString) {
-					document.getElementById("svgcontainer").innerHTML = "";
-					ImageTracer.appendSVGString(svgString, "svgcontainer");
-				}
-				/**
-				 * TODO: is there a way to trace with straight lines only?
-				 * Could simplify the process dramatically...
-				 */
-				ImageTracer.imageToSVG(
-					imageSource /* input filename / URL */,
-					doneTracingCallback,
-					{
-						pathomit,
-						ltres,
-						qtres,
-						colorsampling: 0,
-						colorquantcycles: 1,
-						strokewidth: 0,
-						roundcoords: 2,
-						/**
-						 * Set a custom palette, of:
-						 * - black (foreground shapes)
-						 * - nearly-white (background shapes, will remove in later step)
-						 */
-						pal: [
-							{ r: 0, g: 0, b: 0, a: 255 },
-							{ r: 245, g: 245, b: 245, a: 255 },
-						],
-					}
-				);
-			}
-		</script>
-
-		<p><button onClick="traceImage()">Trace Image</button></p>
-		<p>OPTIONS</p>
-		<p>Path omit: <input id="pathomit" type="number" min="0" value="30" /></p>
-		<p>
-			Line error threshold:
-			<input id="ltres" type="number" min="1" value="2" />
+			Blur radius
+			<input id="radius" type="number" min="1" max="100" value="5" />
 		</p>
 		<p>
-			Quadratic split error threshold:
-			<input id="qtres" type="number" min="1" value="2" />
+			<button onClick="runAll()">Apply silhouette tweaks</button>
 		</p>
-		<div id="svgcontainer"></div>
 
 		<!--  -->
 		<!--  -->
 		<!--  -->
-		<h2>CLEANUP TRACE</h2>
+		<h2>TRACE</h2>
 		<!--  -->
 		<!--  -->
 		<!--  -->
 
-		<script>
-			function cleanupTrace() {
-				/**
-				 * Clone the SVG generated at the previous step
-				 */
-				const cleanedTraceContainer = document.getElementById(
-					"svgcontainer_cleanup"
-				);
-				cleanedTraceContainer.innerHTML =
-					document.getElementById("svgcontainer").innerHTML;
-				/**
-				 * Retain only the "foreground" paths.
-				 *
-				 * We only want to outline and boolean add the traced paths
-				 * that are "foreground" (ie black). Speficially, remove paths with
-				 * `fill="rgb(245,245,245)"`. Note this specific colour was set
-				 * in the palette of the trace in an earlier step.
-				 */
-				cleanedTraceContainer
-					.querySelectorAll(`path[fill="rgb(245,245,245)"]`)
-					.forEach((e) => e.remove());
-				/**
-				 * Convert the foreground paths, which may include curves,
-				 * to polygons, which will consist of straigh lines only.
-				 *
-				 * The current approach is swiped from:
-				 * https://betravis.github.io/shape-tools/path-to-polygon/
-				 *
-				 * That being said, it doesn't seem to do _any_ sampling along
-				 * curves... instead it only keeps the control points. Maybe
-				 * it'd be possible to improve the tracing further by combining
-				 * the "retain all control points" approach with a
-				 * "sample along the line" approach... perhaps sampling along
-				 * the line only for curved segments? This is a deep dive though,
-				 * and certainly not something I intend to try to tackle at this time.
-				 * More the sample-along-the-line approach:
-				 * https://phrogz.net/SVG/convert_path_to_polygon.xhtml
-				 * And there's a very naive implementation in:
-				 * `basic-point-at-length.html` (in this repo)
-				 */
-				convertPathsToPolygon(cleanedTraceContainer.querySelector("svg"));
-			}
-		</script>
-
-		<ul>
-			<li>Retain "foreground" elements only</li>
-			<li>Convert curves lines to straight lines</li>
-		</ul>
-		<p><button onClick="cleanupTrace()">cleanupTrace()</button></p>
-		<div id="svgcontainer_cleanup"></div>
-
-		<!--  -->
-		<!--  -->
-		<!--  -->
-		<h2>PATH OFFSET</h2>
-		<!--  -->
-		<!--  -->
-		<!--  -->
-
-		<script>
-			/* https://danmarshall.github.io/svg-path-outline/ */
-			var spo = require("svg-path-outline");
-
-			function buildSvgNode(n, v) {
-				n = document.createElementNS("http://www.w3.org/2000/svg", n);
-				for (var p in v) n.setAttributeNS(null, p, v[p]);
-				return n;
-			}
-
-			function applyOffset(svgSource, svgDestContainer = null) {
-				let svgDest;
-				if (svgDestContainer !== null) {
-					svgDestContainer.innerHTML = svgSource.parentNode.innerHTML;
-					svgDest = svgDestContainer.querySelector("svg");
-				} else {
-					svgDest = svgSource;
-				}
-				const offset = getInputAsInt("offset");
-				// Remove any path elements from previous applications
-				const pathElems = svgDest.querySelectorAll("path");
-				for (const pathElem of pathElems) {
-					pathElem.remove();
-				}
-				// From each polygon element, generate an offset path element
-				const polygonElems = svgDest.querySelectorAll("polygon");
-				for (const polygonElem of polygonElems) {
-					const polygonData = polygonElem.getAttribute("points");
-					const outlineData = spo(polygonData, offset, { tagName: "polygon" });
-					const outlinePath = buildSvgNode("path", {
-						d: outlineData,
-						fill: "rgba(255,0,0,0.4)",
-					});
-					svgDest.appendChild(outlinePath);
-				}
-				/**
-				 * TODO: maybe modify the viewBox and the width and height of the SVG?
-				 * Otherwise, large offset values can result in cut-off shapes,
-				 * as the offset shape can expand beyond the original SVG bounds.
-				 *
-				 * Example, for 10 units offset...
-				 * go from viewBox "0 0 100 100", width 100, height 100,
-				 * to viewBox "-10 -10 110 110", width 120, height 120
-				 *
-				 * function expandSvgViewbox(x, y)
-				 */
-			}
-		</script>
-
-		<script>
-			function convertOffsetPathsToPolygons(
-				svgSource,
-				svgDestContainer = null
-			) {
-				let svgDest;
-				if (svgDestContainer !== null) {
-					svgDestContainer.innerHTML = svgSource.parentNode.innerHTML;
-					svgDest = svgDestContainer.querySelector("svg");
-				} else {
-					svgDest = svgSource;
-				}
-				// Remove polygon elements, the "not offset" original shapes
-				const polygonElems = svgDest.querySelectorAll("polygon");
-				for (const polygonElem of polygonElems) {
-					polygonElem.remove();
-				}
-				// Convert the newly offset `path` nodes to `polygon`
-				convertPathsToPolygon(svgDest);
-			}
-		</script>
-
+		<p class="note">
+			NOTE: image tracing can take a bit of time. But it should run pretty
+			reliably though.
+		</p>
+		<div id="trace-svg"></div>
+		<h3>Trace tweaks</h3>
 		<p>
-			Offset:
+			Omit shapes with an area less than:
+			<input id="pathomit" type="number" min="0" value="30" />
+		</p>
+		<p>
+			<button onClick="runAll()">Apply trace tweaks</button>
+		</p>
+
+		<!--  -->
+		<!--  -->
+		<!--  -->
+		<h2>OFFSET</h2>
+		<!--  -->
+		<!--  -->
+		<!--  -->
+
+		<p class="note" style="color: magenta">
+			NOTE: sometimes (... quite often actually), the "offset" step fails! I'm
+			still trying to figure out the root cause and fix it... but for now, first
+			tweak the "threshold" value to make sure you have a good silhouette. If
+			the silhouette already looks good, then try twiddling the "blur radius"
+			input by one unit up or down in the silhouette step seems to help.
+		</p>
+		<div id="offset-svg"></div>
+		<h3>Offset tweaks</h3>
+		<p>
+			Offset amount:
 			<input id="offset" type="number" min="0" max="100" value="30" />
 		</p>
+		<button onClick="runAll()">Apply offset tweaks</button>
+
+		<!--  -->
+		<!--  -->
+		<!--  -->
+		<h2>ARRANGE</h2>
+		<!--  -->
+		<!--  -->
+		<!--  -->
+
+		<div id="arrange-container"></div>
+		<h3>Arrangement tweaks</h3>
+		<p>
+			Height in mm (1 inch ~= 25 mm)
+			<input id="heightMm" type="number" min="5" max="100" value="35" />
+		</p>
+		<p>
+			X offset (use to center the image over the base)
+			<input id="arrangeOffsetX" type="number" min="-100" max="100" value="0" />
+		</p>
+		<p>
+			Y offset (use to "float" or "ground" the image)
+			<!-- TODO: max should be based on "base size". For now, have done
+			     base size (72) divided by 4 -->
+			<input id="arrangeOffsetY" type="number" min="0" max="18" value="0" />
+		</p>
+		<button onClick="runAll()">Apply arrangement tweaks</button>
+
+		<!--  -->
+		<!--  -->
+		<!--  -->
+		<h2>UNION</h2>
+		<!--  -->
+		<!--  -->
+		<!--  -->
+		<!-- <div id="union-shapes-debug"></div> -->
+		<!-- <div id="union-arrange-debug"></div> -->
+		<div id="union-container"></div>
+
+		<!--  -->
+		<!--  -->
+		<!--  -->
+		<h2>LAYOUT</h2>
+		<!--  -->
+		<!--  -->
+		<!--  -->
+
+		<div id="layout-container"></div>
 		<button
-			onClick="applyOffset(document.querySelector('#svgcontainer_cleanup svg'), document.querySelector('#svgcontainer_offset')); convertOffsetPathsToPolygons(document.querySelector('#svgcontainer_offset svg'))"
+			onClick="copyTextToClipboard(document.getElementById('layout-container').innerHTML)"
 		>
-			Apply offset
+			Copy SVG to clipboard
 		</button>
-		<div id="svgcontainer_offset"></div>
-
-		<!--  -->
-		<!--  -->
-		<!--  -->
-		<h2>BOOLEAN ADDITION</h2>
-		<!--  -->
-		<!--  -->
-		<!--  -->
-
-		<script>
-			function unionPolygonObjects(polygons) {
-				var segments = PolyBool.segments(polygons[0]);
-				for (var i = 1; i < polygons.length; i++) {
-					var seg2 = PolyBool.segments(polygons[i]);
-					var comb = PolyBool.combine(segments, seg2);
-					segments = PolyBool.selectUnion(comb);
-				}
-				return PolyBool.polygon(segments);
-			}
-
-			function runUnion(svgSourceContainer, svgDestContainer = null) {
-				const polygonElems = svgSourceContainer.querySelectorAll("polygon");
-				const polygonObjs = [];
-				for (const polygonElem of polygonElems) {
-					polygonObjs.push(getPolygonAsPolyboolObj(polygonElem));
-				}
-				/**
-				 * Union of many shapes, as pulled from examples:
-				 * https://github.com/velipso/polybooljs?tab=readme-ov-file#advanced-example-1
-				 */
-				const unionPolygonObj = unionPolygonObjects(polygonObjs);
-				/**
-				 * TODO: renderPolygonAsPathSvg should be refactored.
-				 * Part of it is inferring width and height of resulting SVG...
-				 * but may actually want to explicitly provide those!
-				 * Three different functions happening:
-				 * - inferArtboardDimensions(polygonObj)
-				 * - speculativeWindingOrderFix(polygonObj)
-				 * - renderPathsString() (... already implemented)
-				 * - renderSvg(pathsString) (... for markup and style decisions!)
-				 */
-				const unionSvg = renderPolygonAsPathSvg(unionPolygonObj);
-				svgDestContainer.innerHTML = unionSvg;
-			}
-
-			function getPolygonAsPolyboolObj(polygonElem) {
-				const points = polygonElem
-					.getAttribute("points")
-					.split(" ")
-					.map((e) => e.trim())
-					.filter((e) => e !== "")
-					.map((e) => {
-						const [xStr, yStr] = e.split(",");
-						return [parseFloat(xStr), parseFloat(yStr)];
-					});
-				return {
-					regions: [points],
-					inverted: false,
-				};
-			}
-		</script>
-
-		<button
-			onClick="runUnion(document.querySelector('#svgcontainer_offset'), document.querySelector('#svgcontainer_booleanunion'))"
+		<div style="height: 3em"></div>
+		<div
+			style="
+				max-width: 30em;
+				padding: 2em;
+				border: 1px solid magenta;
+				border-radius: 8px;
+			"
 		>
-			Apply boolean union
-		</button>
-		<div id="svgcontainer_booleanunion"></div>
+			<p style="color: magenta; font-weight: bold; text-align: center">
+				WHAT NEXT?
+			</p>
+			<p>
+				You probably want to print the SVG above somehow! You'll need a tool
+				that lets you paste an SVG from your clipboard, and arrange it on a
+				page. You can usually fit many different miniatures on a single page.
+			</p>
+			<p>
+				<a href="https://www.figma.com/">Figma</a> is likely the easiest option
+				if you're unfamiliar. <a href="https://inkscape.org/">Inkscape</a> is
+				another option, it's a free and open-source vector graphics editor but
+				might have a bit more of a learning curve.
+			</p>
+		</div>
 
-		<!--  -->
-		<!--  -->
-		<!--  -->
-		<h2>Copy to Clipboard</h2>
-		<!--  -->
-		<!--  -->
-		<!--  -->
-
-		<script>
-			async function copyTextToClipboard(text) {
-				const blobText = new Blob([text], { type: "text/plain" });
-				const data = [
-					new ClipboardItem({
-						["text/plain"]: blobText,
-					}),
-				];
-				navigator.clipboard.write(data).then(
-					() => {},
-					() => {
-						alert("Copy to clipboard failed for some reason.");
-					}
-				);
-			}
-		</script>
-
-		<p>This serves as the "export" function... for now at least!</p>
-		<button
-			onClick="copyTextToClipboard(document.getElementById('svgcontainer_booleanunion').innerHTML)"
-		>
-			Copy to clipboard
-		</button>
+		<div style="height: 16em"></div>
 	</body>
 </html>

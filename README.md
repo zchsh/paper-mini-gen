@@ -56,9 +56,7 @@ Next step is to keep working on `js-modules` setup.
   - This step should yield SVG artwork
   - Allow copying the final SVG to the clipboard (paste into Figma!)
 
-- [ ] Move `/js-modules` to main page
-- [ ] Share with DnD folks
-  - Hey y'all!
+- [x] Move `/js-modules` to main page
 
 - [ ] Revisit trace-and-offset step, to address buggy cases
   - Repro case: `sample-char-art-01-small.jpeg` with current default settings. Trace succeeds but "offset" fails. Increasing blur radius to `6`, a single point, seems to "fix" the issue, or work around it at least. Blur radius of `2` produces weird results, the trace looks right but the "offset" doesn't.
