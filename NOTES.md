@@ -56,9 +56,10 @@ Next step is to keep working on `js-modules` setup.
 
 - [x] Move `/js-modules` to main page
 
-- [ ] Add `baseSize` and `baseOverlap` input
+- [x] Add `baseSize` and `baseOverlap` input
   - Tool only really works for paper minis that fit nicely on a 1-inch-radius (72 px) base
   - Would be pretty quick to make this a little user input in the `Arrangement tweaks` area
+  - 2025-04-27 at 17:07 - meh, `baseOverlap` doesn't feel needed. Leaving out, `baseSize` was indeed quick.
 
 - [ ] Revisit trace-and-offset step, to address buggy cases
   - Repro case: `sample-char-art-01-small.jpeg` with current default settings. Trace succeeds but "offset" fails. Increasing blur radius to `6`, a single point, seems to "fix" the issue, or work around it at least. Blur radius of `2` produces weird results, the trace looks right but the "offset" doesn't.

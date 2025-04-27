@@ -234,7 +234,8 @@ function arrangeForUnion(rawPolygons, targetContainer) {
 	const originalBottom = minY + boundingHeight;
 
 	// Add some circular polygons for the base and stuff
-	const baseSize = 72;
+	const baseSizeMm = getInputAsInt("baseSizeMm");
+	const baseSize = baseSizeMm * (PIXELS_PER_INCH / MM_PER_INCH);
 	const baseOverlap = Math.ceil(baseSize / 10);
 
 	const rawBaseCenters = [
