@@ -7,9 +7,13 @@
  * @param {number} radius
  * @returns {string}
  */
-export async function applyThreshold(image, threshold, radius) {
+export async function applyThreshold(image, threshold, radius, resizeMax) {
+	const maxDimension = Math.max(image.width, image.height);
+	const resizeFactor = resizeMax / maxDimension;
 	return (
 		image
+			// Resize the image to maximum width or height
+			.resize({ factor: resizeFactor })
 			// Pad the image, to avoid blur issues near image boundaries
 			.pad({ size: radius * 2, algorithm: "set", color: [255, 255, 255, 255] })
 			// Apply the blur

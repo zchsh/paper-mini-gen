@@ -20,7 +20,7 @@ import { getFallbackThreshold } from "./get-fallback-threshold.js";
  * @param {*} threshold
  * @returns
  */
-export async function processImage(imgSrc, radius, threshold) {
+export async function processImage(imgSrc, radius, threshold, resizeMax) {
 	// Gather optional settings
 	const useAuto = threshold === 100;
 	let image = await IJS.Image.load(imgSrc);
@@ -30,7 +30,8 @@ export async function processImage(imgSrc, radius, threshold) {
 	const processedSrc = await applyThreshold(
 		image,
 		finalThreshold / 100.0,
-		radius
+		radius,
+		resizeMax
 	);
 	// Load the image into a destination element
 	const width = image.width;

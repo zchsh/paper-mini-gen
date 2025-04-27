@@ -20,11 +20,11 @@ window.onImageSelection = onImageSelection;
  */
 function silhouetteResetSettings() {
 	document.getElementById("threshold").value = 100;
-	document.getElementById("radius").value = 5;
+	document.getElementById("radius").value = 6;
 }
 window.silhouetteResetSettings = silhouetteResetSettings;
 
-async function silhouetteExecute(imgSrcId, imgDestId) {
+async function silhouetteExecute(imgSrcId, imgDestId, resizeMax) {
 	// Gather settings
 	const threshold = getInputAsInt("threshold");
 	const radius = getInputAsInt("radius");
@@ -41,7 +41,8 @@ async function silhouetteExecute(imgSrcId, imgDestId) {
 	const [processedSrc, width, height] = await processImage(
 		inputElem.src,
 		radius,
-		threshold
+		threshold,
+		resizeMax
 	);
 	outputElem.src = processedSrc;
 	const paddingBeforeTrace = radius * 2;
@@ -381,6 +382,7 @@ async function applyLayout(
 		paddingBeforeTrace,
 		scale,
 		arrangeOffset,
+		imgResizeMax,
 		imgWidth,
 		imgHeight,
 		boundingWidth,
@@ -408,15 +410,6 @@ async function applyLayout(
 	});
 
 	// Set up path nodes, representing the traced, offset, & union'd shapes
-	// const pathsDebugUnion = pathStrings.map((pathString) => {
-	// 	return buildSvgNode("path", {
-	// 		stroke: "rgba(255,0,255,0.7)",
-	// 		"fill-rule": "nonzero",
-	// 		fill: "rgba(255,0,255,0.3)",
-	// 		"stroke-width": 1,
-	// 		d: pathString,
-	// 	});
-	// });
 	const pathsUnionBackground = pathStrings.map((pathString) => {
 		return buildSvgNode("path", {
 			"fill-rule": "nonzero",
@@ -454,38 +447,69 @@ async function applyLayout(
 	 * Grab the image element, embed into the SVG,
 	 * positioning it carefully to match the union'd shape.
 	 */
+	const scalePostTrace = scale;
+	const maxImgDimension = Math.max(imgWidth, imgHeight);
+	const scalePreTrace = imgResizeMax / maxImgDimension;
+	const finalImgScale = scalePreTrace * scalePostTrace;
 	const imageElem = document.getElementById("raw-image");
-	const scaledPadding = paddingBeforeTrace * scale;
+	const scaledPadding = paddingBeforeTrace * scalePostTrace;
 	const imgTopX = scaledPadding;
 	const imgTopY = scaledPadding;
-	const svgImageTop = await getImageNode(imageElem, scale, {
+	const svgImageTop = await getImageNode(imageElem, finalImgScale, {
 		x: imgTopX,
 		y: imgTopY,
 		style: "opacity: 1;",
-		"clip-path": "url(#unionclip)",
+		// "clip-path": "url(#unionclip)",
 	});
 	const imgBottomX = scaledPadding;
 	const polygonHeightOffset = -1.0 * boundingHeight;
-	const imgBottomScaleYOffset = -1.0 * (imgHeight * scale);
-	const imgBottomBaseOffset = -2.0 * (baseSize - baseOverlap);
+	const imgBottomReflectOffset = -1.0 * (imgHeight * finalImgScale);
+	const imgBottomBaseOffset = 2.0 * (baseSize - baseOverlap);
 	const [arrangeOffsetX, arrangeOffsetY] = arrangeOffset;
-	console.log({ arrangeOffsetX, arrangeOffsetY });
+
 	// Transforms happen AFTER the clipping mask is applied...
 	// The clipping mask is applied to the image at the "top" position...
 	// and then the image is SCALED (inverted), then TRANSLATED to the "bottom"
 	// position.
-	const imgBottomTranslateY =
-		polygonHeightOffset +
-		imgBottomBaseOffset +
-		imgBottomScaleYOffset -
-		arrangeOffsetY * 2 -
-		scaledPadding -
-		1; // TODO: why the heck is this needed? rounding? meh, ignoring... for now
-	const svgImageBottom = await getImageNode(imageElem, scale, {
-		transform: `scale(1,-1) translate(0,${imgBottomTranslateY})`,
+
+	// const imgBottomTranslateY =
+	// 	polygonHeightOffset +
+	// 	imgBottomBaseOffset * -1 +
+	// 	imgBottomReflectOffset -
+	// 	// arrangeOffsetY * 2 -
+	// 	// scaledPadding -
+	// 	// 4.66; // TODO: why the heck is this needed? rounding? meh, ignoring... for now
+	// 	7.36;
+	console.log({
+		imgTopY,
+		scaledPadding,
+		arrangeOffsetY,
+	});
+	const imgBottomY =
+		imgTopY + boundingHeight + imgBottomBaseOffset + arrangeOffsetY * 2;
+	// const imgWidthFinal = imgWidth * finalImgScale;
+	const imgHeightFinal = imgHeight * finalImgScale;
+	/**
+	 * When we reflect the image, it's reflected about the origin point (0,0).
+	 * This means the image is flipped up way outside the viewbox. To compensate,
+	 * we need to translate the image back down.
+	 *
+	 * Note: ideally, we'd instead use the SVG `transform-origin` property.
+	 * But transform-origin doesn't seem to have wide support yet.
+	 * https://developer.mozilla.org/en-US/docs/Web/SVG/Reference/Attribute/transform-origin
+	 */
+	const imgBottomReflectionTranslate = -1 * (imgBottomY * 2 + imgHeightFinal);
+	const svgImageBottom = await getImageNode(imageElem, finalImgScale, {
+		transform: `scale(1, -1) translate(0, ${imgBottomReflectionTranslate})`,
 		x: imgBottomX,
-		y: imgTopY,
+		y: imgBottomY,
 		style: "opacity: 1;",
+	});
+
+	/**
+	 * Build a group for the two images, which includes a clip-path
+	 */
+	const svgGroupImages = buildSvgNode("g", {
 		"clip-path": "url(#unionclip)",
 	});
 
@@ -515,8 +539,9 @@ async function applyLayout(
 	 */
 	svgNode.appendChild(clipPathUnion);
 	svgNode.append(...pathsUnionBackground);
-	svgNode.appendChild(svgImageTop);
-	svgNode.appendChild(svgImageBottom);
+	svgGroupImages.appendChild(svgImageTop);
+	svgGroupImages.appendChild(svgImageBottom);
+	svgNode.appendChild(svgGroupImages);
 	svgNode.append(...pathsUnionOutline);
 	// svgNode.append(...pathsDebugUnion);
 	svgNode.appendChild(dottedLineTop);
@@ -554,12 +579,7 @@ function buildSvgNode(nodeType, values) {
 	return node;
 }
 
-async function getImageNode(
-	imageElem,
-	// svgElem,
-	scale,
-	moreAttributes = {}
-) {
+async function getImageNode(imageElem, scale, moreAttributes = {}) {
 	const imgSrc = imageElem.getAttribute("src");
 	const imgDataUrl = await toDataUrl(imgSrc);
 	const imgHeight = imageElem.naturalHeight;
@@ -567,8 +587,6 @@ async function getImageNode(
 	const imgNode = buildSvgNode("image", {
 		width: imgWidth * scale,
 		height: imgHeight * scale,
-		x: 0,
-		y: 0,
 		"xlink:href": imgDataUrl,
 		...moreAttributes,
 	});

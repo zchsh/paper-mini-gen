@@ -1,6 +1,6 @@
 export function getFallbackThreshold(loadedImage) {
 	const cornerPixels = getCornerPixels(loadedImage);
-	const THRESHOLD_BUFFER = 15;
+	const THRESHOLD_BUFFER = 10;
 	return getApproxBackgroundLuminosity(cornerPixels) - THRESHOLD_BUFFER;
 }
 

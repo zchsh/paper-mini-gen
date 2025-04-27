@@ -43,8 +43,9 @@
 			 * fast anyways.
 			 */
 			async function runAll() {
+				const imgResizeMax = 400;
 				const [paddingBeforeTrace, imgWidth, imgHeight] =
-					await silhouetteExecute("raw-image", "processed-image");
+					await silhouetteExecute("raw-image", "processed-image", imgResizeMax);
 				const result = await traceExecute("processed-image", "trace-svg");
 
 				const svgSourceContainer = document.getElementById("trace-svg");
@@ -73,6 +74,7 @@
 					polygons_union,
 					{
 						scale,
+						imgResizeMax,
 						paddingBeforeTrace,
 						imgWidth,
 						imgHeight,
@@ -93,8 +95,98 @@
 				await runAll();
 			}
 		</script>
+		<style>
+			body {
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+			}
+
+			.raw-image-container {
+				width: 400px;
+				height: 400px;
+			}
+
+			.raw-image-container img {
+				width: 100%;
+				height: 100%;
+				object-fit: contain;
+			}
+
+			.note {
+				font-style: italic;
+				max-width: 30em;
+				margin: 0 auto;
+				text-align: center;
+			}
+		</style>
+		<script>
+			function updateImage(newImageSrc, settings = {}) {
+				const rawImageElement = document.getElementById("raw-image");
+				rawImageElement.src = newImageSrc;
+				rawImageElement.onload = async () => {
+					// Update settings
+					console.log({ settings });
+					for (const [key, value] of Object.entries(settings)) {
+						console.log({ key, value });
+						document.getElementById(key).value = value;
+					}
+					await runAll();
+				};
+			}
+		</script>
 	</head>
-	<body onload="resetAndRunAll()">
+	<body
+		onload="updateImage('/sample-char-art-00.jpeg', {
+		heightMm: 30,
+		radius: 5,
+		arrangeOffsetX: -5
+	})"
+	>
+		<h1>Paper Miniature Generator</h1>
+		<div
+			style="
+				max-width: 30em;
+				padding: 2em;
+				border: 1px solid magenta;
+				border-radius: 8px;
+			"
+		>
+			<p style="color: magenta; font-weight: bold; text-align: center">
+				PLEASE NOTE
+			</p>
+			<p>
+				This tool is a rough work in progress. It works with a pretty narrow
+				range of images. Uploaded images:
+			</p>
+			<ul>
+				<li>
+					MUST have blank background.
+					<a href="https://www.remove.bg/">https://www.remove.bg/</a> is a quick
+					way to remove a background from an image (you'll have to convert to
+					JPEG after though).
+				</li>
+				<li>
+					MUST be a JPEG. If you have a PNG, you can use whatever tool you're
+					most familiar with on your computer, or a quick online tool like
+					<a href="https://convertio.co/png-jpeg/">Convertio</a>.
+				</li>
+				<li>
+					SHOULD be not-too-big. Under 100 kB is ideal. If you want an online
+					image resizing tool, many have annoying ads, but
+					<a href="https://www.adobe.com/express/feature/image/resize"
+						>Adobe Express's resize tool</a
+					>
+					can be refreshing because it's just one giant ad for Adobe.
+				</li>
+			</ul>
+			<p>
+				EVEN IF you have an image that perfectly meets all these criteria, you
+				will likely still need to twiddle some knobs to get this tool to work.
+				Thanks for your patience!
+			</p>
+		</div>
+
 		<!--  -->
 		<!--  -->
 		<!--  -->
@@ -112,6 +204,52 @@
 			/>
 		</p>
 
+		<p>Or choose an example:</p>
+
+		<p>
+			<button
+				onclick="updateImage('/sample-char-art-00.jpeg', {
+				heightMm: 30,
+				radius: 5,
+				arrangeOffsetX: -5,
+				offset: 30
+			})"
+			>
+				sample-char-art-00.jpeg
+			</button>
+			<button
+				onclick="updateImage('/sample-char-art-01.jpeg', {
+				heightMm: 35,
+				radius: 6,
+				arrangeOffsetX: -5,
+				offset: 30
+			})"
+			>
+				sample-char-art-01.jpeg
+			</button>
+			<button
+				onclick="updateImage('/sample-char-art-02.jpeg', {
+			heightMm: 25,
+			radius:7,
+			arrangeOffsetX: 0,
+			offset: 30
+		})"
+			>
+				sample-char-art-02.jpeg
+			</button>
+			<button
+				onclick="updateImage('/sample-char-art-03.jpeg', {
+		heightMm: 35,
+		radius: 6,
+		arrangeOffsetX: 0,
+		offset: 30,
+		threshold: 90
+	})"
+			>
+				sample-char-art-03.jpeg
+			</button>
+		</p>
+
 		<!--  -->
 		<!--  -->
 		<!--  -->
@@ -120,8 +258,15 @@
 		<!--  -->
 		<!--  -->
 
+		<p class="note">
+			NOTE: it may take a minute for image processing to run and update the
+			silhouette image.
+		</p>
+		<div style="height: 1em"></div>
 		<div style="display: flex; align-items: center">
-			<img id="raw-image" src="/sample-char-art-00.jpeg" />
+			<div class="raw-image-container">
+				<img id="raw-image" src="/sample-char-art-00.jpeg" />
+			</div>
 			<img id="processed-image" />
 		</div>
 
@@ -131,7 +276,7 @@
 			<input id="threshold" type="number" min="0" max="100" value="100" />
 		</p>
 		<p>
-			Radius
+			Blur radius
 			<input id="radius" type="number" min="1" max="100" value="5" />
 		</p>
 		<p>
@@ -146,9 +291,16 @@
 		<!--  -->
 		<!--  -->
 
+		<p class="note">
+			NOTE: image tracing can take a bit of time. But it should run pretty
+			reliably though.
+		</p>
 		<div id="trace-svg"></div>
 		<h3>Trace tweaks</h3>
-		<p>Path omit: <input id="pathomit" type="number" min="0" value="30" /></p>
+		<p>
+			Omit shapes with an area less than:
+			<input id="pathomit" type="number" min="0" value="30" />
+		</p>
 		<p>
 			<button onClick="runAll()">Apply trace tweaks</button>
 		</p>
@@ -161,10 +313,17 @@
 		<!--  -->
 		<!--  -->
 
+		<p class="note" style="color: magenta">
+			NOTE: sometimes (... quite often actually), the "offset" step fails! I'm
+			still trying to figure out the root cause and fix it... but for now, first
+			tweak the "threshold" value to make sure you have a good silhouette. If
+			the silhouette already looks good, then try twiddling the "blur radius"
+			input by one unit up or down in the silhouette step seems to help.
+		</p>
 		<div id="offset-svg"></div>
-		<h3>Trace tweaks</h3>
+		<h3>Offset tweaks</h3>
 		<p>
-			Offset:
+			Offset amount:
 			<input id="offset" type="number" min="0" max="100" value="30" />
 		</p>
 		<button onClick="runAll()">Apply offset tweaks</button>
@@ -184,11 +343,11 @@
 			<input id="heightMm" type="number" min="5" max="100" value="35" />
 		</p>
 		<p>
-			X offset in pixels ("center")
+			X offset (use to center the image over the base)
 			<input id="arrangeOffsetX" type="number" min="-100" max="100" value="0" />
 		</p>
 		<p>
-			Y offset in pixels ("float")
+			Y offset (use to "float" or "ground" the image)
 			<!-- TODO: max should be based on "base size". For now, have done
 			     base size (72) divided by 4 -->
 			<input id="arrangeOffsetY" type="number" min="0" max="18" value="0" />
@@ -209,36 +368,42 @@
 		<!--  -->
 		<!--  -->
 		<!--  -->
-		<h2 style="color: magenta">LAYOUT</h2>
+		<h2>LAYOUT</h2>
 		<!--  -->
 		<!--  -->
 		<!--  -->
 
 		<div id="layout-container"></div>
-		<h3>Layout tweaks</h3>
-		<ul>
-			<li>embed single original image in the copy-able SVG, any location</li>
-			<li>add reflected original image</li>
-			<li>adjust positioning of embedded original images</li>
-			<li>add clip path for top image</li>
-			<li>add clip path for bottom image</li>
-			<li>add white background using clip-path shape</li>
-			<li>clean up styles of union shape, for cutting outline</li>
-			<li style="color: magenta">TODO: add dotted lines</li>
-			<li style="color: magenta">
-				TODO: test with more complex shapes, eg with "holes". have noticed
-				sometimes "offset" fails, eg for "sample-char-art-01-small", need to
-				investigate why. larger blur radius seems to help... maybe has to do
-				with path complexity? maybe path smoothing could be applied immediately
-				after the trace step? it does seem like path smoothing would be a nice
-				addition.
-			</li>
-		</ul>
 		<button
 			onClick="copyTextToClipboard(document.getElementById('layout-container').innerHTML)"
 		>
-			Copy Layout SVG to clipboard
+			Copy SVG to clipboard
 		</button>
-		<button onClick="runAll()">Apply layout tweaks</button>
+		<div style="height: 3em"></div>
+		<div
+			style="
+				max-width: 30em;
+				padding: 2em;
+				border: 1px solid magenta;
+				border-radius: 8px;
+			"
+		>
+			<p style="color: magenta; font-weight: bold; text-align: center">
+				WHAT NEXT?
+			</p>
+			<p>
+				You probably want to print the SVG above somehow! You'll need a tool
+				that lets you paste an SVG from your clipboard, and arrange it on a
+				page. You can usually fit many different miniatures on a single page.
+			</p>
+			<p>
+				<a href="https://www.figma.com/">Figma</a> is likely the easiest option
+				if you're unfamiliar. <a href="https://inkscape.org/">Inkscape</a> is
+				another option, it's a free and open-source vector graphics editor but
+				might have a bit more of a learning curve.
+			</p>
+		</div>
+
+		<div style="height: 16em"></div>
 	</body>
 </html>

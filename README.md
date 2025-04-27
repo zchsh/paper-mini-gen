@@ -49,16 +49,26 @@ Next step is to keep working on `js-modules` setup.
   - This step yields the outline of the paper mini (ideally one shape, may be more than one)
     - Could grab the largest area shape? Meh, many shapes is fine. Can use small feature filter at `trace` stage.
 
-- [ ] Implement `07-layout` step to `js-modules` setup
+- [x] Implement `07-layout` step to `js-modules` setup
   - Takes the set of points for the outline of the paper mini as input
   - Renders those points into an SVG (note, may have cutout regions, will use `<path />`)
   - Embeds the original image into the SVG, at the correct position (and z-index!)
   - This step should yield SVG artwork
   - Allow copying the final SVG to the clipboard (paste into Figma!)
 
+- [ ] Move `/js-modules` to main page
+- [ ] Share with DnD folks
+  - Hey y'all!
+
 - [ ] Revisit trace-and-offset step, to address buggy cases
   - Repro case: `sample-char-art-01-small.jpeg` with current default settings. Trace succeeds but "offset" fails. Increasing blur radius to `6`, a single point, seems to "fix" the issue, or work around it at least. Blur radius of `2` produces weird results, the trace looks right but the "offset" doesn't.
   - MAYBE there's a possibility of MERGING POINTS THAT AREA VERY CLOSE TO EACH OTHER.... For each point... if the next point is within a certain distance, then replace both points with a point at the average of the co-ordinates of the two points. When a replacement happens, move on to the next point. In theory you could run this multiple times, but not sure that'll be needed. Might be a neat algorithm to try to implement, and MAYBE it'll address the issue here.
+  - 2025-04-27 at 11:44 - offset seems to fail when there are _multiple_ shapes... maybe I need to separate the shapes before proceeding with the trace? This may be more relevant than path smoothing. Blur may be fixing thing because it prevents separate shapes? Default sample icon with 30 blur radius produces this case.
+
+- [ ] Consider post-trace option to "remove interior voids"
+  - I've been thinking about doing _line drawings_. This would leave significant "holes", or interior shapes, within a larger main shape.
+  - Could there be an option to remove these interior voids? Option to remove them completely could make sense.
+  - Another way to implement this option, more manual maybe a separate thing, would be manual removal of specific shapes, eg by clicking on them and having them change colour.
 
 ### Later
 
