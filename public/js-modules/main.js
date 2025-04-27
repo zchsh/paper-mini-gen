@@ -468,16 +468,23 @@ async function applyLayout(
 	const polygonHeightOffset = -1.0 * boundingHeight;
 	const imgBottomScaleYOffset = -1.0 * (imgHeight * scale);
 	const imgBottomBaseOffset = -2.0 * (baseSize - baseOverlap);
-	const imgBottomY =
+	const [arrangeOffsetX, arrangeOffsetY] = arrangeOffset;
+	console.log({ arrangeOffsetX, arrangeOffsetY });
+	// Transforms happen AFTER the clipping mask is applied...
+	// The clipping mask is applied to the image at the "top" position...
+	// and then the image is SCALED (inverted), then TRANSLATED to the "bottom"
+	// position.
+	const imgBottomTranslateY =
 		polygonHeightOffset +
 		imgBottomBaseOffset +
 		imgBottomScaleYOffset -
+		arrangeOffsetY * 2 -
 		scaledPadding -
 		1; // TODO: why the heck is this needed? rounding? meh, ignoring... for now
 	const svgImageBottom = await getImageNode(imageElem, scale, {
-		transform: `scale(1,-1) translate(0,${imgBottomY})`,
+		transform: `scale(1,-1) translate(0,${imgBottomTranslateY})`,
 		x: imgBottomX,
-		y: scaledPadding,
+		y: imgTopY,
 		style: "opacity: 1;",
 		"clip-path": "url(#unionclip)",
 	});
@@ -485,17 +492,6 @@ async function applyLayout(
 	/**
 	 * Add some dotted lines to the SVG
 	 */
-	const [arrangeOffsetX] = arrangeOffset;
-	const topPolygonBottom = boundingBox.maxY;
-	const topPolygonCenter =
-		boundingBox.minX + (boundingBox.maxX - boundingBox.minX) / 2;
-	const topBaseCenterY = topPolygonBottom;
-	const topBaseCenterX = topPolygonCenter - arrangeOffsetX;
-	// const baseCenters = [
-	// 	[topBaseCenterX, topBaseCenterY],
-	// 	[topBaseCenterX, topBaseCenterY + (baseSize - baseOverlap)],
-	// 	[topBaseCenterX, topBaseCenterY + (baseSize - baseOverlap) * 2],
-	// ];
 	const dottedLineTop = buildSvgNode("line", {
 		x1: baseCenters[0][0] - baseSize / 2,
 		y1: baseCenters[0][1],
