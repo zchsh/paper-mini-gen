@@ -235,36 +235,12 @@ function arrangeForUnion(rawPolygons, targetContainer) {
 	// Add some circular polygons for the base and stuff
 	const baseSize = 72;
 	const baseOverlap = Math.ceil(baseSize / 10);
-	const circleBase = {
-		regions: [
-			createCircularPolygon(baseSize / 2, 24, [
-				boundingCenterX,
-				originalBottom + baseSize - baseOverlap,
-			]),
-		],
-	};
-	const circleBaseTop = {
-		regions: [
-			createCircularPolygon(72 / 2, 24, [boundingCenterX, originalBottom]),
-		],
-	};
-	const circleBaseBottom = {
-		regions: [
-			createCircularPolygon(72 / 2, 24, [
-				boundingCenterX,
-				originalBottom + (baseSize - baseOverlap) * 2,
-			]),
-		],
-	};
 
-	// Add a reflected duplicate for the "other side"
-	const rawReflection = visitPoints(polygons, ([x, y]) => {
-		return [x, y * -1];
-	});
-	const polygonsReflected = visitPoints(rawReflection, ([x, y]) => {
-		const offset = originalBottom * 2 + (baseSize - baseOverlap) * 2;
-		return [x, y + offset];
-	});
+	const rawBaseCenters = [
+		[boundingCenterX, originalBottom],
+		[boundingCenterX, originalBottom + baseSize - baseOverlap],
+		[boundingCenterX, originalBottom + (baseSize - baseOverlap) * 2],
+	];
 
 	// Add X and Y offset. Note that we move the "base" pieces,
 	// and leave the original piece in place.
@@ -278,12 +254,35 @@ function arrangeForUnion(rawPolygons, targetContainer) {
 	const arrangeOffsetX = getInputAsInt("arrangeOffsetX");
 	const arrangeOffsetY = getInputAsInt("arrangeOffsetY");
 
+	const baseCenters = rawBaseCenters.map(([x, y]) => {
+		return [x - arrangeOffsetX, y + arrangeOffsetY];
+	});
+
+	const circleBase = {
+		regions: [createCircularPolygon(baseSize / 2, 24, baseCenters[0])],
+	};
+	const circleBaseTop = {
+		regions: [createCircularPolygon(baseSize / 2, 24, baseCenters[1])],
+	};
+	const circleBaseBottom = {
+		regions: [createCircularPolygon(baseSize / 2, 24, baseCenters[2])],
+	};
+
+	// Add a reflected duplicate for the "other side"
+	const rawReflection = visitPoints(polygons, ([x, y]) => {
+		return [x, y * -1];
+	});
+	const polygonsReflected = visitPoints(rawReflection, ([x, y]) => {
+		const offset = originalBottom * 2 + (baseSize - baseOverlap) * 2;
+		return [x, y + offset];
+	});
+
 	const arrangedPolygons = [
 		...polygons,
 		...translatePolygons(polygonsReflected, [0, arrangeOffsetY * 2]),
-		translatePolygon(circleBaseTop, [arrangeOffsetX * -1, arrangeOffsetY]),
-		translatePolygon(circleBase, [arrangeOffsetX * -1, arrangeOffsetY]),
-		translatePolygon(circleBaseBottom, [arrangeOffsetX * -1, arrangeOffsetY]),
+		circleBaseTop,
+		circleBase,
+		circleBaseBottom,
 	];
 
 	const viewBoxPadding = 9; // 1/8 inch
@@ -293,14 +292,17 @@ function arrangeForUnion(rawPolygons, targetContainer) {
 	);
 	targetContainer.innerHTML = svgStringArranged;
 
-	return [
-		arrangedPolygons,
+	return {
+		polygons_arranged: arrangedPolygons,
 		scale,
 		baseSize,
 		baseOverlap,
 		boundingWidth,
 		boundingHeight,
-	];
+		boundingBox: { minX, minY, maxX, maxY },
+		arrangeOffset: [arrangeOffsetX, arrangeOffsetY],
+		baseCenters,
+	};
 }
 
 function translatePolygons(polygons, offset) {
@@ -378,16 +380,20 @@ async function applyLayout(
 	{
 		paddingBeforeTrace,
 		scale,
-		offset,
+		arrangeOffset,
 		imgWidth,
 		imgHeight,
 		boundingWidth,
 		boundingHeight,
+		boundingBox,
 		baseSize,
 		baseOverlap,
+		baseCenters,
 	},
 	renderId
 ) {
+	const OUTLINE_COLOR = "#DDDDDD";
+
 	const viewBox = getFallbackViewBox([polygonObj], 9);
 	const pathStrings = [polygonObj].map((polygon) => {
 		return renderPolygonAsPathString(polygon);
@@ -402,21 +408,40 @@ async function applyLayout(
 	});
 
 	// Set up path nodes, representing the traced, offset, & union'd shapes
-	const debugUnionNodes = pathStrings.map((pathString) => {
+	// const pathsDebugUnion = pathStrings.map((pathString) => {
+	// 	return buildSvgNode("path", {
+	// 		stroke: "rgba(255,0,255,0.7)",
+	// 		"fill-rule": "nonzero",
+	// 		fill: "rgba(255,0,255,0.3)",
+	// 		"stroke-width": 1,
+	// 		d: pathString,
+	// 	});
+	// });
+	const pathsUnionBackground = pathStrings.map((pathString) => {
 		return buildSvgNode("path", {
-			stroke: "rgba(255,0,255,0.7)",
 			"fill-rule": "nonzero",
-			fill: "rgba(255,0,255,0.3)",
-			"stroke-width": 1,
+			fill: "white",
+			d: pathString,
+		});
+	});
+	const pathsUnionOutline = pathStrings.map((pathString) => {
+		return buildSvgNode("path", {
+			"fill-rule": "nonzero",
+			fill: "none",
+			stroke: OUTLINE_COLOR,
+			"stroke-width": 0.5,
+			"stroke-linecap": "round",
+			"stroke-linejoin": "round",
+			"stroke-miterlimit": 10,
 			d: pathString,
 		});
 	});
 
 	// Set up a clip-path, using the union'd shape
-	const unionClipPath = buildSvgNode("clipPath", {
+	const clipPathUnion = buildSvgNode("clipPath", {
 		id: "unionclip",
 	});
-	unionClipPath.append(
+	clipPathUnion.append(
 		...pathStrings.map((pathString) => {
 			return buildSvgNode("path", {
 				"fill-rule": "nonzero",
@@ -425,26 +450,15 @@ async function applyLayout(
 			});
 		})
 	);
-
-	console.log({
-		paddingBeforeTrace,
-		scale,
-		offset,
-		imgWidth,
-		imgHeight,
-		boundingWidth,
-		boundingHeight,
-		baseSize,
-		baseOverlap,
-	});
 	/**
-	 * Grab the image element, embed into the SVG
+	 * Grab the image element, embed into the SVG,
+	 * positioning it carefully to match the union'd shape.
 	 */
 	const imageElem = document.getElementById("raw-image");
 	const scaledPadding = paddingBeforeTrace * scale;
 	const imgTopX = scaledPadding;
 	const imgTopY = scaledPadding;
-	const imgTopNode = await getImageNode(imageElem, scale, {
+	const svgImageTop = await getImageNode(imageElem, scale, {
 		x: imgTopX,
 		y: imgTopY,
 		style: "opacity: 1;",
@@ -459,30 +473,58 @@ async function applyLayout(
 		imgBottomBaseOffset +
 		imgBottomScaleYOffset -
 		scaledPadding -
-		1; // TODO: why the heck is this needed? meh, seems to be... for now.
-	const imgBottomNode = await getImageNode(imageElem, scale, {
+		1; // TODO: why the heck is this needed? rounding? meh, ignoring... for now
+	const svgImageBottom = await getImageNode(imageElem, scale, {
 		transform: `scale(1,-1) translate(0,${imgBottomY})`,
 		x: imgBottomX,
 		y: scaledPadding,
 		style: "opacity: 1;",
 		"clip-path": "url(#unionclip)",
 	});
+
+	/**
+	 * Add some dotted lines to the SVG
+	 */
+	const [arrangeOffsetX] = arrangeOffset;
+	const topPolygonBottom = boundingBox.maxY;
+	const topPolygonCenter =
+		boundingBox.minX + (boundingBox.maxX - boundingBox.minX) / 2;
+	const topBaseCenterY = topPolygonBottom;
+	const topBaseCenterX = topPolygonCenter - arrangeOffsetX;
+	// const baseCenters = [
+	// 	[topBaseCenterX, topBaseCenterY],
+	// 	[topBaseCenterX, topBaseCenterY + (baseSize - baseOverlap)],
+	// 	[topBaseCenterX, topBaseCenterY + (baseSize - baseOverlap) * 2],
+	// ];
+	const dottedLineTop = buildSvgNode("line", {
+		x1: baseCenters[0][0] - baseSize / 2,
+		y1: baseCenters[0][1],
+		x2: baseCenters[0][0] + baseSize / 2,
+		y2: baseCenters[0][1],
+		stroke: OUTLINE_COLOR,
+		"stroke-width": 0.5,
+		"stroke-dasharray": "2, 2",
+	});
+	const dottedLineBottom = buildSvgNode("line", {
+		x1: baseCenters[2][0] - baseSize / 2,
+		y1: baseCenters[2][1],
+		x2: baseCenters[2][0] + baseSize / 2,
+		y2: baseCenters[2][1],
+		stroke: OUTLINE_COLOR,
+		"stroke-width": 0.5,
+		"stroke-dasharray": "2, 2",
+	});
 	/**
 	 * Build and render the SVG
 	 */
-	svgNode.appendChild(
-		buildSvgNode("rect", {
-			width: svgWidth,
-			height: svgHeight,
-			x: minX,
-			y: minY,
-			fill: "rgba(255,0,255,0.5)",
-		})
-	);
-	svgNode.appendChild(imgTopNode);
-	svgNode.appendChild(imgBottomNode);
-	svgNode.appendChild(unionClipPath);
-	svgNode.append(...debugUnionNodes);
+	svgNode.appendChild(clipPathUnion);
+	svgNode.append(...pathsUnionBackground);
+	svgNode.appendChild(svgImageTop);
+	svgNode.appendChild(svgImageBottom);
+	svgNode.append(...pathsUnionOutline);
+	// svgNode.append(...pathsDebugUnion);
+	svgNode.appendChild(dottedLineTop);
+	svgNode.appendChild(dottedLineBottom);
 
 	const renderElem = document.getElementById(renderId);
 	renderElem.innerHTML = "";

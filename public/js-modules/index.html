@@ -53,14 +53,17 @@
 					"trace-svg",
 					"offset-svg"
 				);
-				const [
+				const {
 					polygons_arranged,
 					scale,
 					baseSize,
 					baseOverlap,
 					boundingWidth,
 					boundingHeight,
-				] = arrangeForUnion(
+					boundingBox,
+					arrangeOffset,
+					baseCenters,
+				} = arrangeForUnion(
 					polygons_offset,
 					document.getElementById("arrange-container")
 				);
@@ -73,10 +76,13 @@
 						paddingBeforeTrace,
 						imgWidth,
 						imgHeight,
+						arrangeOffset,
 						boundingHeight,
 						boundingWidth,
+						boundingBox,
 						baseSize,
 						baseOverlap,
+						baseCenters,
 					},
 					"layout-container"
 				);
@@ -210,18 +216,16 @@
 
 		<div id="layout-container"></div>
 		<h3>Layout tweaks</h3>
-		<ul style="color: magenta">
-			<li style="color: black">
-				embed single original image in the copy-able SVG, any location
-			</li>
-			<li style="color: black">add reflected original image</li>
-			<li style="color: black">
-				adjust positioning of embedded original images
-			</li>
-			<li style="color: magenta">add clip path for top image</li>
-			<li style="color: magenta">add clip path for bottom image</li>
-			<li style="color: magenta">add white background using clip-path shape</li>
-			<li>
+		<ul>
+			<li>embed single original image in the copy-able SVG, any location</li>
+			<li>add reflected original image</li>
+			<li>adjust positioning of embedded original images</li>
+			<li>add clip path for top image</li>
+			<li>add clip path for bottom image</li>
+			<li>add white background using clip-path shape</li>
+			<li>clean up styles of union shape, for cutting outline</li>
+			<li style="color: magenta">TODO: add dotted lines</li>
+			<li style="color: magenta">
 				TODO: test with more complex shapes, eg with "holes". have noticed
 				sometimes "offset" fails, eg for "sample-char-art-01-small", need to
 				investigate why. larger blur radius seems to help... maybe has to do
@@ -229,8 +233,6 @@
 				after the trace step? it does seem like path smoothing would be a nice
 				addition.
 			</li>
-			<li>TODO: clean up styles of union shape, for cutting outline</li>
-			<li>TODO: add dotted lines</li>
 		</ul>
 		<button
 			onClick="copyTextToClipboard(document.getElementById('layout-container').innerHTML)"
