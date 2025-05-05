@@ -2,64 +2,10 @@
 
 ## Next steps
 
-Next step is to keep working on `js-modules` setup.
-
-- [x] Add `03-trace` step to `js-modules` setup
-  - Takes the silhouette image as input
-  - Note that previous `ImageTracer` step seems to yield an SVG string... gonna leave that for now
-  - Docs on `ImageTracer` for later: <https://github.com/jankovicsandras/imagetracerjs>
-  - This step should yield a set of regions compatible with `<polygon />` shapes
-
-- [x] Add `04-offset` step to `js-modules` setup
-  - Takes the traced silhouette as input
-  - In this step, the traced polygon(s) should have their paths offset
-  - `toy-offset-and-addition` contains the latest bits of work on the offset front (ignore the addition part)
-  - The offset tool I'm using yields paths with curves... these need to be flattened
-  - `demo-flatten-svg` was my latest bit of work and exploration on the flattening front
-  - This step should yield a set of regions compatible with `<polygon />` shapes
-
-- [x] Write a function to visit points, and do something to do those points
-  - Could try translate first?
-
-- [x] Write (or find) a function to flip a set of x,y points vertically (ie on the horizontal axis)
-  - Maybe looking at <https://g.js.org/ref/mirror.html> could be good?
-  - Could also look into <https://maker.js.org/docs/intermediate-drawing/>. Already used for offset. Has mirror function... so maybe that's a good way to go?
-  - Probably makes sense to start by stubbing `demo-vertical-mirror`
-  - 2025-04-17 at 22:16 - meh, already have an approach here I think... if I think about this as "reflect a single point about some line", that seems more feasible to DIY. and that "line" can be the horizontal line that passes through the bottom-most point (max Y i think?) of the polygon itself (or, could be centre point?)
-  - Example algorithm: <https://www.mathwarehouse.com/transformations/reflections-in-math.php>
-  - Note: for _winding order_, may need to _reverse points_ after the flip is done
-
-- [x] Add `05-arrange` step to `js-modules` setup
-  - Takes the offset silhouette polygons as input
-  - Should add three circular polygons, for the base and stuff
-  - See `lib/create-circular-polygon.js`. Convert to module!
-  - Two of your boolean-offset polygons, one of the flipped vertically
-  - This step should yield a set of regions compatible with `<polygon />` shapes
-  - 2025-04-25 - implemented scaling!
-  - 2025-04-25 - implemented xy tweaks
-  - 2025-04-25 - added base overlap
-  - 2025-04-25 at 17:59 - wrapping up this step for now
-
-- [x] Add `06-union` step to `js-modules` setup
-  - Takes the arranges polygon-compatible shapes as input
-  - Executes a boolean addition on all the input shapes
-  - This step should yield a set of regions compatible with `<polygon />` shapes
-  - This step yields the outline of the paper mini (ideally one shape, may be more than one)
-    - Could grab the largest area shape? Meh, many shapes is fine. Can use small feature filter at `trace` stage.
-
-- [x] Implement `07-layout` step to `js-modules` setup
-  - Takes the set of points for the outline of the paper mini as input
-  - Renders those points into an SVG (note, may have cutout regions, will use `<path />`)
-  - Embeds the original image into the SVG, at the correct position (and z-index!)
-  - This step should yield SVG artwork
-  - Allow copying the final SVG to the clipboard (paste into Figma!)
-
-- [x] Move `/js-modules` to main page
-
-- [x] Add `baseSize` and `baseOverlap` input
-  - Tool only really works for paper minis that fit nicely on a 1-inch-radius (72 px) base
-  - Would be pretty quick to make this a little user input in the `Arrangement tweaks` area
-  - 2025-04-27 at 17:07 - meh, `baseOverlap` doesn't feel needed. Leaving out, `baseSize` was indeed quick.
+- [ ] Clean up repository a bit
+  - `js-modules` could be organized a little bit, rename to `modules`, remove redundant dir
+  - all `demo` and `toy` things could be consolidated into a single directory
+  - create `sample-image` directory, maybe
 
 - [ ] Revisit trace-and-offset step, to address buggy cases
   - Repro case: `sample-char-art-01-small.jpeg` with current default settings. Trace succeeds but "offset" fails. Increasing blur radius to `6`, a single point, seems to "fix" the issue, or work around it at least. Blur radius of `2` produces weird results, the trace looks right but the "offset" doesn't.
