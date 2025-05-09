@@ -3,10 +3,12 @@
 	<head>
 		<title>Demo - Average Redundant Points</title>
 		<script src="/demo-average-redundant-points/pathseg.js"></script>
-		<script src="/demo-average-redundant-points/render-paths-string.js"></script>
-		<script src="/demo-average-redundant-points/render-polygons-as-path-svg.js"></script>
+		<script src="/demo-average-redundant-points/create-svg-elem.js"></script>
+
+		<script src="/demo-average-redundant-points/path-data-string-from-regions.js"></script>
 		<script src="/demo-average-redundant-points/get-bounding-points.js"></script>
-		<script src="/demo-average-redundant-points/path-data-to-points.js"></script>
+		<script src="/demo-average-redundant-points/points-from-path-data-string.js"></script>
+
 		<style>
 			.example-container {
 				display: flex;
@@ -22,62 +24,90 @@
 			}
 		</style>
 		<script>
+			// Note: we assume a viewBox of 0 0 100 100 for all examples
 			const examplePathDataStrings = [
 				"M29 32.5V70H70.5V32.5L68.5 31L29 32.5Z",
 				"M24 58.5L21.5 60L50 72.5L77.5 53L66.5 36.5L68.5 35.5L66.5 33.5L31.5 38.5L20 57L24 58.5Z",
 			];
 
-			function runExamples() {
-				const exampleRegions = examplePathDataStrings.map((pathDataString) => {
-					return pathDataToPoints(pathDataString);
+			function buildSvgRootNode(viewBox) {
+				const [minX, minY, svgWidth, svgHeight] = viewBox;
+				const svgNode = createSvgElem("svg", {
+					width: svgWidth,
+					height: svgHeight,
+					viewBox: `${minX} ${minY} ${svgWidth} ${svgHeight}`,
 				});
-				// Render the example regions
-				for (const exampleRegion of exampleRegions) {
-					// Set up an svg node to hold the path node
-					const viewBox = [0, 0, 100, 100];
-					const [minX, minY, svgWidth, svgHeight] = viewBox;
-					const svgNode = buildSvgNode("svg", {
-						width: svgWidth,
-						height: svgHeight,
-						viewBox: `${minX} ${minY} ${svgWidth} ${svgHeight}`,
-					});
-					// set up a path node
-					const pathNode = buildSvgNode("path", {
-						d: renderPathsString([exampleRegion]),
-						fill: "rgba(255,0,255,0.3)",
-						stroke: "rgba(255,0,255,0.7)",
-						"stroke-width": "0.5",
-					});
-					svgNode.appendChild(pathNode);
+				return svgNode;
+			}
 
-					// Set up circle nodes, which mark individual points
-					const circleNodes = exampleRegion.map((point) => {
-						const [cx, cy] = point;
-						const circleNode = buildSvgNode("circle", {
-							cx,
-							cy,
-							r: 1,
-							fill: "magenta",
-						});
-						return circleNode;
-					});
+			function buildPathNode(points) {
+				const pathNode = createSvgElem("path", {
+					d: pathDataStringFromRegions([points]),
+					fill: "rgba(255,0,255,0.3)",
+					stroke: "rgba(255,0,255,0.7)",
+					"stroke-width": "0.5",
+				});
+				return pathNode;
+			}
 
-					for (const circleNode of circleNodes) {
-						svgNode.appendChild(circleNode);
-					}
-					//
+			function getCircleNodesFromPoints(points) {
+				const circleNodes = points.map((point) => {
+					const [cx, cy] = point;
+					const circleNode = createSvgElem("circle", {
+						cx,
+						cy,
+						r: 1,
+						fill: "magenta",
+					});
+					return circleNode;
+				});
+				return circleNodes;
+			}
+
+			function renderRegionAsSvgElem(region) {
+				// Get a <path> node from the region, and circle nodes to mark points
+				const pathNode = buildPathNode(region);
+				const pointNodes = getCircleNodesFromPoints(region);
+				// Set up a root <svg> node, and add in the <path> and <circle> nodes
+				const svgNode = buildSvgRootNode([0, 0, 100, 100]);
+				svgNode.appendChild(pathNode);
+				for (const pointNode of pointNodes) {
+					svgNode.appendChild(pointNode);
+				}
+				return svgNode;
+			}
+
+			function runExamples() {
+				/**
+				 * Convert the provided example path data strings into regions.
+				 * Each region is an array of points, each point is an [x, y] tuple.
+				 */
+				const exampleRegions = examplePathDataStrings.map((pathDataString) => {
+					return pointsFromPathDataString(pathDataString);
+				});
+				// Render each example region
+				for (const regionBefore of exampleRegions) {
+					// Set up a container to hold the example
 					const container = document.createElement("div");
 					container.className = "example-container";
-					//
+					// The "before" div will hold the original SVG
 					const before = document.createElement("div");
 					before.className = "example-before";
-					before.appendChild(svgNode);
+					const svgBefore = renderRegionAsSvgElem(regionBefore);
+					before.appendChild(svgBefore);
 					container.appendChild(before);
-					//
+					/**
+					 * Remove redundant points from the region
+					 */
+					/**
+					 * TODO: actually remove redundant points, for now we just clone
+					 */
+					const regionAfter = [...regionBefore];
+					// The "after" div will hold the SVG with redundant points removed
 					const after = document.createElement("div");
 					after.className = "example-after";
-					const svgNodeClone = svgNode.cloneNode(true);
-					after.appendChild(svgNodeClone);
+					const svgAfter = renderRegionAsSvgElem(regionAfter);
+					after.appendChild(svgAfter);
 					container.appendChild(after);
 					//
 					document.body.appendChild(container);

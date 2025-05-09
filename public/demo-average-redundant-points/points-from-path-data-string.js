@@ -67,27 +67,21 @@ function pathSegListToPoints(pathSegList) {
 	return result;
 }
 
-function buildSvgNode(nodeType, values) {
-	const node = document.createElementNS("http://www.w3.org/2000/svg", nodeType);
-	for (const key in values) {
-		const namespace =
-			key === "xlink:href" ? "http://www.w3.org/1999/xlink" : null;
-		if (namespace !== null) {
-			node.setAttributeNS(namespace, key, values[key]);
-		} else {
-			node.setAttribute(key, values[key]);
-		}
-	}
-	return node;
-}
-
-function pathDataToPoints(pathData) {
+/**
+ *
+ * TODO: what is the path data string has multiple regions?
+ * Do we currently handle that properly? Might be worth investigating.
+ *
+ * @param {string} pathData
+ * @returns
+ */
+function pointsFromPathDataString(pathData) {
 	/**
 	 * Build an SVG path node, this is necessary to use pathSegList
 	 * NOTE: also requires a polyfill for the deprecated pathSegList, see:
 	 * https://github.com/progers/pathseg
 	 */
-	const pathNode = buildSvgNode("path", { d: pathData });
+	const pathNode = createSvgElem("path", { d: pathData });
 	const rawPoints = pathSegListToPoints(pathNode.pathSegList);
 	const points = rawPoints.reduce((acc, val, index) => {
 		if (index % 2 === 0) {
@@ -97,6 +91,5 @@ function pathDataToPoints(pathData) {
 		}
 		return acc;
 	}, []);
-	console.log("points", points);
 	return points;
 }
