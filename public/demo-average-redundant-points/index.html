@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>Demo - Average Redundant Points</title>
+		<script src="/demo-average-redundant-points/pathseg.js"></script>
+		<script src="/demo-average-redundant-points/render-paths-string.js"></script>
+		<script src="/demo-average-redundant-points/render-polygons-as-path-svg.js"></script>
+		<script src="/demo-average-redundant-points/get-bounding-points.js"></script>
+		<script src="/demo-average-redundant-points/path-data-to-points.js"></script>
+		<style>
+			.example-container {
+				display: flex;
+				gap: 16px;
+			}
+
+			.example-before {
+				border: 1px solid magenta;
+			}
+
+			.example-after {
+				border: 1px solid magenta;
+			}
+		</style>
+		<script>
+			const examplePathDataStrings = [
+				"M29 32.5V70H70.5V32.5L68.5 31L29 32.5Z",
+				"M24 58.5L21.5 60L50 72.5L77.5 53L66.5 36.5L68.5 35.5L66.5 33.5L31.5 38.5L20 57L24 58.5Z",
+			];
+
+			function runExamples() {
+				const exampleRegions = examplePathDataStrings.map((pathDataString) => {
+					return pathDataToPoints(pathDataString);
+				});
+				// Render the example regions
+				for (const exampleRegion of exampleRegions) {
+					// Set up an svg node to hold the path node
+					const viewBox = [0, 0, 100, 100];
+					const [minX, minY, svgWidth, svgHeight] = viewBox;
+					const svgNode = buildSvgNode("svg", {
+						width: svgWidth,
+						height: svgHeight,
+						viewBox: `${minX} ${minY} ${svgWidth} ${svgHeight}`,
+					});
+					// set up a path node
+					const pathNode = buildSvgNode("path", {
+						d: renderPathsString([exampleRegion]),
+						fill: "rgba(255,0,255,0.3)",
+						stroke: "rgba(255,0,255,0.7)",
+						"stroke-width": "0.5",
+					});
+					svgNode.appendChild(pathNode);
+
+					// Set up circle nodes, which mark individual points
+					const circleNodes = exampleRegion.map((point) => {
+						const [cx, cy] = point;
+						const circleNode = buildSvgNode("circle", {
+							cx,
+							cy,
+							r: 1,
+							fill: "magenta",
+						});
+						return circleNode;
+					});
+
+					for (const circleNode of circleNodes) {
+						svgNode.appendChild(circleNode);
+					}
+					//
+					const container = document.createElement("div");
+					container.className = "example-container";
+					//
+					const before = document.createElement("div");
+					before.className = "example-before";
+					before.appendChild(svgNode);
+					container.appendChild(before);
+					//
+					const after = document.createElement("div");
+					after.className = "example-after";
+					const svgNodeClone = svgNode.cloneNode(true);
+					after.appendChild(svgNodeClone);
+					container.appendChild(after);
+					//
+					document.body.appendChild(container);
+				}
+			}
+		</script>
+	</head>
+	<body onload="runExamples()">
+		<!-- <div class="example-container">
+			<div class="example-before">
+				<svg
+					width="100"
+					height="100"
+					viewBox="0 0 100 100"
+					fill="none"
+					xmlns="http://www.w3.org/2000/svg"
+				>
+					<path d="M29 32.5V70H70.5V32.5L68.5 31L29 32.5Z" fill="#D9D9D9" />
+				</svg>
+			</div>
+			<div class="example-after"></div>
+		</div>
+		<div class="example-container">
+			<div class="example-before">
+				<svg
+					width="100"
+					height="100"
+					viewBox="0 0 100 100"
+					fill="none"
+					xmlns="http://www.w3.org/2000/svg"
+				>
+					<path
+						d="M24 58.5L21.5 60L50 72.5L77.5 53L66.5 36.5L68.5 35.5L66.5 33.5L31.5 38.5L20 57L24 58.5Z"
+						fill="#D9D9D9"
+					/>
+				</svg>
+			</div>
+			<div class="example-after"></div>
+		</div> -->
+	</body>
+</html>
