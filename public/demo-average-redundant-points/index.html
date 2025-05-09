@@ -77,6 +77,59 @@
 				return svgNode;
 			}
 
+			function getIsRedundant(pointOne, pointTwo) {
+				// Check if the two points are redundant
+				const distanceBetween = Math.sqrt(
+					Math.pow(pointTwo[0] - pointOne[0], 2) +
+						Math.pow(pointTwo[1] - pointOne[1], 2)
+				);
+				return distanceBetween < 5;
+			}
+
+			function getAveragePoint(pointOne, pointTwo) {
+				// Average the two points
+				const averagePoint = [
+					(pointOne[0] + pointTwo[0]) / 2,
+					(pointOne[1] + pointTwo[1]) / 2,
+				];
+				return averagePoint;
+			}
+
+			/**
+			 * TODO: actually remove redundant points, for now we just clone
+			 */
+			function reducePointsAverageRedundant(points) {
+				//
+				if (points.length < 3) {
+					return points;
+				}
+				//
+
+				let currentPoint = null;
+				let nextPoint = null;
+				const newPoints = [];
+				for (let i = 0; i < points.length - 1; i++) {
+					//
+					if (!currentPoint) {
+						currentPoint = points[i];
+					}
+					nextPoint = points[i + 1];
+
+					const isRedundant = getIsRedundant(currentPoint, nextPoint);
+					//
+					if (isRedundant) {
+						// Average the two points
+						const averagePoint = getAveragePoint(currentPoint, nextPoint);
+						currentPoint = averagePoint;
+						// Current point will be pushed once we find a non-redundant point
+					} else {
+						newPoints.push(currentPoint);
+						currentPoint = null;
+					}
+				}
+				return newPoints;
+			}
+
 			function runExamples() {
 				/**
 				 * Convert the provided example path data strings into regions.
@@ -99,16 +152,15 @@
 					/**
 					 * Remove redundant points from the region
 					 */
-					/**
-					 * TODO: actually remove redundant points, for now we just clone
-					 */
-					const regionAfter = [...regionBefore];
+					const regionAfter = reducePointsAverageRedundant(regionBefore);
 					// The "after" div will hold the SVG with redundant points removed
 					const after = document.createElement("div");
 					after.className = "example-after";
 					const svgAfter = renderRegionAsSvgElem(regionAfter);
 					after.appendChild(svgAfter);
 					container.appendChild(after);
+					//
+					console.log({ regionBefore, regionAfter });
 					//
 					document.body.appendChild(container);
 				}
