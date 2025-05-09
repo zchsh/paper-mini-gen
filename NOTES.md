@@ -2,15 +2,16 @@
 
 ## Next steps
 
-- [ ] Clean up repository a bit
-  - `js-modules` could be organized a little bit, rename to `modules`, remove redundant dir
-  - all `demo` and `toy` things could be consolidated into a single directory
-  - create `sample-image` directory, maybe
-
 - [ ] Revisit trace-and-offset step, to address buggy cases
   - Repro case: `sample-char-art-01-small.jpeg` with current default settings. Trace succeeds but "offset" fails. Increasing blur radius to `6`, a single point, seems to "fix" the issue, or work around it at least. Blur radius of `2` produces weird results, the trace looks right but the "offset" doesn't.
   - MAYBE there's a possibility of MERGING POINTS THAT AREA VERY CLOSE TO EACH OTHER.... For each point... if the next point is within a certain distance, then replace both points with a point at the average of the co-ordinates of the two points. When a replacement happens, move on to the next point. In theory you could run this multiple times, but not sure that'll be needed. Might be a neat algorithm to try to implement, and MAYBE it'll address the issue here.
   - 2025-04-27 at 11:44 - offset seems to fail when there are _multiple_ shapes... maybe I need to separate the shapes before proceeding with the trace? This may be more relevant than path smoothing. Blur may be fixing thing because it prevents separate shapes? Default sample icon with 30 blur radius produces this case.
+  - 2025-05-09 at 10:22 - have some basic examples working at `/demo-average-redundant-points`. Might be nice to get some less basic examples working... namely, polygons with multiple regions, which will probably break things in interesting ways.
+
+- [ ] Clean up repository a bit
+  - `js-modules` could be organized a little bit, rename to `modules`, remove redundant dir
+  - all `demo` and `toy` things could be consolidated into a single directory
+  - create `sample-image` directory, maybe
 
 - [ ] Consider post-trace option to "remove interior voids"
   - I've been thinking about doing _line drawings_. This would leave significant "holes", or interior shapes, within a larger main shape.
