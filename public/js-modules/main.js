@@ -4,6 +4,8 @@ import { getInputAsInt } from "/js-modules/modules/00-common/get-input-as-int.js
 import { onImageSelection } from "/js-modules/modules/01-upload/on-image-selection.js";
 // SILHOUETTE
 import { processImage } from "/js-modules/modules/02-silhouette/process-image.js";
+// TRACE
+import { reduceClusteredPoints } from "/js-modules/modules/03-trace/reduce-clustered-points.js";
 // ARRANGE
 import {
 	visitPoints,
@@ -165,7 +167,9 @@ function cleanupTrace(svgContainerElem) {
 		 * Have not implemented any kind of group assignment...
 		 * But somehow things still seem to work?
 		 */
-		const { groupId, points } = path;
+		const { groupId, points: rawPoints } = path;
+		const points = reduceClusteredPoints(rawPoints, 3);
+		console.log({ rawPointCount: rawPoints.length, pointCount: points.length });
 		const isFirstIteration = currentGroupId === null;
 		const hasGroupId = typeof groupId === "string";
 		const hasGroupIdMatch = hasGroupId && groupId === currentGroupId;
@@ -481,11 +485,11 @@ async function applyLayout(
 	// 	// scaledPadding -
 	// 	// 4.66; // TODO: why the heck is this needed? rounding? meh, ignoring... for now
 	// 	7.36;
-	console.log({
-		imgTopY,
-		scaledPadding,
-		arrangeOffsetY,
-	});
+	// console.log({
+	// 	imgTopY,
+	// 	scaledPadding,
+	// 	arrangeOffsetY,
+	// });
 	const imgBottomY =
 		imgTopY + boundingHeight + imgBottomBaseOffset + arrangeOffsetY * 2;
 	// const imgWidthFinal = imgWidth * finalImgScale;
