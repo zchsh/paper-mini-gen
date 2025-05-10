@@ -1,5 +1,7 @@
-/* https://danmarshall.github.io/svg-path-outline/ */
-var spo = require("svg-path-outline");
+import { svgNodeFromPolygons } from "/js-modules/modules/00-common/svg-node-from-polygons.js";
+// From https://danmarshall.github.io/svg-path-outline/
+import { outline as spo } from "/js-modules/modules/04-offset/svg-path-outline.js";
+import { parseSvgViewbox } from "/js-modules/modules/04-offset/parse-svg-viewbox.js";
 
 function buildSvgNode(n, v) {
 	n = document.createElementNS("http://www.w3.org/2000/svg", n);
@@ -11,7 +13,7 @@ function getInputAsInt(inputId) {
 	return parseInt(document.getElementById(inputId).value);
 }
 
-function applyOffset(svgSourceContainerId, svgDestContainerId = null) {
+export function applyOffset(svgSourceContainerId, svgDestContainerId = null) {
 	const svgSourceContainer = document.getElementById(svgSourceContainerId);
 	const svgSource = svgSourceContainer.querySelector("svg");
 	let svgDest;
@@ -22,6 +24,8 @@ function applyOffset(svgSourceContainerId, svgDestContainerId = null) {
 	} else {
 		svgDest = svgSource;
 	}
+
+	console.log("svgDest", svgDest);
 
 	const offset = getInputAsInt("offset");
 	// From each polygon element, generate an offset path element
@@ -47,11 +51,13 @@ function applyOffset(svgSourceContainerId, svgDestContainerId = null) {
 		viewBox[2] + offset * 2,
 		viewBox[3] + offset * 2,
 	];
-	const svgStringAll = renderPolygonsAsPathSvg(polygons, viewBoxModded);
+	const svgNodeAll = svgNodeFromPolygons(polygons, viewBoxModded);
+	// const svgStringAll = renderPolygonsAsPathSvg(polygons, viewBoxModded);
 	//
-	svgDest.parentNode.innerHTML = svgStringAll;
+	// svgDest.parentNode.innerHTML = svgStringAll;
+	const parentNode = svgDest.parentNode;
+	parentNode.innerHTML = "";
+	parentNode.appendChild(svgNodeAll);
 
 	return [polygons, offset];
 }
-
-window.applyOffset = applyOffset;

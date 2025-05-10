@@ -1,11 +1,20 @@
 // COMMON
 import { getInputAsInt } from "/js-modules/modules/00-common/get-input-as-int.js";
+import { getFallbackViewBox } from "/js-modules/modules/00-common/get-fallback-viewbox.js";
+import { getBoundingPoints } from "/js-modules/modules/00-common/get-bounding-points.js";
+import { pathDataStringFromRegions } from "/js-modules/modules/00-common/path-data-string-from-regions.js";
 // UPLOAD
 import { onImageSelection } from "/js-modules/modules/01-upload/on-image-selection.js";
+import { resetSettings } from "/js-modules/modules/01-upload/reset-settings.js";
 // SILHOUETTE
 import { processImage } from "/js-modules/modules/02-silhouette/process-image.js";
 // TRACE
 import { reduceClusteredPoints } from "/js-modules/modules/03-trace/reduce-clustered-points.js";
+import { svgNodeFromPolygons } from "/js-modules/modules/00-common/svg-node-from-polygons.js";
+
+// OFFSET
+import { applyOffset } from "/js-modules/modules/04-offset/apply-offset.js";
+import { parseSvgViewbox } from "/js-modules/modules/04-offset/parse-svg-viewbox.js";
 // ARRANGE
 import {
 	visitPoints,
@@ -16,16 +25,11 @@ import {
  * UPLOAD
  */
 window.onImageSelection = onImageSelection;
+window.resetSettings = resetSettings;
 
 /**
  * SILHOUETTE
  */
-function silhouetteResetSettings() {
-	document.getElementById("threshold").value = 100;
-	document.getElementById("radius").value = 6;
-}
-window.silhouetteResetSettings = silhouetteResetSettings;
-
 async function silhouetteExecute(imgSrcId, imgDestId, resizeMax) {
 	// Gather settings
 	const threshold = getInputAsInt("threshold");
@@ -195,10 +199,15 @@ function cleanupTrace(svgContainerElem) {
 	 * that might be appropriate to pass to the next step!
 	 */
 
+	/**
+	 * TODO: investigate why debug points get passed on to the next step.
+	 * Almost certainly relates to the TODO comment directly above this one.
+	 */
+	const showDebugPoints = false; // enable to see the issue above
 	const viewBox = parseSvgViewbox(svgElem);
-	const svgStringAll = renderPolygonsAsPathSvg(polygons, viewBox);
-	//
-	svgContainerElem.innerHTML = svgStringAll;
+	const svgNodeAll = svgNodeFromPolygons(polygons, viewBox, showDebugPoints);
+	svgContainerElem.innerHTML = "";
+	svgContainerElem.appendChild(svgNodeAll);
 }
 
 /**
@@ -207,6 +216,8 @@ function cleanupTrace(svgContainerElem) {
  * TODO: not shown here cause I couldn't figure out imports and stuff.
  * Might be worth figuring that out so you can clean things up a bit.
  */
+
+window.applyOffset = applyOffset;
 
 /**
  * ARRANGEMENT
@@ -292,11 +303,17 @@ function arrangeForUnion(rawPolygons, targetContainer) {
 	];
 
 	const viewBoxPadding = 9; // 1/8 inch
-	const svgStringArranged = renderPolygonsAsPathSvg(
-		arrangedPolygons,
-		viewBoxPadding
-	);
-	targetContainer.innerHTML = svgStringArranged;
+
+	const viewBox = getFallbackViewBox(arrangedPolygons, viewBoxPadding);
+	const svgNodeArranged = svgNodeFromPolygons(arrangedPolygons, viewBox);
+	targetContainer.innerHTML = "";
+	targetContainer.appendChild(svgNodeArranged);
+
+	// const svgStringArranged = renderPolygonsAsPathSvg(
+	// 	arrangedPolygons,
+	// 	viewBoxPadding
+	// );
+	// targetContainer.innerHTML = svgStringArranged;
 
 	return {
 		polygons_arranged: arrangedPolygons,
@@ -331,21 +348,23 @@ window.arrangeForUnion = arrangeForUnion;
  * TODO: finish and clean up below
  */
 function applyUnion(polygonObjs, renderId, debugId01, debugId02) {
+	console.log({ debugId01, debugId02 });
 	// Debug individual shapes
 	if (debugId01) {
 		const container = document.getElementById(debugId01);
 		container.innerHTML = "";
 		for (const polygonObj of polygonObjs) {
-			const svgString = renderPolygonsAsPathSvg([polygonObj], 9);
-			container.innerHTML += svgString;
+			const viewBox = getFallbackViewBox([polygonObj], 9);
+			container.appendChild(svgNodeFromPolygons([polygonObj], viewBox));
 		}
 	}
 
 	// Debug arrangement of individual shapes
 	if (debugId02) {
 		const container = document.getElementById(debugId02);
-		const svgString = renderPolygonsAsPathSvg(polygonObjs, 9);
-		container.innerHTML = svgString;
+		container.innerHTML = "";
+		const viewBox = getFallbackViewBox(polygonObjs, 9);
+		container.appendChild(svgNodeFromPolygons(polygonObjs, viewBox));
 	}
 
 	/**
@@ -353,8 +372,13 @@ function applyUnion(polygonObjs, renderId, debugId01, debugId02) {
 	 * https://github.com/velipso/polybooljs?tab=readme-ov-file#advanced-example-1
 	 */
 	const unionPolygonObj = unionPolygonObjects(polygonObjs);
-	const unionSvg = renderPolygonsAsPathSvg([unionPolygonObj], 9);
-	document.getElementById(renderId).innerHTML = unionSvg;
+
+	// const unionSvg = renderPolygonsAsPathSvg([unionPolygonObj], 9);
+	const unionViewBox = getFallbackViewBox([unionPolygonObj], 9);
+	const unionSvgNode = svgNodeFromPolygons([unionPolygonObj], unionViewBox);
+	// document.getElementById(renderId).innerHTML = unionSvg;
+	document.getElementById(renderId).innerHTML = "";
+	document.getElementById(renderId).appendChild(unionSvgNode);
 	return unionPolygonObj;
 }
 
@@ -403,7 +427,7 @@ async function applyLayout(
 
 	const viewBox = getFallbackViewBox([polygonObj], 9);
 	const pathStrings = [polygonObj].map((polygon) => {
-		return renderPolygonAsPathString(polygon);
+		return pathDataStringFromRegions(polygon.regions);
 	});
 
 	// Set up the SVG node

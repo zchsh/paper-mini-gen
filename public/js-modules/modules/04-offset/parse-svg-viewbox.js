@@ -1,4 +1,4 @@
-function parseSvgViewbox(svgElem) {
+export function parseSvgViewbox(svgElem) {
 	let viewBoxString = svgElem.getAttribute("viewBox");
 	if (!viewBoxString) {
 		const svgWidth = svgElem.getAttribute("width");

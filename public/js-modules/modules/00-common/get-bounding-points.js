@@ -1,4 +1,4 @@
-function getBoundingPoints(allPoints) {
+export function getBoundingPoints(allPoints) {
 	const { minX, minY, maxX, maxY } = allPoints.reduce(
 		(acc, point) => {
 			const [x, y] = point;
