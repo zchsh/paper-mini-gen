@@ -1,3 +1,5 @@
+import { createSvgElem } from "./create-svg-elem.js";
+
 /**
  * A pretty "naive" converter that uses control points, and ignores
  * points on curves.
@@ -75,7 +77,7 @@ function pathSegListToPoints(pathSegList) {
  * @param {string} pathData
  * @returns
  */
-function pointsFromPathDataString(pathData) {
+export function pointsFromPathDataString(pathData) {
 	/**
 	 * Build an SVG path node, this is necessary to use pathSegList
 	 * NOTE: also requires a polyfill for the deprecated pathSegList, see:

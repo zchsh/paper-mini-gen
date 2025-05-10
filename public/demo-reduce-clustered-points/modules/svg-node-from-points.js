@@ -1,3 +1,7 @@
+import { buildPathNode } from "./build-path-node.js";
+import { buildCircleNodesFromPoints } from "./build-circle-nodes-from-points.js";
+import { buildSvgRootNode } from "./build-svg-root-node.js";
+
 /**
  * Given an array of [x, y] points, and a viewBox,
  * Return an SVG node with a <path> element to represent the shape,
@@ -6,7 +10,7 @@
  * @param {number[][]} points - An array of [x, y] points
  * @returns {SVGElement} An SVG node with the path and points
  */
-function svgNodeFromPoints(points, viewBox) {
+export function svgNodeFromPoints(points, viewBox) {
 	// Get a <path> node from the points, and <circle> nodes to mark points
 	const pathNode = buildPathNode(points);
 	const pointNodes = buildCircleNodesFromPoints(points);

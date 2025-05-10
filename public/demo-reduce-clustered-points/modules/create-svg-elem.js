@@ -1,4 +1,4 @@
-function createSvgElem(nodeType, values) {
+export function createSvgElem(nodeType, values) {
 	const node = document.createElementNS("http://www.w3.org/2000/svg", nodeType);
 	for (const key in values) {
 		const namespace =

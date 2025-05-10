@@ -1,3 +1,6 @@
+import { getDistanceBetweenPoints } from "./get-distance-between-points.js";
+import { getAveragePoint } from "./get-average-point.js";
+
 /**
  * Given an array of [x, y] points, and a tolerance distance,
  * reduce the number of points in the array by finding sequential
@@ -12,7 +15,7 @@
  * @param {number} tolerance - The distance within which points are considered redundant.
  * @return {Array} - A new array of points with redundant points removed.
  */
-function reduceClusteredPoints(points, tolerance = 5) {
+export function reduceClusteredPoints(points, tolerance = 5) {
 	/**
 	 * We need at least 3 points to have a useful shape.
 	 * If we have fewer than 3 points, return early, even if they're
