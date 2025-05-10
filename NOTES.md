@@ -11,6 +11,7 @@
 - [ ] Revisit offset step, to address buggy "offset" cases
   - To reproduce, pick any example, reset blur to `1`, and step up through the blur values. Every example seems to have at least a couple points where the trace step is fine but the "offset" step fails.
   - Polygons with simple straight segments only, with no weird clustered points, are coming out of the trace step. Why is the union step failing sometimes?
+  - 2025-05-10 at 17:29 - Maybe Clipper would be a good fit: <https://sourceforge.net/p/jsclipper/wiki/Home%206/>. Probably worth making a separate demo page... but, that can come later. For now, continue cleanup!
 
 ### Later
 

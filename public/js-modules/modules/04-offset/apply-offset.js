@@ -1,4 +1,7 @@
+import { buildSvgRootNode } from "/js-modules/modules/00-common/build-svg-root-node.js";
+
 import { svgNodeFromPolygons } from "/js-modules/modules/00-common/svg-node-from-polygons.js";
+import { pathDataStringFromRegions } from "/js-modules/modules/00-common/path-data-string-from-regions.js";
 // From https://danmarshall.github.io/svg-path-outline/
 import { outline as spo } from "/js-modules/modules/04-offset/svg-path-outline.js";
 import { parseSvgViewbox } from "/js-modules/modules/04-offset/parse-svg-viewbox.js";
@@ -16,6 +19,9 @@ function getInputAsInt(inputId) {
 /**
  * TODO: use sourcePolygons... maybe with some offset library
  * that plays nicely with simple arrays of points?
+ *
+ * Maybe Clipper:
+ * https://sourceforge.net/p/jsclipper/wiki/Home%206/
  */
 export function applyOffset(
 	svgSourceContainerId,
@@ -61,19 +67,35 @@ export function applyOffset(
 		svgDest.appendChild(outlinePath);
 		pathElem.remove();
 	}
+
+	/**
+	 * Construct a new SVG node, where we'll create all the "outlined" polygons
+	 */
+	const sourceViewBox = parseSvgViewbox(svgSource);
+	const svgNode = buildSvgRootNode(sourceViewBox);
+
+	for (const sourcePolygon of sourcePolygons) {
+		const pathData = pathDataStringFromRegions(sourcePolygon.regions);
+		const outlineData = spo(pathData, offset, { tagName: "path" });
+		const outlinePath = buildSvgNode("path", {
+			d: outlineData,
+			fill: "rgba(255,0,255,0.444)",
+		});
+		svgNode.appendChild(outlinePath);
+	}
 	/**
 	 * Convert path, which probs include curves, to straight lines
 	 */
-	const polygons = flattenSvgToPaths(svgDest);
+	const polygons = flattenSvgToPaths(svgNode);
 	// const polygons = sourcePolygons;
-	const viewBox = parseSvgViewbox(svgDest);
+	const viewBox = parseSvgViewbox(svgNode);
 	const viewBoxModded = [
 		viewBox[0] - offset,
 		viewBox[1] - offset,
 		viewBox[2] + offset * 2,
 		viewBox[3] + offset * 2,
 	];
-	const svgNodeAll = svgNodeFromPolygons(polygons, viewBoxModded);
+	const svgNodeAll = svgNodeFromPolygons(polygons, viewBoxModded, true);
 	// const svgStringAll = renderPolygonsAsPathSvg(polygons, viewBoxModded);
 	//
 	// svgDest.parentNode.innerHTML = svgStringAll;
