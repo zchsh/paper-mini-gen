@@ -82,7 +82,7 @@ async function traceExecute(imgElemId, svgContainerId) {
 		 * Set up function to run after tracing is complete
 		 * TODO: this could be an argument to traceExecute()?
 		 *
-		 * @param {*} svgString
+		 * @param {string} svgString
 		 */
 		function doneTracingCallback(svgString) {
 			const svgContainerElem = document.getElementById(svgContainerId);
@@ -93,10 +93,10 @@ async function traceExecute(imgElemId, svgContainerId) {
 			 */
 			svgContainerElem.innerHTML = "";
 			ImageTracer.appendSVGString(svgString, svgContainerId);
-			// Clean up SVG
-			cleanupTrace(svgContainerElem);
-			//
-			resolve(svgString);
+			// Clean up SVG, the `cleanupTrace` function also renders it out to DOM
+			const cleanTracePolygons = cleanupTrace(svgContainerElem);
+			// Resolve with the cleaned up polygons
+			resolve(cleanTracePolygons);
 		}
 		/**
 		 * TODO: is there a way to trace with straight lines only?
@@ -194,20 +194,13 @@ function cleanupTrace(svgContainerElem) {
 	// different groupID to follow it and cause it to be pushed)
 	polygons.push({ regions });
 
-	/**
-	 * TODO: the `polygons` variable has the polygon data
-	 * that might be appropriate to pass to the next step!
-	 */
-
-	/**
-	 * TODO: investigate why debug points get passed on to the next step.
-	 * Almost certainly relates to the TODO comment directly above this one.
-	 */
-	const showDebugPoints = false; // enable to see the issue above
+	const showDebugPoints = true; // enable to see the issue above
 	const viewBox = parseSvgViewbox(svgElem);
 	const svgNodeAll = svgNodeFromPolygons(polygons, viewBox, showDebugPoints);
 	svgContainerElem.innerHTML = "";
 	svgContainerElem.appendChild(svgNodeAll);
+
+	return polygons;
 }
 
 /**

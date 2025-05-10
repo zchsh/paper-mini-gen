@@ -2,8 +2,6 @@
 <html>
 	<head>
 		<!-- COMMON -->
-		<!-- <script src="/js-modules/modules/00-common/render-polygons-as-path-svg.js"></script> -->
-		<!-- <script src="/js-modules/modules/00-common/get-bounding-points.js"></script> -->
 		<script src="/js-modules/modules/00-common/copy-text-to-clipboard.js"></script>
 		<!-- SILHOUETTE - could try to figure out how to include as a module? -->
 		<script src="/js-modules/modules/02-silhouette/image.min.js"></script>
@@ -11,15 +9,11 @@
 		<script src="/js-modules/modules/03-trace/imagetracer_v1.2.6.js"></script>
 		<!-- TRACE CLEANUP -->
 		<script src="/js-modules/modules/03-trace/flatten-svg/path-data-polyfill.js"></script>
-		<!-- TODO: the TRACE CLEANUP scripts below this comment could be modules -->
 		<script src="/js-modules/modules/03-trace/flatten-svg/svg-to-paths.js"></script>
 		<!-- OFFSET -->
 		<script src="/js-modules/modules/04-offset/bezier.js"></script>
 		<script src="/js-modules/modules/04-offset/browser.maker.js"></script>
-		<!-- <script src="/js-modules/modules/04-offset/svg-path-outline.js"></script> -->
-		<!-- <script src="/js-modules/modules/04-offset/apply-offset.js"></script> -->
 		<script src="/js-modules/modules/04-offset/flatten-svg-to-paths.js"></script>
-		<!-- <script src="/js-modules/modules/04-offset/parse-svg-viewbox.js"></script> -->
 		<!-- ARRANGE -->
 		<script src="/js-modules/modules/05-arrange/create-circular-polygon.js"></script>
 		<!-- UNION -->
@@ -47,13 +41,18 @@
 				const imgResizeMax = 400;
 				const [paddingBeforeTrace, imgWidth, imgHeight] =
 					await silhouetteExecute("raw-image", "processed-image", imgResizeMax);
-				const result = await traceExecute("processed-image", "trace-svg");
+				const cleanTracePolygons = await traceExecute(
+					"processed-image",
+					"trace-svg"
+				);
 
+				console.log({ cleanTracePolygons });
 				const svgSourceContainer = document.getElementById("trace-svg");
 				const svgSource = svgSourceContainer.querySelector("svg");
 				const [polygons_offset, offset] = applyOffset(
 					"trace-svg",
-					"offset-svg"
+					"offset-svg",
+					cleanTracePolygons
 				);
 				const {
 					polygons_arranged,

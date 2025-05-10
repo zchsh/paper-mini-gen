@@ -2,27 +2,11 @@
 
 ## Next steps
 
-- [x] Use JavaScript modules
-  - <https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Modules>
-  - 2025-05-10 at 10:29 - have done this, could still do with some cleanup, but that's separate I think
-
-- [x] Would be nice to be able to mask image
-  - Doing this in the `<svg>`-approved way probably makes sense
-  - Use the offset mask, I think, same outline as what'll get cut out
-  - 2025-05-10 at 10:28 - this is done, was easier than expected
-
-- [ ] Revisit trace-and-offset step, to address buggy cases
-  - Repro case: `sample-char-art-01-small.jpeg` with current default settings. Trace succeeds but "offset" fails. Increasing blur radius to `6`, a single point, seems to "fix" the issue, or work around it at least. Blur radius of `2` produces weird results, the trace looks right but the "offset" doesn't.
-  - MAYBE there's a possibility of MERGING POINTS THAT AREA VERY CLOSE TO EACH OTHER.... For each point... if the next point is within a certain distance, then replace both points with a point at the average of the co-ordinates of the two points. When a replacement happens, move on to the next point. In theory you could run this multiple times, but not sure that'll be needed. Might be a neat algorithm to try to implement, and MAYBE it'll address the issue here.
-  - 2025-04-27 at 11:44 - offset seems to fail when there are _multiple_ shapes... maybe I need to separate the shapes before proceeding with the trace? This may be more relevant than path smoothing. Blur may be fixing thing because it prevents separate shapes? Default sample icon with 30 blur radius produces this case.
-  - 2025-05-09 at 10:22 - have some basic examples working at `/demo-average-redundant-points`. Might be nice to get some less basic examples working... namely, polygons with multiple regions, which will probably break things in interesting ways.
-  - 2025-05-10 at 10:04 - have just finished cleaning up this work, now at `/demo-reduce-clustered-points`. Very roughly jammed it into the process on the main page. Might be making a difference, but issues still remain... eg `sample-char-art-01` with tolerance of `3` and blur radius of `3`. Tweaking the clustered point "tolerance" changes things, which is neat... but, still seeing issues anyways. Maybe it's not about path simplicity, and I need to look iunto the "offset" process? This seems likely - copying and pasting into Figma, offset and outline seems to work great. I think one good thing to do before considering this step "done" is to add point markers to the "trace" step. Ideally point markers that help you see overlapping points, if any. Adding a control for "clustered point tolerance" might be neat as well, for debug purposes.
-  - 2025-05-10 at 13:38 - currently working in `debugTrace`
-
 - [ ] Clean up repository a bit
   - `js-modules` could be organized a little bit, rename to `modules`, remove redundant dir
   - all `demo` and `toy` things could be consolidated into a single directory
   - create `sample-image` directory, maybe
+  - 2025-05-10 at 16:53 - currently working on trying to clean up `applyOffset`
 
 - [ ] Revisit offset step, to address buggy "offset" cases
   - To reproduce, pick any example, reset blur to `1`, and step up through the blur values. Every example seems to have at least a couple points where the trace step is fine but the "offset" step fails.
