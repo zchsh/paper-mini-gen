@@ -3,11 +3,20 @@
 	<head>
 		<title>Demo - Average Redundant Points</title>
 		<script src="/demo-average-redundant-points/pathseg.js"></script>
+
+		<script src="/demo-average-redundant-points/get-distance-between-points.js"></script>
+		<script src="/demo-average-redundant-points/get-average-point.js"></script>
+		<script src="/demo-average-redundant-points/reduce-clustered-points.js"></script>
+
 		<script src="/demo-average-redundant-points/create-svg-elem.js"></script>
 
 		<script src="/demo-average-redundant-points/path-data-string-from-regions.js"></script>
-		<script src="/demo-average-redundant-points/get-bounding-points.js"></script>
 		<script src="/demo-average-redundant-points/points-from-path-data-string.js"></script>
+
+		<script src="/demo-average-redundant-points/build-svg-root-node.js"></script>
+		<script src="/demo-average-redundant-points/build-path-node.js"></script>
+		<script src="/demo-average-redundant-points/build-circle-nodes-from-points.js"></script>
+		<script src="/demo-average-redundant-points/svg-node-from-points.js"></script>
 
 		<style>
 			.example-container {
@@ -30,107 +39,14 @@
 				"M24 58.5L21.5 60L50 72.5L77.5 53L66.5 36.5L68.5 35.5L66.5 33.5L31.5 38.5L20 57L24 58.5Z",
 			];
 
-			function buildSvgRootNode(viewBox) {
-				const [minX, minY, svgWidth, svgHeight] = viewBox;
-				const svgNode = createSvgElem("svg", {
-					width: svgWidth,
-					height: svgHeight,
-					viewBox: `${minX} ${minY} ${svgWidth} ${svgHeight}`,
-				});
-				return svgNode;
-			}
-
-			function buildPathNode(points) {
-				const pathNode = createSvgElem("path", {
-					d: pathDataStringFromRegions([points]),
-					fill: "rgba(255,0,255,0.3)",
-					stroke: "rgba(255,0,255,0.7)",
-					"stroke-width": "0.5",
-				});
-				return pathNode;
-			}
-
-			function getCircleNodesFromPoints(points) {
-				const circleNodes = points.map((point) => {
-					const [cx, cy] = point;
-					const circleNode = createSvgElem("circle", {
-						cx,
-						cy,
-						r: 1,
-						fill: "magenta",
-					});
-					return circleNode;
-				});
-				return circleNodes;
-			}
-
-			function renderRegionAsSvgElem(region) {
-				// Get a <path> node from the region, and circle nodes to mark points
-				const pathNode = buildPathNode(region);
-				const pointNodes = getCircleNodesFromPoints(region);
-				// Set up a root <svg> node, and add in the <path> and <circle> nodes
-				const svgNode = buildSvgRootNode([0, 0, 100, 100]);
-				svgNode.appendChild(pathNode);
-				for (const pointNode of pointNodes) {
-					svgNode.appendChild(pointNode);
-				}
-				return svgNode;
-			}
-
-			function getIsRedundant(pointOne, pointTwo) {
-				// Check if the two points are redundant
-				const distanceBetween = Math.sqrt(
-					Math.pow(pointTwo[0] - pointOne[0], 2) +
-						Math.pow(pointTwo[1] - pointOne[1], 2)
-				);
-				return distanceBetween < 5;
-			}
-
-			function getAveragePoint(pointOne, pointTwo) {
-				// Average the two points
-				const averagePoint = [
-					(pointOne[0] + pointTwo[0]) / 2,
-					(pointOne[1] + pointTwo[1]) / 2,
-				];
-				return averagePoint;
-			}
-
-			/**
-			 * TODO: actually remove redundant points, for now we just clone
-			 */
-			function reducePointsAverageRedundant(points) {
-				//
-				if (points.length < 3) {
-					return points;
-				}
-				//
-
-				let currentPoint = null;
-				let nextPoint = null;
-				const newPoints = [];
-				for (let i = 0; i < points.length - 1; i++) {
-					//
-					if (!currentPoint) {
-						currentPoint = points[i];
-					}
-					nextPoint = points[i + 1];
-
-					const isRedundant = getIsRedundant(currentPoint, nextPoint);
-					//
-					if (isRedundant) {
-						// Average the two points
-						const averagePoint = getAveragePoint(currentPoint, nextPoint);
-						currentPoint = averagePoint;
-						// Current point will be pushed once we find a non-redundant point
-					} else {
-						newPoints.push(currentPoint);
-						currentPoint = null;
-					}
-				}
-				return newPoints;
-			}
-
 			function runExamples() {
+				/**
+				 * NOTE: we assume a viewBox of 0 0 100 100 for all examples.
+				 * There could be a smarter way to go about this, but for now,
+				 * I find it easy to put all the examples I want to test
+				 * in the same size viewBox.
+				 */
+				const viewBox = [0, 0, 100, 100];
 				/**
 				 * Convert the provided example path data strings into regions.
 				 * Each region is an array of points, each point is an [x, y] tuple.
@@ -138,66 +54,35 @@
 				const exampleRegions = examplePathDataStrings.map((pathDataString) => {
 					return pointsFromPathDataString(pathDataString);
 				});
-				// Render each example region
+				/**
+				 * Render each example region
+				 */
 				for (const regionBefore of exampleRegions) {
+					// Remove redundant points from the region
+					const regionAfter = reduceClusteredPoints(regionBefore);
+					/**
+					 * Render before and after SVGs from regionBefore and regionAfter
+					 */
 					// Set up a container to hold the example
 					const container = document.createElement("div");
 					container.className = "example-container";
 					// The "before" div will hold the original SVG
 					const before = document.createElement("div");
 					before.className = "example-before";
-					const svgBefore = renderRegionAsSvgElem(regionBefore);
+					const svgBefore = svgNodeFromPoints(regionBefore, viewBox);
 					before.appendChild(svgBefore);
 					container.appendChild(before);
-					/**
-					 * Remove redundant points from the region
-					 */
-					const regionAfter = reducePointsAverageRedundant(regionBefore);
 					// The "after" div will hold the SVG with redundant points removed
 					const after = document.createElement("div");
 					after.className = "example-after";
-					const svgAfter = renderRegionAsSvgElem(regionAfter);
+					const svgAfter = svgNodeFromPoints(regionAfter, viewBox);
 					after.appendChild(svgAfter);
 					container.appendChild(after);
-					//
-					console.log({ regionBefore, regionAfter });
-					//
+					// Append the container to the body
 					document.body.appendChild(container);
 				}
 			}
 		</script>
 	</head>
-	<body onload="runExamples()">
-		<!-- <div class="example-container">
-			<div class="example-before">
-				<svg
-					width="100"
-					height="100"
-					viewBox="0 0 100 100"
-					fill="none"
-					xmlns="http://www.w3.org/2000/svg"
-				>
-					<path d="M29 32.5V70H70.5V32.5L68.5 31L29 32.5Z" fill="#D9D9D9" />
-				</svg>
-			</div>
-			<div class="example-after"></div>
-		</div>
-		<div class="example-container">
-			<div class="example-before">
-				<svg
-					width="100"
-					height="100"
-					viewBox="0 0 100 100"
-					fill="none"
-					xmlns="http://www.w3.org/2000/svg"
-				>
-					<path
-						d="M24 58.5L21.5 60L50 72.5L77.5 53L66.5 36.5L68.5 35.5L66.5 33.5L31.5 38.5L20 57L24 58.5Z"
-						fill="#D9D9D9"
-					/>
-				</svg>
-			</div>
-			<div class="example-after"></div>
-		</div> -->
-	</body>
+	<body onload="runExamples()"></body>
 </html>
