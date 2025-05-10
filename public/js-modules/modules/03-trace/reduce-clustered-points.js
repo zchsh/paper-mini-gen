@@ -46,6 +46,16 @@ export function reduceClusteredPoints(points, tolerance = 5) {
 		 * next iteration, we'll take one step forward and compare
 		 * the next point to the one after that.
 		 */
+		/**
+		 * TODO: handle case where shape is being reduced to < 3 points.
+		 * If there are a limited number of points remaining, and a limited
+		 * number of points in the `reducedPoints` array, maybe we should
+		 * turn off the reduction process? Eg,:
+		 * - 1 point in the `reducedPoints` array, and we're on the second-to-last
+		 *   point, then keep it no matter what.
+		 * - 2 points in the `reducedPoints` array, and we're on the last point,
+		 *   then keep it no matter what.
+		 */
 		if (isRedundant) {
 			const averagePoint = getAveragePoint(currentPoint, nextPoint);
 			currentPoint = averagePoint;
