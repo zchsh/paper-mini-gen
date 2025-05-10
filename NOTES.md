@@ -2,6 +2,15 @@
 
 ## Next steps
 
+- [x] Use JavaScript modules
+  - <https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Modules>
+  - 2025-05-10 at 10:29 - have done this, could still do with some cleanup, but that's separate I think
+
+- [x] Would be nice to be able to mask image
+  - Doing this in the `<svg>`-approved way probably makes sense
+  - Use the offset mask, I think, same outline as what'll get cut out
+  - 2025-05-10 at 10:28 - this is done, was easier than expected
+
 - [ ] Revisit trace-and-offset step, to address buggy cases
   - Repro case: `sample-char-art-01-small.jpeg` with current default settings. Trace succeeds but "offset" fails. Increasing blur radius to `6`, a single point, seems to "fix" the issue, or work around it at least. Blur radius of `2` produces weird results, the trace looks right but the "offset" doesn't.
   - MAYBE there's a possibility of MERGING POINTS THAT AREA VERY CLOSE TO EACH OTHER.... For each point... if the next point is within a certain distance, then replace both points with a point at the average of the co-ordinates of the two points. When a replacement happens, move on to the next point. In theory you could run this multiple times, but not sure that'll be needed. Might be a neat algorithm to try to implement, and MAYBE it'll address the issue here.
@@ -14,20 +23,11 @@
   - all `demo` and `toy` things could be consolidated into a single directory
   - create `sample-image` directory, maybe
 
-- [ ] Revisit offset step, to address buggy cases
+- [ ] Revisit offset step, to address buggy "offset" cases
   - To reproduce, pick any example, reset blur to `1`, and step up through the blur values. Every example seems to have at least a couple points where the trace step is fine but the "offset" step fails.
   - Polygons with simple straight segments only, with no weird clustered points, are coming out of the trace step. Why is the union step failing sometimes?
 
-- [ ] Consider post-trace option to "remove interior voids"
-  - I've been thinking about doing _line drawings_. This would leave significant "holes", or interior shapes, within a larger main shape.
-  - Could there be an option to remove these interior voids? Option to remove them completely could make sense.
-  - Another way to implement this option, more manual maybe a separate thing, would be manual removal of specific shapes, eg by clicking on them and having them change colour.
-
 ### Later
-
-#### Look into performance
-
-- Seems way worse on my M1 laptop than on M1 mac mini... why?
 
 #### Support transparent images
 
@@ -36,13 +36,19 @@
 - tried before with `sample-taxi-transparent.png`, in `demo-image-js`
 - may be worth exploring alternatives to `image-js`... (?)
 
+### Consider post-trace option to "remove interior voids"
+  
+- I've been thinking about doing _line drawings_. This would leave significant "holes", or interior shapes, within a larger main shape.
+- Could there be an option to remove these interior voids? Option to remove them completely could make sense.
+- Another way to implement this option, more manual maybe a separate thing, would be manual removal of specific shapes, eg by clicking on them and having them change colour.
+
 #### Update image-js version
 
 - currently on `0.37.0` ish - <https://github.com/image-js/image-js>
 
-#### Use JavaScript modules
+### Look into performance
 
-- <https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Modules>
+- Seems way worse on my M1 laptop than on M1 mac mini... why?
 
 #### Stub in documentation
 
@@ -54,12 +60,6 @@
 - Maybe ideal scenario: same as now, but for any curved _segments_, convert to straight lines based on some _angle tolerance_
   - This same "angle tolerance" principle is what i want for `create-circular-polygon` as well....
 
-#### Explore image masking
-
-- [ ] Would be nice to be able to mask image
-  - Doing this in the `<svg>`-approved way probably makes sense
-  - Use the offset mask, I think, same outline as what'll get cut out
-
 #### Explore path smoothing after boolean addition
 
 - [ ] Explore path smoothing, so scissors-based cutout is easier
@@ -69,6 +69,7 @@
   - Want it to be easy to cut out the shapes
   - Path smoothing of some kind might help with that
   - 2025-04-13 at 18:05 - stubbedin `demo-smooth-to-polyline`
+  - 2025-05-10 at 10:27 - there's a Figma plugin for this that might be worth trying: <https://www.figma.com/community/plugin/809139536998662893/simplify>. Might make sense to set up "Copy SVG" at every step for debug purposes... then you can test the smoothing process in Figma, see if it works, and if it does and the plugin is licensed appropriately, swipe the code and integrate it here.
 
 #### Revisit image processing
 
