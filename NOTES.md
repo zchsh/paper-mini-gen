@@ -36,7 +36,13 @@
 - tried before with `sample-taxi-transparent.png`, in `demo-image-js`
 - may be worth exploring alternatives to `image-js`... (?)
 
-### Consider post-trace option to "remove interior voids"
+#### Support "backside" images
+
+- Requires more art, but really adds something I think, and could maybe encourage hand-drawing over AI tool use, eg see <https://www.youtube.com/watch?v=ehjWZRPq9JA>
+- Totally optional
+- Art has to kind of match up from front to back in terms of shape... cutout from front would always be used.
+
+#### Consider post-trace option to "remove interior voids"
   
 - I've been thinking about doing _line drawings_. This would leave significant "holes", or interior shapes, within a larger main shape.
 - Could there be an option to remove these interior voids? Option to remove them completely could make sense.
@@ -46,7 +52,7 @@
 
 - currently on `0.37.0` ish - <https://github.com/image-js/image-js>
 
-### Look into performance
+#### Look into performance
 
 - Seems way worse on my M1 laptop than on M1 mac mini... why?
 
