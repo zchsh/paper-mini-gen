@@ -2,16 +2,18 @@
 
 ## Next steps
 
-- [ ] Clean up repository a bit
+- [x] Clean up repository a bit
   - [x] `js-modules` could be organized a little bit, rename to `modules`, remove redundant dir
   - [x] create `sample-art` directory
-  - [ ] all `demo` and `toy` things could be consolidated into a single `demo` directory
+  - [x] all `demo` and `toy` things could be consolidated into a single `demo` directory
   - 2025-05-10 at 16:53 - currently working on trying to clean up `applyOffset`
 
 - [ ] Revisit offset step, to address buggy "offset" cases
   - To reproduce, pick any example, reset blur to `1`, and step up through the blur values. Every example seems to have at least a couple points where the trace step is fine but the "offset" step fails.
   - Polygons with simple straight segments only, with no weird clustered points, are coming out of the trace step. Why is the union step failing sometimes?
   - 2025-05-10 at 17:29 - Maybe Clipper would be a good fit: <https://sourceforge.net/p/jsclipper/wiki/Home%206/>. Probably worth making a separate demo page... but, that can come later. For now, continue cleanup!
+  - 2025-05-11 at 12:55 - maybe this has more to do with weird "winding order" hacks... i don't feel i had a great handle on all of that. Might be a bit of an "exercise", but for each "region" could be neat to render _arrows_ at each point, pointing towards the "next" point in the array... this way, could visualize winding order. Then could set up some test cases with different holes and stuff. I feel like that _might_ have an impact on the boolean addition issue... i have a feeling something like that was happening with the `/demo/demo-boolean-operations` test... see also `/demo/demo-bool-ops-01` and `/demo/demo-bool-ops-02`, which both use `polybool` rather than `clipper`... might be worth taking the traced SVGs that are failing to offset, copying them from the browser, and running in some local test cases.
+  - 2025-05-11 at 13:06 - vaguely related, neat comparison of polygon boolean operation algorithms: <https://daef.github.io/poly-bool-comparison/>
 
 ### Later
 

@@ -3,18 +3,11 @@
 	<head>
 		<title>Toy - Polygon Offset</title>
 		<!-- https://github.com/Pomax/bezierjs -->
-		<script src="/lib/bezier.js" type="text/javascript"></script>
-		<script
-			src="https://microsoft.github.io/maker.js/target/js/browser.maker.js"
-			type="text/javascript"
-		></script>
-		<script
-			src="https://danmarshall.github.io/svg-path-outline/browser/index.js"
-			type="text/javascript"
-		></script>
-		<script type="text/javascript" src="/lib/get-input-as-int.js"></script>
-		<script type="text/javascript" src="/lib/pathseg.js"></script>
-		<script type="text/javascript" src="/lib/path-to-polygon.js"></script>
+		<script src="/demo/toy-offset-and-addition/pathseg-polyfill.js"></script>
+		<script src="/demo/toy-offset-and-addition/bezier.js"></script>
+		<script src="/demo/toy-offset-and-addition/browser.maker.js"></script>
+		<script src="/demo/toy-offset-and-addition/get-input-as-int.js"></script>
+		<script src="/demo/toy-offset-and-addition/path-to-polygon.js"></script>
 	</head>
 	<body>
 		<!--  -->
@@ -25,9 +18,9 @@
 		<!--  -->
 		<!--  -->
 
-		<script>
+		<script type="module">
 			/* https://danmarshall.github.io/svg-path-outline/ */
-			var spo = require("svg-path-outline");
+			import { outline as spo } from "/demo/toy-offset-and-addition/svg-path-outline.js";
 
 			function buildSvgNode(n, v) {
 				n = document.createElementNS("http://www.w3.org/2000/svg", n);
@@ -61,6 +54,8 @@
 					svgDest.appendChild(outlinePath);
 				}
 			}
+
+			window.applyOffset = applyOffset;
 		</script>
 		<p>Original SVG</p>
 		<div id="original-svg">
