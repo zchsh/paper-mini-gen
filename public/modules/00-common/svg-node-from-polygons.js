@@ -1,6 +1,6 @@
-import { buildPathNode } from "/js-modules/modules/00-common/build-path-node.js";
-import { buildCircleNodesFromPoints } from "/js-modules/modules/00-common/build-circle-nodes-from-points.js";
-import { buildSvgRootNode } from "/js-modules/modules/00-common/build-svg-root-node.js";
+import { buildPathNode } from "/modules/00-common/build-path-node.js";
+import { buildCircleNodesFromPoints } from "/modules/00-common/build-circle-nodes-from-points.js";
+import { buildSvgRootNode } from "/modules/00-common/build-svg-root-node.js";
 
 /**
  * Given an array of polygons, and a viewBox,

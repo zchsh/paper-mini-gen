@@ -1,25 +1,25 @@
 // COMMON
-import { getInputAsInt } from "/js-modules/modules/00-common/get-input-as-int.js";
-import { getFallbackViewBox } from "/js-modules/modules/00-common/get-fallback-viewbox.js";
-import { getBoundingPoints } from "/js-modules/modules/00-common/get-bounding-points.js";
-import { pathDataStringFromRegions } from "/js-modules/modules/00-common/path-data-string-from-regions.js";
+import { getInputAsInt } from "/modules/00-common/get-input-as-int.js";
+import { getFallbackViewBox } from "/modules/00-common/get-fallback-viewbox.js";
+import { getBoundingPoints } from "/modules/00-common/get-bounding-points.js";
+import { pathDataStringFromRegions } from "/modules/00-common/path-data-string-from-regions.js";
 // UPLOAD
-import { onImageSelection } from "/js-modules/modules/01-upload/on-image-selection.js";
-import { resetSettings } from "/js-modules/modules/01-upload/reset-settings.js";
+import { onImageSelection } from "/modules/01-upload/on-image-selection.js";
+import { resetSettings } from "/modules/01-upload/reset-settings.js";
 // SILHOUETTE
-import { processImage } from "/js-modules/modules/02-silhouette/process-image.js";
+import { processImage } from "/modules/02-silhouette/process-image.js";
 // TRACE
-import { reduceClusteredPoints } from "/js-modules/modules/03-trace/reduce-clustered-points.js";
-import { svgNodeFromPolygons } from "/js-modules/modules/00-common/svg-node-from-polygons.js";
+import { reduceClusteredPoints } from "/modules/03-trace/reduce-clustered-points.js";
+import { svgNodeFromPolygons } from "/modules/00-common/svg-node-from-polygons.js";
 
 // OFFSET
-import { applyOffset } from "/js-modules/modules/04-offset/apply-offset.js";
-import { parseSvgViewbox } from "/js-modules/modules/04-offset/parse-svg-viewbox.js";
+import { applyOffset } from "/modules/04-offset/apply-offset.js";
+import { parseSvgViewbox } from "/modules/04-offset/parse-svg-viewbox.js";
 // ARRANGE
 import {
 	visitPoints,
 	visitPointsPolygon,
-} from "/js-modules/modules/05-arrange/visit-points.js";
+} from "/modules/05-arrange/visit-points.js";
 
 /**
  * UPLOAD

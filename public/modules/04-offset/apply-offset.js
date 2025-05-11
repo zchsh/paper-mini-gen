@@ -1,10 +1,10 @@
-import { buildSvgRootNode } from "/js-modules/modules/00-common/build-svg-root-node.js";
+import { buildSvgRootNode } from "/modules/00-common/build-svg-root-node.js";
 
-import { svgNodeFromPolygons } from "/js-modules/modules/00-common/svg-node-from-polygons.js";
-import { pathDataStringFromRegions } from "/js-modules/modules/00-common/path-data-string-from-regions.js";
+import { svgNodeFromPolygons } from "/modules/00-common/svg-node-from-polygons.js";
+import { pathDataStringFromRegions } from "/modules/00-common/path-data-string-from-regions.js";
 // From https://danmarshall.github.io/svg-path-outline/
-import { outline as spo } from "/js-modules/modules/04-offset/svg-path-outline.js";
-import { parseSvgViewbox } from "/js-modules/modules/04-offset/parse-svg-viewbox.js";
+import { outline as spo } from "/modules/04-offset/svg-path-outline.js";
+import { parseSvgViewbox } from "/modules/04-offset/parse-svg-viewbox.js";
 
 function buildSvgNode(n, v) {
 	n = document.createElementNS("http://www.w3.org/2000/svg", n);

@@ -2,24 +2,24 @@
 <html>
 	<head>
 		<!-- COMMON -->
-		<script src="/js-modules/modules/00-common/copy-text-to-clipboard.js"></script>
+		<script src="/modules/00-common/copy-text-to-clipboard.js"></script>
 		<!-- SILHOUETTE - could try to figure out how to include as a module? -->
-		<script src="/js-modules/modules/02-silhouette/image.min.js"></script>
+		<script src="/modules/02-silhouette/image.min.js"></script>
 		<!-- TRACE - could try to figure out how to include as a module? -->
-		<script src="/js-modules/modules/03-trace/imagetracer_v1.2.6.js"></script>
+		<script src="/modules/03-trace/imagetracer_v1.2.6.js"></script>
 		<!-- TRACE CLEANUP -->
-		<script src="/js-modules/modules/03-trace/flatten-svg/path-data-polyfill.js"></script>
-		<script src="/js-modules/modules/03-trace/flatten-svg/svg-to-paths.js"></script>
+		<script src="/modules/03-trace/flatten-svg/path-data-polyfill.js"></script>
+		<script src="/modules/03-trace/flatten-svg/svg-to-paths.js"></script>
 		<!-- OFFSET -->
-		<script src="/js-modules/modules/04-offset/bezier.js"></script>
-		<script src="/js-modules/modules/04-offset/browser.maker.js"></script>
-		<script src="/js-modules/modules/04-offset/flatten-svg-to-paths.js"></script>
+		<script src="/modules/04-offset/bezier.js"></script>
+		<script src="/modules/04-offset/browser.maker.js"></script>
+		<script src="/modules/04-offset/flatten-svg-to-paths.js"></script>
 		<!-- ARRANGE -->
-		<script src="/js-modules/modules/05-arrange/create-circular-polygon.js"></script>
+		<script src="/modules/05-arrange/create-circular-polygon.js"></script>
 		<!-- UNION -->
-		<script src="/js-modules/modules/06-union/polybooljs-1.2.2/dist/polybool.js"></script>
+		<script src="/modules/06-union/polybooljs-1.2.2/dist/polybool.js"></script>
 		<!-- main module -->
-		<script type="module" src="/js-modules/main.js"></script>
+		<script type="module" src="/modules/main.js"></script>
 		<!-- main execution -->
 		<script>
 			/**
@@ -70,9 +70,9 @@
 				);
 				const polygons_union = applyUnion(
 					polygons_arranged,
-					"union-container",
-					"union-shapes-debug",
-					"union-arrange-debug"
+					"union-container"
+					// "union-shapes-debug",
+					// "union-arrange-debug"
 				);
 				// TODO: grab polygon width and height, probs from "arrange for union"
 				await applyLayout(

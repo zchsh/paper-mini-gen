@@ -1,4 +1,4 @@
-import { getBoundingPoints } from "/js-modules/modules/00-common/get-bounding-points.js";
+import { getBoundingPoints } from "/modules/00-common/get-bounding-points.js";
 
 export function getFallbackViewBox(polygons, rawPadding) {
 	const allPoints = polygons.map((p) => p.regions.flat()).flat();
