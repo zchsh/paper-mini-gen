@@ -3,9 +3,9 @@
 ## Next steps
 
 - [ ] Clean up repository a bit
-  - `js-modules` could be organized a little bit, rename to `modules`, remove redundant dir
-  - all `demo` and `toy` things could be consolidated into a single directory
-  - create `sample-image` directory, maybe
+  - [x] `js-modules` could be organized a little bit, rename to `modules`, remove redundant dir
+  - [x] create `sample-art` directory
+  - [ ] all `demo` and `toy` things could be consolidated into a single `demo` directory
   - 2025-05-10 at 16:53 - currently working on trying to clean up `applyOffset`
 
 - [ ] Revisit offset step, to address buggy "offset" cases
