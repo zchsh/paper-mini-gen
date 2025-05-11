@@ -52,21 +52,7 @@ export function applyOffset(
 		svgDest = svgSource;
 	}
 
-	console.log({ sourcePolygons, svgDest });
-
 	const offset = getInputAsInt("offset");
-	// From each polygon element, generate an offset path element
-	const pathElems = svgDest.querySelectorAll("path");
-	for (const pathElem of pathElems) {
-		const pathData = pathElem.getAttribute("d");
-		const outlineData = spo(pathData, offset, { tagName: "path" });
-		const outlinePath = buildSvgNode("path", {
-			d: outlineData,
-			fill: "rgba(255,0,255,0.444)",
-		});
-		svgDest.appendChild(outlinePath);
-		pathElem.remove();
-	}
 
 	/**
 	 * Construct a new SVG node, where we'll create all the "outlined" polygons
@@ -95,13 +81,18 @@ export function applyOffset(
 		viewBox[2] + offset * 2,
 		viewBox[3] + offset * 2,
 	];
-	const svgNodeAll = svgNodeFromPolygons(polygons, viewBoxModded, true);
-	// const svgStringAll = renderPolygonsAsPathSvg(polygons, viewBoxModded);
-	//
-	// svgDest.parentNode.innerHTML = svgStringAll;
+	const svgNodeFlattened = svgNodeFromPolygons(polygons, viewBoxModded, true);
+
 	const parentNode = svgDest.parentNode;
 	parentNode.innerHTML = "";
-	parentNode.appendChild(svgNodeAll);
+	parentNode.appendChild(svgNodeFlattened);
+	/**
+	 * NOTE: can debug that issues with the "offset" operation seem to happen
+	 * even before flattening. Uncomment the line below to double-check - any
+	 * example that is currently failing to offset from a valid trace likely
+	 * also fails even before it is flattened from curves to straight lines.a
+	 */
+	// parentNode.appendChild(svgNode);
 
 	return [polygons, offset];
 }
