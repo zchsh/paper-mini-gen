@@ -12,44 +12,44 @@
 			import { regionsFromPathDataString } from "/demo/debug-offset-step/modules/regions-from-path-data-string.js";
 			import { svgNodeFromPolygons } from "/demo/debug-offset-step/modules/svg-node-from-polygons.js";
 			import { getFallbackViewBox } from "/demo/debug-offset-step/modules/get-fallback-viewbox.js";
+			import { applyOffsetToRegions } from "/demo/debug-offset-step/modules/apply-offset-to-regions.js";
+			import { simplifyRegions } from "/demo/debug-offset-step/modules/simplify-regions.js";
+
+			const OFFSET_AMOUNT = 12;
 
 			/**
-			 * TODO: write description
+			 * Puff out the viewBox of each example a bit, so we have offset space
 			 */
-			function simplifyRegions(regions) {
-				const polygonsClipper = regions.map((region) => {
-					return region.map(([X, Y]) => ({ X, Y }));
-				});
-				const polygonsClipperSimplified = ClipperLib.Clipper.SimplifyPolygons(
-					polygonsClipper,
-					ClipperLib.PolyFillType.pftNonZero
-				);
-				const polygonsSimplified = polygonsClipperSimplified.map((region) => {
-					return region.map(({ X, Y }) => [X, Y]);
-				});
-				return polygonsSimplified;
-			}
-
-			const offsetAmount = 12;
-
-			// Render each of the examples
-			for (const { pathData, viewBox: rawViewBox } of EXAMPLES.slice(0, 2)) {
-				const extraPadding = offsetAmount * 2;
+			const examplesPrepared = EXAMPLES.map((example) => {
+				const { pathData, viewBox: rawViewBox } = example;
+				const extraPadding = OFFSET_AMOUNT * 2;
 				const viewBox = [
 					rawViewBox[0] - extraPadding,
 					rawViewBox[1] - extraPadding,
 					rawViewBox[2] + extraPadding * 2,
 					rawViewBox[3] + extraPadding * 2,
 				];
+				return { pathData, viewBox };
+			});
+
+			/**
+			 * Render each of the examples
+			 */
+			for (const { pathData, viewBox } of examplesPrepared) {
 				const regions = regionsFromPathDataString(pathData);
-				// Render a "before" element, for comparison
+				/**
+				 * Render a "before" element, for comparison
+				 */
 				const beforeSvgNode = svgNodeFromPolygons([{ regions }], viewBox, {
 					showDebug: true,
 					debugColor1: "rgba(255,0,255,0.3)",
 					debugColor2: "rgba(255,0,255,0.8)",
 				});
 				document.body.append(beforeSvgNode);
-				// Ensure the region has no self-intersections, using SimplifyPolygon()
+
+				/**
+				 * Ensure the region has no self-intersections, render the result
+				 */
 				const regionsSimplified = simplifyRegions(regions);
 				const simplifiedRegionNode = svgNodeFromPolygons(
 					[{ regions: regionsSimplified }],
@@ -63,70 +63,20 @@
 				document.body.append(simplifiedRegionNode);
 
 				/**
-				 * TODO: describe why this is needed...
-				 * ie Clipper wants integer co-ordinates, we scale up to avoid
-				 * losing too much precision in rounding.
+				 * Apply the offset to the simplified regions, and render the result
 				 */
-				const preClipperScale = 10;
-				const regionsSimplifiedClipper = regionsSimplified.map((region) => {
-					return region.map(([X, Y]) => ({
-						X: Math.round(X * 10),
-						Y: Math.round(Y * 10),
-					}));
+				const offsetRegions = applyOffsetToRegions(
+					regionsSimplified,
+					OFFSET_AMOUNT
+				);
+				const offsetPolygon = { regions: offsetRegions };
+				const offsetNode = svgNodeFromPolygons([offsetPolygon], viewBox, {
+					showDebug: true,
+					debugColor1: "rgba(255,0,255,0.3)",
+					debugColor2: "rgba(0,0,255,0.8)",
 				});
-
-				/**
-				 * TODO: below is roughed in from:
-				 * https://sourceforge.net/p/jsclipper/wiki/documentation/#clipperlibclipperoffsetexecute
-				 */
-
-				const arcTolerance = 125;
-				const miterLimit = 2;
-				var subjectClipper = new ClipperLib.Paths();
-				var solutionClipper = new ClipperLib.Paths();
-				/**
-				 * TODO: handle multiple regions!
-				 * I think this might already be working?
-				 */
-				for (const region of regionsSimplifiedClipper) {
-					subjectClipper.push(region.slice(0));
-				}
-				const clipperOffsetScale = 100;
-				ClipperLib.JS.ScaleUpPaths(subjectClipper, clipperOffsetScale);
-				const clipperOffset = new ClipperLib.ClipperOffset(
-					miterLimit,
-					arcTolerance
-				);
-				clipperOffset.AddPaths(
-					subjectClipper,
-					ClipperLib.JoinType.jtRound,
-					ClipperLib.EndType.etClosedPolygon
-				);
-				clipperOffset.Execute(
-					solutionClipper,
-					offsetAmount * clipperOffsetScale * preClipperScale
-				);
-				ClipperLib.JS.ScaleDownPaths(
-					solutionClipper,
-					clipperOffsetScale * preClipperScale
-				);
-				const solutionRegions = solutionClipper.map((regionClipper) => {
-					return regionClipper.map(({ X, Y }) => [X, Y]);
-				});
-				const solutionPolygon = { regions: solutionRegions };
-				const solutionViewBox = getFallbackViewBox([solutionPolygon], 10);
-				const demoSolutionNode = svgNodeFromPolygons(
-					[solutionPolygon],
-					// solutionViewBox,
-					viewBox,
-					{
-						showDebug: true,
-						debugColor1: "rgba(255,0,255,0.3)",
-						debugColor2: "rgba(0,0,255,0.8)",
-					}
-				);
-				document.body.append(demoSolutionNode);
-
+				document.body.append(offsetNode);
+				// Create a divider before the next example
 				document.body.append(document.createElement("hr"));
 			}
 		</script>
