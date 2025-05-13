@@ -1,6 +1,6 @@
 import { buildPathNode } from "./build-path-node.js";
-import { buildCircleNodesFromPoints } from "./build-circle-nodes-from-points.js";
 import { buildSvgRootNode } from "./build-svg-root-node.js";
+import { buildRegionDebugGroup } from "./build-region-debug-group.js";
 
 /**
  * Given an array of polygons, and a viewBox,
@@ -14,29 +14,27 @@ import { buildSvgRootNode } from "./build-svg-root-node.js";
  * @param {{ regions: [number, number][][]}} polygons - An array of polygons objects
  * @returns {SVGElement} An SVG node with the path and points
  */
-export function svgNodeFromPolygons(polygons, viewBox, debugPoints = false) {
+export function svgNodeFromPolygons(
+	polygons,
+	viewBox,
+	{ showDebug, debugColor1, debugColor2 } = {
+		showDebug: false,
+		debugColor1: "magenta",
+		debugColor2: "blue",
+	}
+) {
 	// Set up a root <svg> node, and add in the <path> and <circle> nodes
 	const svgNode = buildSvgRootNode(viewBox);
 	// Iterate over the polygons, adding paths and circles for each
 	for (const polygon of polygons) {
 		// Get a <path> node from the polygon regions
-		const pathNode = buildPathNode(polygon.regions);
+		const pathNode = buildPathNode(polygon.regions, debugColor1);
 		svgNode.appendChild(pathNode);
-		// For each region, add <circle> nodes to highlight points
-		/**
-		 * TODO: add chevrons to indicate winding direction
-		 * See notes in sketchbook, would like to able to adjust
-		 * size and angle of chevrons.
-		 * Start by drawing partial line segment - already shows direction,
-		 * just not as clear. Then clone and rotate that line segment to form
-		 * the two lines of the chevron.
-		 */
-		if (debugPoints) {
+		// For each region, add <circle> nodes to highlight points, and
+		// chevron-like lines to show winding direction
+		if (showDebug) {
 			for (const region of polygon.regions) {
-				const pointNodes = buildCircleNodesFromPoints(region);
-				for (const pointNode of pointNodes) {
-					svgNode.appendChild(pointNode);
-				}
+				svgNode.appendChild(buildRegionDebugGroup(region, debugColor2));
 			}
 		}
 	}

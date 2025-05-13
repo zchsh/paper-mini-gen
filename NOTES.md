@@ -17,6 +17,8 @@
   - 2025-05-11 at 13:12 - might be worth taking the traced SVGs that are failing to offset, copying them from the browser, and running in some local test cases. Started in `/demo/debug-offset-step/post-trace-fixtures`. Note that different `offset` values seem to affect the success of the operation a _lot_... so it does seem worth doing a side-by-side demo of different "offset outline" libraries.
   - 2025-05-11 at 13:35 - starting points for trying out ClipperJS - [ClipperOffset](https://sourceforge.net/p/jsclipper/wiki/documentation/#clipperoffset), but first ensure no self-intersections, maybe with a union operation in Clipper? [SimplifyPolygon](https://sourceforge.net/p/jsclipper/wiki/documentation/#clipperlibclippersimplifypolygon). And see also [Strictly Simple Polygons](https://sourceforge.net/p/jsclipper/wiki/documentation/#clipperlibclipperstrictlysimple), maybe that should be applied right after tracing?
   - 2025-05-13 at 09:36 - first step is going to be showing the winding direction in each `region` of a given polygon. Hopefully this will be helpful in debugging any winding-related issues in union or outline steps.
+  - 2025-05-13 at 12:14 - winding display is done. Just starting on trying out Clipper, in `public/demo/debug-offset-step/index.html`
+  - 2025-05-13 at 12:44 - have Clipper "simplifying" paths, already seems to be doing something. Promising so far!
 
 ### Later
 

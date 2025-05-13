@@ -21,7 +21,6 @@ export function pathDataStringFromRegions(regions) {
 		}
 		pathDataString += "Z";
 	}
-	console.log({ pathDataString });
 	if (pathDataString == "") pathDataString = "M0,0";
 	return pathDataString;
 }
