@@ -30,8 +30,17 @@
 				return polygonsSimplified;
 			}
 
+			const offsetAmount = 12;
+
 			// Render each of the examples
-			for (const { pathData, viewBox } of EXAMPLES.slice(0, 1)) {
+			for (const { pathData, viewBox: rawViewBox } of EXAMPLES.slice(0, 2)) {
+				const extraPadding = offsetAmount * 2;
+				const viewBox = [
+					rawViewBox[0] - extraPadding,
+					rawViewBox[1] - extraPadding,
+					rawViewBox[2] + extraPadding * 2,
+					rawViewBox[3] + extraPadding * 2,
+				];
 				const regions = regionsFromPathDataString(pathData);
 				// Render a "before" element, for comparison
 				const beforeSvgNode = svgNodeFromPolygons([{ regions }], viewBox, {
@@ -48,46 +57,56 @@
 					{
 						showDebug: true,
 						debugColor1: "rgba(255,0,255,0.3)",
-						debugColor2: "rgba(0,0,255,0.8)",
+						debugColor2: "rgba(128,0,255,0.8)",
 					}
 				);
 				document.body.append(simplifiedRegionNode);
+
 				/**
-				 * TODO: offset the simplified shape, and render that out
+				 * TODO: describe why this is needed...
+				 * ie Clipper wants integer co-ordinates, we scale up to avoid
+				 * losing too much precision in rounding.
 				 */
+				const preClipperScale = 10;
 				const regionsSimplifiedClipper = regionsSimplified.map((region) => {
-					return region.map(([X, Y]) => ({ X, Y }));
+					return region.map(([X, Y]) => ({
+						X: Math.round(X * 10),
+						Y: Math.round(Y * 10),
+					}));
 				});
 
 				/**
 				 * TODO: below is roughed in from:
 				 * https://sourceforge.net/p/jsclipper/wiki/documentation/#clipperlibclipperoffsetexecute
-				 *
-				 * TODO: run some real data!
 				 */
+
+				const arcTolerance = 125;
+				const miterLimit = 2;
 				var subjectClipper = new ClipperLib.Paths();
 				var solutionClipper = new ClipperLib.Paths();
-				subjectClipper[0] = [
-					{ X: 348, Y: 257 },
-					{ X: 364, Y: 148 },
-					{ X: 362, Y: 148 },
-					{ X: 326, Y: 241 },
-					{ X: 295, Y: 219 },
-					{ X: 258, Y: 88 },
-					{ X: 440, Y: 129 },
-					{ X: 370, Y: 196 },
-					{ X: 372, Y: 275 },
-				];
-				var scale = 100;
-				ClipperLib.JS.ScaleUpPaths(subjectClipper, scale);
-				var co = new ClipperLib.ClipperOffset(2, 0.25);
-				co.AddPaths(
+				/**
+				 * TODO: handle multiple regions!
+				 */
+				subjectClipper[0] = regionsSimplifiedClipper[0].slice(0);
+				const clipperOffsetScale = 100;
+				ClipperLib.JS.ScaleUpPaths(subjectClipper, clipperOffsetScale);
+				const clipperOffset = new ClipperLib.ClipperOffset(
+					miterLimit,
+					arcTolerance
+				);
+				clipperOffset.AddPaths(
 					subjectClipper,
 					ClipperLib.JoinType.jtRound,
 					ClipperLib.EndType.etClosedPolygon
 				);
-				co.Execute(solutionClipper, -7.0);
-				ClipperLib.JS.ScaleDownPaths(solutionClipper, scale);
+				clipperOffset.Execute(
+					solutionClipper,
+					offsetAmount * clipperOffsetScale * preClipperScale
+				);
+				ClipperLib.JS.ScaleDownPaths(
+					solutionClipper,
+					clipperOffsetScale * preClipperScale
+				);
 				const solutionRegions = solutionClipper.map((regionClipper) => {
 					return regionClipper.map(({ X, Y }) => [X, Y]);
 				});
@@ -95,7 +114,8 @@
 				const solutionViewBox = getFallbackViewBox([solutionPolygon], 10);
 				const demoSolutionNode = svgNodeFromPolygons(
 					[solutionPolygon],
-					solutionViewBox,
+					// solutionViewBox,
+					viewBox,
 					{
 						showDebug: true,
 						debugColor1: "rgba(255,0,255,0.3)",
@@ -103,6 +123,8 @@
 					}
 				);
 				document.body.append(demoSolutionNode);
+
+				document.body.append(document.createElement("hr"));
 			}
 		</script>
 	</head>
