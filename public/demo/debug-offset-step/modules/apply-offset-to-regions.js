@@ -1,10 +1,27 @@
 /**
- * TODO: write description
- *
- * Roughed in from:
- * https://sourceforge.net/p/jsclipper/wiki/documentation/#clipperlibclipperoffsetexecute
+ * Given an array of regions, where each region is an array of points,
+ * and each point is an [x, y] tuple, as well as an offset amount, being
+ * a number in units relative to the regions provided,
+ * Return an array of regions representing an offset of the combined
+ * original regions.
  *
  * NOTE: requires ClipperLib in the global scope
+ *
+ * NOTE: incoming regions should meet the following criteria:
+ * - no self-intersections, even micro-self-intersections
+ * - no vertices that are extremely close to each other
+ * If you have a set of regions that may not meet these criteria, consider
+ * using Clipper's SimplifyPolygons and CleanPolygons. An adjacent function
+ * in this repository, simplifyRegions, does this for you.
+ *
+ * Documentation on ClipperOffset:
+ * https://sourceforge.net/p/jsclipper/wiki/documentation/#clipperoffset
+ *
+ * @param {[number, number][][]} regions - array of regions, where each region
+ * is an array of points, and each point is an [x, y] tuple.
+ * @param {number} offsetAmount - amount to offset the regions by, in units
+ * @returns {[number, number][][]} - array of regions representing the offset
+ * shape
  */
 export function applyOffsetToRegions(regionsSimplified, offsetAmount) {
 	/**

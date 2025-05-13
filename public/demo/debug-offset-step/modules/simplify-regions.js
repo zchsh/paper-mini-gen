@@ -4,10 +4,13 @@
  * Return an array of similar regions, but with simplifications applied
  * by ClipperJS.
  *
+ * NOTE: requires ClipperLib in the global scope
+ *
  * Documentation on SimplifyPolygons:
  * https://sourceforge.net/p/jsclipper/wiki/documentation/#clipperlibclippersimplifypolygon
  *
- * NOTE: requires ClipperLib in the global scope
+ * TODO: consider whether to also use CleanPolygons:
+ * https://sourceforge.net/p/jsclipper/wiki/documentation/#clipperlibclippercleanpolygon
  *
  * @param {[number, number][][]} regions - array of regions, where each region
  * is an array of points, and each point is an [x, y] tuple.
