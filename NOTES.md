@@ -5,7 +5,7 @@
 - [ ] Clean up `public/demo/debug-offset-step` for re-use
   - [x] Draft description and JSDoc for `public/demo/debug-offset-step/simplify-regions.js`
   - [x] Draft description and JSDoc for `public/demo/debug-offset-step/apply-offset-to-regions.js`
-  - [ ] Draft description and JSDoc for `public/demo/debug-offset-step/regions-from-path-data-string.js`
+  - [x] Draft description and JSDoc for `public/demo/debug-offset-step/regions-from-path-data-string.js`
   - [ ] In `public/demo/debug-offset-step/simplify-regions.js`, consider using Clipper's `CleanPolygons`
   
 - [ ] Try re-using `public/demo/debug-offset-step` in main tool

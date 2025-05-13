@@ -5,12 +5,16 @@ import { createSvgElem } from "./create-svg-elem.js";
  * Returns an array of regions derived from the pathSegList.
  *
  * Note: use of this function requires a polyfill for pathSegList.
- * TODO: look into alternatives to using pathSegList, as it's deprecated.
- * https://github.com/progers/pathseg
  *
  * Note: this is a pretty "naive" converter that uses control points only.
  * This tool ignores any points on curved segments. It's therefore best used
  * with polygons that are already "flattened" into straight lines.
+ *
+ * TODO (later): look into alternatives to using the deprecated pathSegList.
+ * https://github.com/progers/pathseg is the polyfill.
+ * However, currently SVG PathData seems to have pretty poor support:
+ * https://developer.mozilla.org/en-US/docs/Web/API/SVGPathElement/getPathData#browser_compatibility
+ * So... feels like it's fine to just leave this for now.
  *
  * @param {SVGPathSegList} pathSegList - The pathSegList to convert
  * @returns {[number, number][][]} - An array of regions. Each region is an
@@ -78,41 +82,27 @@ function pathSegListToRegions(pathSegList) {
 				console.log("unknown path command: ", segment.pathSegTypeAsLetter);
 		}
 		if (x !== null || y !== null) {
-			result.push(x, y);
+			result.push([x, y]);
 		}
 	}
 	return regions;
 }
 
 /**
- * TODO: write description
+ * Given a string of SVG path data,
+ * Return an array of regions derived from the path data. A region is an
+ * array of points. Each point is an [x, y] tuple.
  *
  * Note: use of this function requires a polyfill for pathSegList.
- * TODO: look into alternatives to using pathSegList, as it's deprecated.
- * https://github.com/progers/pathseg
+ * Example: https://github.com/progers/pathseg
  *
- * @param {string} pathData
- * @returns
+ * @param {string} pathData A string of SVG path data
+ * @returns {[number, number][][]} An array of regions. Each region is an
+ * array of points. Each point is an [x, y] tuple.
  */
 export function regionsFromPathDataString(pathData) {
-	/**
-	 * Build an SVG path node, this is necessary to use pathSegList
-	 * NOTE: also requires a polyfill for the deprecated pathSegList, see:
-	 * https://github.com/progers/pathseg
-	 */
+	// Build an SVG path node, this is necessary to use pathSegList
 	const pathNode = createSvgElem("path", { d: pathData });
-	const rawRegions = pathSegListToRegions(pathNode.pathSegList);
-	const regions = rawRegions.map((rawRegion) => {
-		const region = rawRegion.reduce((acc, val, index) => {
-			if (index % 2 === 0) {
-				acc.push([val]);
-			} else {
-				acc[acc.length - 1].push(val);
-			}
-			return acc;
-		}, []);
-		return region;
-	});
-
-	return regions;
+	// Convert the pathNode's pathSegList to regions, and return those regions
+	return pathSegListToRegions(pathNode.pathSegList);
 }
