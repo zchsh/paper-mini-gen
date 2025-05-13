@@ -9,7 +9,12 @@
   - [x] In `public/demo/debug-offset-step/simplify-regions.js`, consider using Clipper's `CleanPolygons`
   - [x] In `public/demo/debug-offset-step`, investigate why `CleanRegions` doesn't seem to work _after_ offset
   - 2025-05-13 at 17:23 - pretty happy with the clean-up results here! Heck, pretty sure I can use ClipperJS for the Union part of things too... something to look into soon, I think, would be nice to cut down the wide spread libraries I've explored in my desperate state of ignorance.
-  
+
+- [ ] Do a little more organizing in `public/demo/debug-offset-step`
+  - The "step folders" approach to module organization in the main tool is already showing signs of not being a great long-term solution
+  - With `debug-offset-step`, it feels like there are a few distinct categories: parse SVG path data to regions, render regions to SVG nodes (including all the neat debug visuals on point location and winding order), and the ClipperJS stuff, namely `simplify-regions`, `clean-regions`, and `apply-offset-to-regions`.
+  - With the above in mind... maybe make a few new folders within `modules`? `parse`, for parsing SVG path data, `render`, for rendering regions to SVG nodes, and `clipper-wrappers`, for the functions I've written that kinda just wrap ClipperJS.
+
 - [ ] Try re-using `public/demo/debug-offset-step` in main tool
   - Uses [ClipperJS](https://sourceforge.net/p/jsclipper/wiki/documentation/) rather than [svg-path-outline](https://github.com/danmarshall/svg-path-outline)
 
