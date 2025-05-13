@@ -86,8 +86,11 @@
 				var solutionClipper = new ClipperLib.Paths();
 				/**
 				 * TODO: handle multiple regions!
+				 * I think this might already be working?
 				 */
-				subjectClipper[0] = regionsSimplifiedClipper[0].slice(0);
+				for (const region of regionsSimplifiedClipper) {
+					subjectClipper.push(region.slice(0));
+				}
 				const clipperOffsetScale = 100;
 				ClipperLib.JS.ScaleUpPaths(subjectClipper, clipperOffsetScale);
 				const clipperOffset = new ClipperLib.ClipperOffset(
