@@ -103,6 +103,12 @@ function pathSegListToRegions(pathSegList) {
 export function regionsFromPathDataString(pathData) {
 	// Build an SVG path node, this is necessary to use pathSegList
 	const pathNode = createSvgElem("path", { d: pathData });
-	// Convert the pathNode's pathSegList to regions, and return those regions
-	return pathSegListToRegions(pathNode.pathSegList);
+	// Convert the pathNode's pathSegList to regions
+	const rawRegions = pathSegListToRegions(pathNode.pathSegList);
+	// Filter out any regions with fewer than 3 points
+	const regionsFiltered = rawRegions.filter((region) => {
+		return region.length >= 3;
+	});
+	// Return the filtered regions
+	return regionsFiltered;
 }

@@ -15,6 +15,11 @@ export function buildRegionDebugGroup(
 	region,
 	debugColor = "rgba(0,0,255,0.8)"
 ) {
+	if (!region || region.length < 3) {
+		throw new Error(
+			"Invalid region in buildRegionDebugGroup: must be an array of at least 3 points"
+		);
+	}
 	const debugStrokeWidth = 0.5;
 	const dotSize = 1;
 	const chevronLength = 5;

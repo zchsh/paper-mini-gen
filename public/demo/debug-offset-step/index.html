@@ -13,6 +13,7 @@
 			import { svgNodeFromPolygons } from "/demo/debug-offset-step/modules/svg-node-from-polygons.js";
 			import { applyOffsetToRegions } from "/demo/debug-offset-step/modules/apply-offset-to-regions.js";
 			import { simplifyRegions } from "/demo/debug-offset-step/modules/simplify-regions.js";
+			import { cleanRegions } from "/demo/debug-offset-step/modules/clean-regions.js";
 
 			const OFFSET_AMOUNT = 12;
 
@@ -49,13 +50,14 @@
 				/**
 				 * Ensure the region has no self-intersections, render the result
 				 */
-				const regionsSimplified = simplifyRegions(regions);
+				const regionsCleaned = cleanRegions(regions, 0.5);
+				const regionsSimplified = simplifyRegions(regionsCleaned);
 				const simplifiedRegionNode = svgNodeFromPolygons(
 					[{ regions: regionsSimplified }],
 					viewBox,
 					{
 						showDebug: true,
-						debugColor1: "rgba(255,0,255,0.3)",
+						debugColor1: "rgba(128,0,255,0.3)",
 						debugColor2: "rgba(128,0,255,0.8)",
 					}
 				);
@@ -64,15 +66,26 @@
 				/**
 				 * Apply the offset to the simplified regions, and render the result
 				 */
-				const offsetRegions = applyOffsetToRegions(
+				const rawOffsetRegions = applyOffsetToRegions(
 					regionsSimplified,
 					OFFSET_AMOUNT
 				);
+				/**
+				 * Clean the offset regions, and render the result
+				 *
+				 * TODO: could add user-facing control over the clean threshold.
+				 * Alternately... should maybe keep the "clean" threshold pretty low,
+				 * and later add a true path smoothing step... see NOTES.md for more,
+				 * I think the latest is I might want to explore using:
+				 * https://mourner.github.io/simplify-js/
+				 */
+				const offsetRegions = cleanRegions(rawOffsetRegions, 0.5);
+				// const offsetRegions = rawOffsetRegions;
 				const offsetPolygon = { regions: offsetRegions };
 				const offsetNode = svgNodeFromPolygons([offsetPolygon], viewBox, {
 					showDebug: true,
-					debugColor1: "rgba(255,0,255,0.3)",
-					debugColor2: "rgba(0,0,255,0.8)",
+					debugColor1: "rgba(0,128,255,0.3)",
+					debugColor2: "rgba(0,128,255,0.8)",
 				});
 				document.body.append(offsetNode);
 				// Create a divider before the next example

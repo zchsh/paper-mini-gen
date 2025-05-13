@@ -2,11 +2,13 @@
 
 ## Next steps
 
-- [ ] Clean up `public/demo/debug-offset-step` for re-use
+- [x] Clean up `public/demo/debug-offset-step` for re-use
   - [x] Draft description and JSDoc for `public/demo/debug-offset-step/simplify-regions.js`
   - [x] Draft description and JSDoc for `public/demo/debug-offset-step/apply-offset-to-regions.js`
   - [x] Draft description and JSDoc for `public/demo/debug-offset-step/regions-from-path-data-string.js`
-  - [ ] In `public/demo/debug-offset-step/simplify-regions.js`, consider using Clipper's `CleanPolygons`
+  - [x] In `public/demo/debug-offset-step/simplify-regions.js`, consider using Clipper's `CleanPolygons`
+  - [x] In `public/demo/debug-offset-step`, investigate why `CleanRegions` doesn't seem to work _after_ offset
+  - 2025-05-13 at 17:23 - pretty happy with the clean-up results here! Heck, pretty sure I can use ClipperJS for the Union part of things too... something to look into soon, I think, would be nice to cut down the wide spread libraries I've explored in my desperate state of ignorance.
   
 - [ ] Try re-using `public/demo/debug-offset-step` in main tool
   - Uses [ClipperJS](https://sourceforge.net/p/jsclipper/wiki/documentation/) rather than [svg-path-outline](https://github.com/danmarshall/svg-path-outline)
