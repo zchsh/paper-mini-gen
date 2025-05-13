@@ -8,7 +8,7 @@
   - [x] all `demo` and `toy` things could be consolidated into a single `demo` directory
   - 2025-05-10 at 16:53 - currently working on trying to clean up `applyOffset`
 
-- [ ] Revisit offset step, to address buggy "offset" cases
+- [x] Revisit offset step, to address buggy "offset" cases
   - To reproduce, pick any example, reset blur to `1`, and step up through the blur values. Every example seems to have at least a couple points where the trace step is fine but the "offset" step fails.
   - Polygons with simple straight segments only, with no weird clustered points, are coming out of the trace step. Why is the union step failing sometimes?
   - 2025-05-10 at 17:29 - Maybe Clipper would be a good fit: <https://sourceforge.net/p/jsclipper/wiki/Home%206/>. Probably worth making a separate demo page... but, that can come later. For now, continue cleanup!
@@ -19,6 +19,15 @@
   - 2025-05-13 at 09:36 - first step is going to be showing the winding direction in each `region` of a given polygon. Hopefully this will be helpful in debugging any winding-related issues in union or outline steps.
   - 2025-05-13 at 12:14 - winding display is done. Just starting on trying out Clipper, in `public/demo/debug-offset-step/index.html`
   - 2025-05-13 at 12:44 - have Clipper "simplifying" paths, already seems to be doing something. Promising so far!
+  - 2025-05-13 at 16:25 - seems to be working! Going to work on cleanup, and then move on to integrating these fixes into the main page.
+
+- [ ] Clean up `public/demo/debug-offset-step` for re-use
+  - [ ] Draft description and JSDoc for `public/demo/debug-offset-step/simplify-regions.js`
+  - [ ] Draft description and JSDoc for `public/demo/debug-offset-step/apply-offset-to-regions.js`
+  - [ ] Draft description and JSDoc for `public/demo/debug-offset-step/regions-from-path-data-string.js`
+  
+- [ ] Try re-using `public/demo/debug-offset-step` in main tool
+  - Uses [ClipperJS](https://sourceforge.net/p/jsclipper/wiki/documentation/) rather than [svg-path-outline](https://github.com/danmarshall/svg-path-outline)
 
 ### Later
 

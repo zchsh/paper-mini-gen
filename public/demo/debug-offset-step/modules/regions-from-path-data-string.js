@@ -1,11 +1,20 @@
 import { createSvgElem } from "./create-svg-elem.js";
 
 /**
- * A pretty "naive" converter that uses control points, and ignores
- * points on curves.
+ * Given an SVG pathSegList,
+ * Returns an array of regions derived from the pathSegList.
  *
- * TODO: look into alternatives to using pathSegList, as it's deprecated
+ * Note: use of this function requires a polyfill for pathSegList.
+ * TODO: look into alternatives to using pathSegList, as it's deprecated.
  * https://github.com/progers/pathseg
+ *
+ * Note: this is a pretty "naive" converter that uses control points only.
+ * This tool ignores any points on curved segments. It's therefore best used
+ * with polygons that are already "flattened" into straight lines.
+ *
+ * @param {SVGPathSegList} pathSegList - The pathSegList to convert
+ * @returns {[number, number][][]} - An array of regions. Each region is an
+ * array of points. Each point is an [x, y] tuple.
  */
 function pathSegListToRegions(pathSegList) {
 	var count = pathSegList.numberOfItems;
@@ -76,9 +85,11 @@ function pathSegListToRegions(pathSegList) {
 }
 
 /**
+ * TODO: write description
  *
- * TODO: what is the path data string has multiple regions?
- * Do we currently handle that properly? Might be worth investigating.
+ * Note: use of this function requires a polyfill for pathSegList.
+ * TODO: look into alternatives to using pathSegList, as it's deprecated.
+ * https://github.com/progers/pathseg
  *
  * @param {string} pathData
  * @returns

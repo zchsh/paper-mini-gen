@@ -1,9 +1,11 @@
 /**
- * Converts an array of regions to an SVG path string.
- * A region is an array of points, and each point is an [x, y] tuple.
+ * Given an array of regions,
+ * Returns an SVG path string that can be used to draw the regions.
  *
- * @param {Array} regions - Array of regions, each region is an array of points
- * @returns {string} - SVG path string
+ * A region is an array of points. Each point is an [x, y] tuple.
+ *
+ * @param {[number, number][][]} regions - Array of regions
+ * @returns {string} - SVG path data string
  */
 export function pathDataStringFromRegions(regions) {
 	let pathDataString = "";
