@@ -11,6 +11,7 @@
 		<script type="module">
 			import { regionsFromPathDataString } from "/demo/debug-offset-step/modules/regions-from-path-data-string.js";
 			import { svgNodeFromPolygons } from "/demo/debug-offset-step/modules/svg-node-from-polygons.js";
+			import { getFallbackViewBox } from "/demo/debug-offset-step/modules/get-fallback-viewbox.js";
 
 			/**
 			 * TODO: write description
@@ -30,7 +31,7 @@
 			}
 
 			// Render each of the examples
-			for (const { pathData, viewBox } of EXAMPLES) {
+			for (const { pathData, viewBox } of EXAMPLES.slice(0, 1)) {
 				const regions = regionsFromPathDataString(pathData);
 				// Render a "before" element, for comparison
 				const beforeSvgNode = svgNodeFromPolygons([{ regions }], viewBox, {
@@ -54,6 +55,54 @@
 				/**
 				 * TODO: offset the simplified shape, and render that out
 				 */
+				const regionsSimplifiedClipper = regionsSimplified.map((region) => {
+					return region.map(([X, Y]) => ({ X, Y }));
+				});
+
+				/**
+				 * TODO: below is roughed in from:
+				 * https://sourceforge.net/p/jsclipper/wiki/documentation/#clipperlibclipperoffsetexecute
+				 *
+				 * TODO: run some real data!
+				 */
+				var subjectClipper = new ClipperLib.Paths();
+				var solutionClipper = new ClipperLib.Paths();
+				subjectClipper[0] = [
+					{ X: 348, Y: 257 },
+					{ X: 364, Y: 148 },
+					{ X: 362, Y: 148 },
+					{ X: 326, Y: 241 },
+					{ X: 295, Y: 219 },
+					{ X: 258, Y: 88 },
+					{ X: 440, Y: 129 },
+					{ X: 370, Y: 196 },
+					{ X: 372, Y: 275 },
+				];
+				var scale = 100;
+				ClipperLib.JS.ScaleUpPaths(subjectClipper, scale);
+				var co = new ClipperLib.ClipperOffset(2, 0.25);
+				co.AddPaths(
+					subjectClipper,
+					ClipperLib.JoinType.jtRound,
+					ClipperLib.EndType.etClosedPolygon
+				);
+				co.Execute(solutionClipper, -7.0);
+				ClipperLib.JS.ScaleDownPaths(solutionClipper, scale);
+				const solutionRegions = solutionClipper.map((regionClipper) => {
+					return regionClipper.map(({ X, Y }) => [X, Y]);
+				});
+				const solutionPolygon = { regions: solutionRegions };
+				const solutionViewBox = getFallbackViewBox([solutionPolygon], 10);
+				const demoSolutionNode = svgNodeFromPolygons(
+					[solutionPolygon],
+					solutionViewBox,
+					{
+						showDebug: true,
+						debugColor1: "rgba(255,0,255,0.3)",
+						debugColor2: "rgba(0,0,255,0.8)",
+					}
+				);
+				document.body.append(demoSolutionNode);
 			}
 		</script>
 	</head>
