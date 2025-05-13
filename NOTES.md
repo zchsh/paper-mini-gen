@@ -16,6 +16,7 @@
   - 2025-05-11 at 13:06 - vaguely related, neat comparison of polygon boolean operation algorithms: <https://daef.github.io/poly-bool-comparison/>
   - 2025-05-11 at 13:12 - might be worth taking the traced SVGs that are failing to offset, copying them from the browser, and running in some local test cases. Started in `/demo/debug-offset-step/post-trace-fixtures`. Note that different `offset` values seem to affect the success of the operation a _lot_... so it does seem worth doing a side-by-side demo of different "offset outline" libraries.
   - 2025-05-11 at 13:35 - starting points for trying out ClipperJS - [ClipperOffset](https://sourceforge.net/p/jsclipper/wiki/documentation/#clipperoffset), but first ensure no self-intersections, maybe with a union operation in Clipper? [SimplifyPolygon](https://sourceforge.net/p/jsclipper/wiki/documentation/#clipperlibclippersimplifypolygon). And see also [Strictly Simple Polygons](https://sourceforge.net/p/jsclipper/wiki/documentation/#clipperlibclipperstrictlysimple), maybe that should be applied right after tracing?
+  - 2025-05-13 at 09:36 - first step is going to be showing the winding direction in each `region` of a given polygon. Hopefully this will be helpful in debugging any winding-related issues in union or outline steps.
 
 ### Later
 
@@ -36,7 +37,13 @@
   
 - I've been thinking about doing _line drawings_. This would leave significant "holes", or interior shapes, within a larger main shape.
 - Could there be an option to remove these interior voids? Option to remove them completely could make sense.
-- Another way to implement this option, more manual maybe a separate thing, would be manual removal of specific shapes, eg by clicking on them and having them change colour.
+- Another way to implement this option, more manual maybe a separate thing, would be manual removal of specific shapes, eg by clicking on them and having them change colour
+
+#### Consider use of imagetracer's imagedataToTracedata API
+
+- <https://github.com/jankovicsandras/imagetracerjs?tab=readme-ov-file#api>
+- May remove need for roundtrip through `<svg>` element, which I think is currently being done?
+- As with other steps... data transformation happens outside the DOM, rendering to DOM is a convenience that happens in the browser
 
 #### Update image-js version
 
@@ -66,6 +73,7 @@
   - Path smoothing of some kind might help with that
   - 2025-04-13 at 18:05 - stubbedin `demo-smooth-to-polyline`
   - 2025-05-10 at 10:27 - there's a Figma plugin for this that might be worth trying: <https://www.figma.com/community/plugin/809139536998662893/simplify>. Might make sense to set up "Copy SVG" at every step for debug purposes... then you can test the smoothing process in Figma, see if it works, and if it does and the plugin is licensed appropriately, swipe the code and integrate it here.
+  - 2025-05-13 at 09:41 - <https://mourner.github.io/simplify-js/> looks perfect
 
 #### Revisit image processing
 
