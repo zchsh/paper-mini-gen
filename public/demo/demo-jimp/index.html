@@ -7,7 +7,7 @@
 			src="/demo/demo-jimp/modules/jimp-globalizer.js"
 		></script>
 		<script>
-			window.onload = async function () {
+			async function runSilhouette() {
 				/**
 				 * Settings
 				 */
@@ -33,10 +33,7 @@
 					color: 0xffffffff,
 				});
 				flatBg.composite(loadedImage, blurExtension, blurExtension);
-				// Debug: render the flattened background image
-				const flatBgBase64 = await flatBg.getBase64("image/jpeg");
-				const outputElem = document.getElementById("output-01");
-				outputElem.src = flatBgBase64;
+
 				/**
 				 * Create a threshold image
 				 */
@@ -47,6 +44,22 @@
 				thresholdMask.invert();
 				thresholdMask.threshold({ max: 100 - threshold });
 				thresholdMask.invert();
+				/**
+				 * Return the images
+				 */
+				return [flatBg, thresholdMask];
+			}
+
+			window.onload = async function () {
+				/**
+				 * TODO: fix up this function for re-use
+				 */
+				const [flatBg, thresholdMask] = await runSilhouette();
+				// Debug: render the flattened background image
+				const flatBgBase64 = await flatBg.getBase64("image/jpeg");
+				const outputElem = document.getElementById("output-01");
+				outputElem.src = flatBgBase64;
+				// Render the threshold image
 				const thresholdBase64 = await thresholdMask.getBase64("image/jpeg");
 				const thresholdElem = document.getElementById("output-02");
 				thresholdElem.src = thresholdBase64;
@@ -58,6 +71,13 @@
 		<h2>PNG (original | flattened | threshold)</h2>
 		<div style="background: dodgerblue; display: flex">
 			<img src="/demo/demo-jimp/images/sample-char-art-01-small.png" />
+			<img id="output-01" />
+			<img id="output-02" />
+		</div>
+
+		<h2 style="color: magenta">JPEG (original | flattened | threshold)</h2>
+		<div style="background: dodgerblue; display: flex">
+			<img src="/demo/demo-jimp/images/sample-char-art-01-small.jpeg" />
 			<img id="output-01" />
 			<img id="output-02" />
 		</div>
