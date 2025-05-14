@@ -10,13 +10,21 @@
   - [x] In `public/demo/debug-offset-step`, investigate why `CleanRegions` doesn't seem to work _after_ offset
   - 2025-05-13 at 17:23 - pretty happy with the clean-up results here! Heck, pretty sure I can use ClipperJS for the Union part of things too... something to look into soon, I think, would be nice to cut down the wide spread libraries I've explored in my desperate state of ignorance.
 
-- [ ] Do a little more organizing in `public/demo/debug-offset-step`
+- [x] Do a little more organizing in `public/demo/debug-offset-step`
   - The "step folders" approach to module organization in the main tool is already showing signs of not being a great long-term solution
   - With `debug-offset-step`, it feels like there are a few distinct categories: parse SVG path data to regions, render regions to SVG nodes (including all the neat debug visuals on point location and winding order), and the ClipperJS stuff, namely `simplify-regions`, `clean-regions`, and `apply-offset-to-regions`.
   - With the above in mind... maybe make a few new folders within `modules`? `parse`, for parsing SVG path data, `render`, for rendering regions to SVG nodes, and `clipper-wrappers`, for the functions I've written that kinda just wrap ClipperJS.
 
-- [ ] Try re-using `public/demo/debug-offset-step` in main tool
+- [x] Try re-using `public/demo/debug-offset-step` in main tool
   - Uses [ClipperJS](https://sourceforge.net/p/jsclipper/wiki/documentation/) rather than [svg-path-outline](https://github.com/danmarshall/svg-path-outline)
+  - 2025-05-13 at 20:26 - in progress, promising so far! Lots of clean up to do in `min.js`
+  - 2025-05-13 at 20:47 - seems to working REALLY well! super stoked about that...
+
+- [ ] Work on a demo tool to support transparent images
+  - Create a new `demo/demo-image-js-handle-png`
+  - Copy over work from `demo-image-js`
+  - Add second example with identical image, but it's a transparent PNG
+  - 2025-05-13 at 21:06 - next step is probably to grab a newer version of ImageJS... which one has the best documentation? 0.37.0 is latest... Pretty sure I'm currently using <https://www.lactame.com/lib/image-js/0.21.2/image.min.js>. There's a directory listing at <https://www.lactame.com/lib/image-js/>. Docs for 0.37.0 are at <https://image-js.github.io/image-js/>.
 
 ### Later
 

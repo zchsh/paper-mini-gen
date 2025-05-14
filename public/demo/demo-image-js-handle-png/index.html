@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<!-- https://www.lactame.com/lib/image-js/0.21.2/image.min.js -->
+		<!-- IMAGE UPLOAD  -->
+		<script src="/demo/demo-image-js-handle-png/on-image-selection.js"></script>
+		<script src="/demo/demo-image-js-handle-png/image.min.js"></script>
+		<script src="/demo/demo-image-js-handle-png/get-input-as-int.js"></script>
+		<script src="/demo/demo-image-js-handle-png/apply-threshold.js"></script>
+		<script src="/demo/demo-image-js-handle-png/get-fallback-threshold.js"></script>
+		<script src="/demo/demo-image-js-handle-png/process-image.js"></script>
+		<script>
+			/**
+			 * IMAGE TRACING
+			 */
+			function silhouetteResetSettings() {
+				document.getElementById("threshold").value = 100;
+				document.getElementById("radius").value = 5;
+			}
+
+			async function silhouetteExecuteAll() {
+				await silhouetteExecute("raw-image-jpg", "processed-image-jpg");
+				await silhouetteExecute(
+					"raw-image-png",
+					"processed-image-png",
+					"alpha-image-png"
+				);
+			}
+
+			async function silhouetteExecute(
+				inputElemId,
+				outputElemId,
+				alphaElemId = null
+			) {
+				// Gather settings
+				const threshold = getInputAsInt("threshold");
+				const radius = getInputAsInt("radius");
+				// Gather elements
+				const inputElem = document.getElementById(inputElemId);
+				const outputElem = document.getElementById(outputElemId);
+				// Execute
+				const [processedResult, alphaResult] = await processImage(
+					inputElem.src,
+					radius,
+					threshold
+				);
+				outputElem.src = processedResult;
+				if (alphaElemId) {
+					alphaElem = document.getElementById(alphaElemId);
+					alphaElem.src = alphaResult;
+				}
+			}
+		</script>
+	</head>
+	<body onload="silhouetteResetSettings(); silhouetteExecuteAll()">
+		<!--  -->
+		<!--  -->
+		<!--  -->
+		<h1>IMAGEJS SILHOUETTE - PNG PROCESSING</h1>
+		<!--  -->
+		<!--  -->
+		<!--  -->
+
+		<h3 style="color: magenta">PNG</h3>
+		<p>
+			Threshold (100 means auto)
+			<input id="threshold" type="number" min="0" max="100" value="100" />
+		</p>
+		<p>
+			Radius
+			<input id="radius" type="number" min="1" max="100" value="5" />
+		</p>
+		<p><button onClick="silhouetteExecute()">Apply tweaks</button></p>
+
+		<div style="display: flex; align-items: center; border: 2px solid magenta">
+			<img
+				id="raw-image-png"
+				src="/demo/demo-image-js-handle-png/images/sample-char-art-01-small.png"
+			/>
+			<img id="alpha-image-png" />
+			<img id="processed-image-png" />
+		</div>
+
+		<h3>JPEG</h3>
+		<p>
+			Threshold (100 means auto)
+			<input id="threshold" type="number" min="0" max="100" value="100" />
+		</p>
+		<p>
+			Radius
+			<input id="radius" type="number" min="1" max="100" value="5" />
+		</p>
+		<div style="display: flex; align-items: center">
+			<img
+				id="raw-image-jpg"
+				src="/demo/demo-image-js-handle-png/images/sample-char-art-01-small.jpeg"
+			/>
+			<img id="processed-image-jpg" />
+		</div>
+	</body>
+</html>
