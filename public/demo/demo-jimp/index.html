@@ -8,42 +8,58 @@
 		></script>
 		<script>
 			window.onload = async function () {
-				console.log({ in: "index.html", Jimp: window.Jimp });
+				/**
+				 * Settings
+				 */
+				const blurAmount = 2;
+				const threshold = 80;
+				/**
+				 * Load the original image
+				 */
 				const loadedImage = await Jimp.read(
 					"/demo/demo-jimp/images/sample-char-art-01-small.png"
 				);
 				const width = loadedImage.bitmap.width;
 				const height = loadedImage.bitmap.height;
-				console.log({ loadedImage, width, height });
-
+				/**
+				 * Create a flattened background image
+				 *
+				 * Note we add width and height to account for blur space
+				 */
+				const blurExtension = blurAmount * 4;
 				const flatBg = new Jimp({
-					width,
-					height,
-					color: 0xff00ffff,
+					width: width + blurExtension * 2,
+					height: height + blurExtension * 2,
+					color: 0xffffffff,
 				});
+				flatBg.composite(loadedImage, blurExtension, blurExtension);
+				// Debug: render the flattened background image
 				const flatBgBase64 = await flatBg.getBase64("image/jpeg");
 				const outputElem = document.getElementById("output-01");
-				console.log({ outputElem, flatBgBase64 });
 				outputElem.src = flatBgBase64;
+				/**
+				 * Create a threshold image
+				 */
+				const thresholdMask = flatBg.clone();
+				if (blurAmount > 0) {
+					thresholdMask.blur(blurAmount);
+				}
+				thresholdMask.invert();
+				thresholdMask.threshold({ max: 100 - threshold });
+				thresholdMask.invert();
+				const thresholdBase64 = await thresholdMask.getBase64("image/jpeg");
+				const thresholdElem = document.getElementById("output-02");
+				thresholdElem.src = thresholdBase64;
 			};
 		</script>
 	</head>
 	<body>
-		PNG, original
-		<br />
-		<div style="background: dodgerblue; display: inline-block">
+		<h1>Jimp Demo (replace image-js?)</h1>
+		<h2>PNG (original | flattened | threshold)</h2>
+		<div style="background: dodgerblue; display: flex">
 			<img src="/demo/demo-jimp/images/sample-char-art-01-small.png" />
-		</div>
-
-		<br />
-		<br />
-
-		PNG, modified
-		<br />
-		<div style="background: dodgerblue; display: inline-block">
-			TODO: merge original image onto flat background image (below)
-			<br />
 			<img id="output-01" />
+			<img id="output-02" />
 		</div>
 	</body>
 </html>
