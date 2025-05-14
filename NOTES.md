@@ -2,44 +2,14 @@
 
 ## Next steps
 
-- [x] Clean up `public/demo/debug-offset-step` for re-use
-  - [x] Draft description and JSDoc for `public/demo/debug-offset-step/simplify-regions.js`
-  - [x] Draft description and JSDoc for `public/demo/debug-offset-step/apply-offset-to-regions.js`
-  - [x] Draft description and JSDoc for `public/demo/debug-offset-step/regions-from-path-data-string.js`
-  - [x] In `public/demo/debug-offset-step/simplify-regions.js`, consider using Clipper's `CleanPolygons`
-  - [x] In `public/demo/debug-offset-step`, investigate why `CleanRegions` doesn't seem to work _after_ offset
-  - 2025-05-13 at 17:23 - pretty happy with the clean-up results here! Heck, pretty sure I can use ClipperJS for the Union part of things too... something to look into soon, I think, would be nice to cut down the wide spread libraries I've explored in my desperate state of ignorance.
-
-- [x] Do a little more organizing in `public/demo/debug-offset-step`
-  - The "step folders" approach to module organization in the main tool is already showing signs of not being a great long-term solution
-  - With `debug-offset-step`, it feels like there are a few distinct categories: parse SVG path data to regions, render regions to SVG nodes (including all the neat debug visuals on point location and winding order), and the ClipperJS stuff, namely `simplify-regions`, `clean-regions`, and `apply-offset-to-regions`.
-  - With the above in mind... maybe make a few new folders within `modules`? `parse`, for parsing SVG path data, `render`, for rendering regions to SVG nodes, and `clipper-wrappers`, for the functions I've written that kinda just wrap ClipperJS.
-
-- [x] Try re-using `public/demo/debug-offset-step` in main tool
-  - Uses [ClipperJS](https://sourceforge.net/p/jsclipper/wiki/documentation/) rather than [svg-path-outline](https://github.com/danmarshall/svg-path-outline)
-  - 2025-05-13 at 20:26 - in progress, promising so far! Lots of clean up to do in `min.js`
-  - 2025-05-13 at 20:47 - seems to working REALLY well! super stoked about that...
-
 - [ ] Work on a demo tool to support transparent images
-  - Create a new `demo/demo-image-js-handle-png`
-  - Copy over work from `demo-image-js`
-  - Add second example with identical image, but it's a transparent PNG
+  - [x] Create a new `demo/demo-image-js-handle-png`
+  - [x] Copy over work from `demo-image-js`
+  - [x] Add second example with identical image, but it's a transparent PNG
+  - One approach is make a threshold mask based on the alpha channel, then apply that mask
   - 2025-05-13 at 21:06 - next step is probably to grab a newer version of ImageJS... which one has the best documentation? 0.37.0 is latest... Pretty sure I'm currently using <https://www.lactame.com/lib/image-js/0.21.2/image.min.js>. There's a directory listing at <https://www.lactame.com/lib/image-js/>. Docs for 0.37.0 are at <https://image-js.github.io/image-js/>.
 
 ### Later
-
-#### Support transparent images
-
-- one approach is make a threshold mask based on the alpha channel, then apply that mask
-- eg <https://github.com/image-js/image-js?tab=readme-ov-file#paint-a-mask>
-- tried before with `sample-taxi-transparent.png`, in `demo-image-js`
-- may be worth exploring alternatives to `image-js`... (?)
-
-#### Support "backside" images
-
-- Requires more art, but really adds something I think, and could maybe encourage hand-drawing over AI tool use, eg see <https://www.youtube.com/watch?v=ehjWZRPq9JA>
-- Totally optional
-- Art has to kind of match up from front to back in terms of shape... cutout from front would always be used.
 
 #### Consider post-trace option to "remove interior voids"
   
@@ -47,15 +17,29 @@
 - Could there be an option to remove these interior voids? Option to remove them completely could make sense.
 - Another way to implement this option, more manual maybe a separate thing, would be manual removal of specific shapes, eg by clicking on them and having them change colour
 
+#### Explore path smoothing after boolean addition
+
+- [ ] Explore path smoothing, so scissors-based cutout is easier
+  - <https://www.smoothsvg.com/> is a starting point
+    - this was the first search result, could probably dive deeper
+  - also this: <https://stackoverflow.com/a/28722732>
+  - Want it to be easy to cut out the shapes
+  - Path smoothing of some kind might help with that
+  - 2025-04-13 at 18:05 - stubbedin `demo-smooth-to-polyline`
+  - 2025-05-10 at 10:27 - there's a Figma plugin for this that might be worth trying: <https://www.figma.com/community/plugin/809139536998662893/simplify>. Might make sense to set up "Copy SVG" at every step for debug purposes... then you can test the smoothing process in Figma, see if it works, and if it does and the plugin is licensed appropriately, swipe the code and integrate it here.
+  - 2025-05-13 at 09:41 - <https://mourner.github.io/simplify-js/> looks perfect
+
+#### Support "backside" images
+
+- Requires more art, but really adds something I think, and could maybe encourage hand-drawing over AI tool use, eg see <https://www.youtube.com/watch?v=ehjWZRPq9JA>
+- Totally optional
+- Art has to kind of match up from front to back in terms of shape... cutout from front would always be used.
+
 #### Consider use of imagetracer's imagedataToTracedata API
 
 - <https://github.com/jankovicsandras/imagetracerjs?tab=readme-ov-file#api>
 - May remove need for roundtrip through `<svg>` element, which I think is currently being done?
 - As with other steps... data transformation happens outside the DOM, rendering to DOM is a convenience that happens in the browser
-
-#### Update image-js version
-
-- currently on `0.37.0` ish - <https://github.com/image-js/image-js>
 
 #### Look into performance
 
@@ -70,18 +54,6 @@
 - Current algorithm grabs all the points, no nuance between the points of an arc
 - Maybe ideal scenario: same as now, but for any curved _segments_, convert to straight lines based on some _angle tolerance_
   - This same "angle tolerance" principle is what i want for `create-circular-polygon` as well....
-
-#### Explore path smoothing after boolean addition
-
-- [ ] Explore path smoothing, so scissors-based cutout is easier
-  - <https://www.smoothsvg.com/> is a starting point
-    - this was the first search result, could probably dive deeper
-  - also this: <https://stackoverflow.com/a/28722732>
-  - Want it to be easy to cut out the shapes
-  - Path smoothing of some kind might help with that
-  - 2025-04-13 at 18:05 - stubbedin `demo-smooth-to-polyline`
-  - 2025-05-10 at 10:27 - there's a Figma plugin for this that might be worth trying: <https://www.figma.com/community/plugin/809139536998662893/simplify>. Might make sense to set up "Copy SVG" at every step for debug purposes... then you can test the smoothing process in Figma, see if it works, and if it does and the plugin is licensed appropriately, swipe the code and integrate it here.
-  - 2025-05-13 at 09:41 - <https://mourner.github.io/simplify-js/> looks perfect
 
 #### Revisit image processing
 
