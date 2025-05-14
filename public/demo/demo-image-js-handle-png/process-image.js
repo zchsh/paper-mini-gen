@@ -23,21 +23,53 @@ async function processImage(imgSrc, radius, threshold) {
 	 * it's like the entire image aka a black square which isn't what I want.
 	 * Maybe there'd be a way to show an intermediate step with the
 	 * PNG conversion to JPEG shown?
+	 *
+	 * Docs:
+	 * https://image-js.github.io/image-js/
 	 */
 	let withAlphaMaskSrc = null;
 	// Get the alpha channel.
 	const hasAlphaChannel = image.alpha;
 	const colorModel = image.colorModel;
-	const extension = image.extension;
-	console.log({ extension, hasAlphaChannel, colorModel });
+	const width = image.width;
+	const height = image.height;
+	const alphaPixelsCount = image.countAlphaPixels();
+	console.log({ alphaPixelsCount, hasAlphaChannel, colorModel, width, height });
 	if (hasAlphaChannel) {
-		// Convert to JPEG
+		// Create a new image with the same size and color model as the original
+		// new Image(width: number, height: number, data: Array?, options: object?)
+		// const alphaImage = new IJS.Image(width, height);
+		// const alphaImage = IJS.Image.createFrom(image);
+		// Grab the alpha channel
+		// const alphaChannel = image.getChannel(3);
+		// image.setChannel(alphaChannel, 0);
+		// console.log({ alphaChannel });
+		// // Create a binary mask on the transparent pixels (255 = opaque).
+		// const mask = alphaChannel.mask({
+		// 	threshold: 254,
+		// 	invert: true,
+		// 	useAlpha: true,
+		// });
+		// // Paint the pixels from the mask in white.
+		// image.paintMasks(mask, { color: "magenta", alpha: 255 });
+		// image.level({ channel: 3, min: 128, max: 255 });
+		image.paintPolygon(
+			[
+				[0, 0],
+				[50, 0],
+				[50, 50],
+				[0, 50],
+				[0, 0],
+			],
+			{ color: [255, 0, 255], alpha: 255, filled: false }
+		);
+		// // Save the image as jpg.
+		// // await image.save('image.jpg');
+		// // Write out to a data URL so you can return this intermediate step
 		withAlphaMaskSrc = image.toDataURL();
-		// Convert to RGB
-		// image = image.toRGB();
+		// withAlphaMaskSrc = alphaImage.toDataURL();
 	}
-	// const alphaChannel = image.getChannel(3);
-	// console.log({ alphaChannel });
+
 	// // Create a binary mask on the transparent pixels (255 = opaque).
 	// const mask = alphaChannel.mask({ threshold: 255, invert: true });
 	// // Paint the pixels from the mask in white.

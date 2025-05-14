@@ -20,7 +20,11 @@
 			}
 
 			async function silhouetteExecuteAll() {
-				await silhouetteExecute("raw-image-jpg", "processed-image-jpg");
+				await silhouetteExecute(
+					"raw-image-jpg",
+					"processed-image-jpg",
+					"alpha-image-jpg"
+				);
 				await silhouetteExecute(
 					"raw-image-png",
 					"processed-image-png",
@@ -96,6 +100,7 @@
 				id="raw-image-jpg"
 				src="/demo/demo-image-js-handle-png/images/sample-char-art-01-small.jpeg"
 			/>
+			<img style="border: 1px solid green" id="alpha-image-jpg" />
 			<img style="border: 1px solid dodgerblue" id="processed-image-jpg" />
 		</div>
 	</body>
