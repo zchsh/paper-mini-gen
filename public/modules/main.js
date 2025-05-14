@@ -10,7 +10,9 @@ import { resetSettings } from "/modules/01-upload/reset-settings.js";
 import { processImage } from "/modules/02-silhouette/process-image.js";
 // TRACE
 import { reduceClusteredPoints } from "/modules/03-trace/reduce-clustered-points.js";
-import { svgNodeFromPolygons } from "/modules/00-common/svg-node-from-polygons.js";
+import { cleanRegions } from "/modules/clipperjs-wrappers/clean-regions.js";
+import { simplifyRegions } from "/modules/clipperjs-wrappers/simplify-regions.js";
+import { svgNodeFromPolygons } from "./render/svg-node-from-polygons.js";
 
 // OFFSET
 import { applyOffset } from "/modules/04-offset/apply-offset.js";
@@ -161,6 +163,10 @@ function cleanupTrace(svgContainerElem) {
 	 *
 	 * Regions may mean filled or un-filled areas, something to do with
 	 * winding order, I don't fully get it but so far it works...
+	 *
+	 * TODO: split this out... maybe look into an alternative to flattenSVG?
+	 * I imagine ClipperJS might be able to handle the flattening...
+	 * probably worth looking into.
 	 */
 	const polygons = [];
 	let regions = [];
@@ -173,7 +179,7 @@ function cleanupTrace(svgContainerElem) {
 		 */
 		const { groupId, points: rawPoints } = path;
 		const points = reduceClusteredPoints(rawPoints, 3);
-		console.log({ rawPointCount: rawPoints.length, pointCount: points.length });
+
 		const isFirstIteration = currentGroupId === null;
 		const hasGroupId = typeof groupId === "string";
 		const hasGroupIdMatch = hasGroupId && groupId === currentGroupId;
@@ -194,13 +200,24 @@ function cleanupTrace(svgContainerElem) {
 	// different groupID to follow it and cause it to be pushed)
 	polygons.push({ regions });
 
+	/**
+	 * Clean up with ClipperJS
+	 */
+	const polygonsCleaned = polygons.map((polygon) => {
+		const regionsCleaned = cleanRegions(polygon.regions, 0.5);
+		const regionsSimplified = simplifyRegions(regionsCleaned);
+		return { regions: regionsSimplified };
+	});
+
 	const showDebugPoints = true; // enable to see the issue above
 	const viewBox = parseSvgViewbox(svgElem);
-	const svgNodeAll = svgNodeFromPolygons(polygons, viewBox, showDebugPoints);
+	const svgNodeAll = svgNodeFromPolygons(polygonsCleaned, viewBox, {
+		showDebug: showDebugPoints,
+	});
 	svgContainerElem.innerHTML = "";
 	svgContainerElem.appendChild(svgNodeAll);
 
-	return polygons;
+	return polygonsCleaned;
 }
 
 /**
