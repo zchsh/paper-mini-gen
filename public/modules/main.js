@@ -15,7 +15,8 @@ import { simplifyRegions } from "/modules/clipperjs-wrappers/simplify-regions.js
 import { svgNodeFromPolygons } from "./render/svg-node-from-polygons.js";
 
 // OFFSET
-import { applyOffset } from "/modules/04-offset/apply-offset.js";
+// import { applyOffset } from "/modules/04-offset/apply-offset.js";
+import { applyOffsetToRegions } from "/modules/clipperjs-wrappers/apply-offset-to-regions.js";
 import { parseSvgViewbox } from "/modules/04-offset/parse-svg-viewbox.js";
 // ARRANGE
 import {
@@ -204,7 +205,7 @@ function cleanupTrace(svgContainerElem) {
 	 * Clean up with ClipperJS
 	 */
 	const polygonsCleaned = polygons.map((polygon) => {
-		const regionsCleaned = cleanRegions(polygon.regions, 0.5);
+		const regionsCleaned = cleanRegions(polygon.regions, 0.2);
 		const regionsSimplified = simplifyRegions(regionsCleaned);
 		return { regions: regionsSimplified };
 	});
@@ -227,7 +228,46 @@ function cleanupTrace(svgContainerElem) {
  * Might be worth figuring that out so you can clean things up a bit.
  */
 
-window.applyOffset = applyOffset;
+function renderAppliedOffset(polygons, offset, svgSrcNode, destNode) {
+	const viewBox = parseSvgViewbox(svgSrcNode);
+	const viewBoxModded = [
+		viewBox[0] - offset,
+		viewBox[1] - offset,
+		viewBox[2] + offset * 2,
+		viewBox[3] + offset * 2,
+	];
+	const svgNodeFlattened = svgNodeFromPolygons(polygons, viewBoxModded, {
+		showDebug: true,
+	});
+	destNode.innerHTML = "";
+	destNode.appendChild(svgNodeFlattened);
+}
+
+function applyOffsetV2(
+	svgSourceContainerId,
+	svgDestContainerId,
+	sourcePolygons
+) {
+	const offset = getInputAsInt("offset");
+
+	const allRegions = [];
+	for (const polygon of sourcePolygons) {
+		allRegions.push(...polygon.regions);
+	}
+	const regionsWithOffset = applyOffsetToRegions(allRegions, offset);
+	const polygonsWithOffset = [
+		{
+			regions: regionsWithOffset,
+		},
+	];
+
+	const svgSourceContainer = document.getElementById(svgSourceContainerId);
+	const svgSrcNode = svgSourceContainer.querySelector("svg");
+	const destNode = document.getElementById(svgDestContainerId);
+	renderAppliedOffset(polygonsWithOffset, offset, svgSrcNode, destNode);
+	return [polygonsWithOffset, offset];
+}
+window.applyOffset = applyOffsetV2;
 
 /**
  * ARRANGEMENT

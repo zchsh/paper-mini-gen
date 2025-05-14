@@ -82,7 +82,6 @@ export function applyOffset(
 		viewBox[3] + offset * 2,
 	];
 	const svgNodeFlattened = svgNodeFromPolygons(polygons, viewBoxModded, true);
-
 	const parentNode = svgDest.parentNode;
 	parentNode.innerHTML = "";
 	parentNode.appendChild(svgNodeFlattened);
