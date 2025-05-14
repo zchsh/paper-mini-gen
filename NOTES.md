@@ -2,13 +2,20 @@
 
 ## Next steps
 
-- [ ] Work on a demo tool to support transparent images
+- [x] Work on a demo tool to support transparent images
   - [x] Create a new `demo/demo-image-js-handle-png`
   - [x] Copy over work from `demo-image-js`
   - [x] Add second example with identical image, but it's a transparent PNG
   - One approach is make a threshold mask based on the alpha channel, then apply that mask
   - 2025-05-13 at 21:06 - next step is probably to grab a newer version of ImageJS... which one has the best documentation? 0.37.0 is latest... Pretty sure I'm currently using <https://www.lactame.com/lib/image-js/0.21.2/image.min.js>. There's a directory listing at <https://www.lactame.com/lib/image-js/>. Docs for 0.37.0 are at <https://image-js.github.io/image-js/>.
   - 2025-05-14 at 07:43 - swapped in new version, currently working on <http://localhost:3000/demo/demo-image-js-handle-png>
+  - 2025-05-14 at 14:00 - really getting there with `Jimp`!
+  - [x] Draft description for `create-silhouette.js`
+  - [x] Try cleaning up `demo/demo-jimp`, to prep for re-use in main
+  - 2025-05-14 at 14:26 - done! I think `Jimp` is gonna work well. I dig that it could run in Node too.
+
+- [ ] Try porting over `create-silhouette.js` with `Jimp` to main tool
+  - Grab your work from `demo/demo-jimp`
 
 - [ ] Clean up `main.js` and that whole setup generally
   - `<script>` content in `index.html` could be moved to `main.js`

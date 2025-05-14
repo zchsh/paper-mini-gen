@@ -1,85 +1,130 @@
 <!DOCTYPE html>
 <html>
 	<head>
-		<title>Demo - Jimp</title>
+		<title>Demo Jimp - Silhouette</title>
 		<script
 			type="module"
-			src="/demo/demo-jimp/modules/jimp-globalizer.js"
+			src="/demo/demo-jimp/modules/jimp/jimp-globalizer.js"
 		></script>
-		<script>
-			async function runSilhouette() {
-				/**
-				 * Settings
-				 */
-				const blurAmount = 2;
-				const threshold = 80;
-				/**
-				 * Load the original image
-				 */
-				const loadedImage = await Jimp.read(
-					"/demo/demo-jimp/images/sample-char-art-01-small.png"
+		<script type="module">
+			import { createSilhouette } from "/demo/demo-jimp/modules/create-silhouette.js";
+			import { getInputAsInt } from "/demo/demo-jimp/modules/get-input-as-int.js";
+			/**
+			 * Run the PNG example
+			 */
+			async function runPngExample({ blurAmount, threshold }) {
+				const [pngFlatSrc, pngThresholdSrc] = await createSilhouette(
+					"/demo/demo-jimp/images/sample-char-art-01-small.png",
+					blurAmount,
+					threshold
 				);
-				const width = loadedImage.bitmap.width;
-				const height = loadedImage.bitmap.height;
-				/**
-				 * Create a flattened background image
-				 *
-				 * Note we add width and height to account for blur space
-				 */
-				const blurExtension = blurAmount * 4;
-				const flatBg = new Jimp({
-					width: width + blurExtension * 2,
-					height: height + blurExtension * 2,
-					color: 0xffffffff,
-				});
-				flatBg.composite(loadedImage, blurExtension, blurExtension);
-
-				/**
-				 * Create a threshold image
-				 */
-				const thresholdMask = flatBg.clone();
-				if (blurAmount > 0) {
-					thresholdMask.blur(blurAmount);
-				}
-				thresholdMask.invert();
-				thresholdMask.threshold({ max: 100 - threshold });
-				thresholdMask.invert();
-				/**
-				 * Return the images
-				 */
-				return [flatBg, thresholdMask];
+				document.getElementById("png-output-01").src = pngFlatSrc;
+				document.getElementById("png-output-02").src = pngThresholdSrc;
+			}
+			/**
+			 * Run the JPEG example
+			 */
+			async function runJpgExample({ blurAmount, threshold }) {
+				const [jpgFlatSrc, jpgThresholdSrc] = await createSilhouette(
+					"/demo/demo-jimp/images/sample-char-art-01-small.jpeg",
+					blurAmount,
+					threshold
+				);
+				document.getElementById("jpg-output-01").src = jpgFlatSrc;
+				document.getElementById("jpg-output-02").src = jpgThresholdSrc;
 			}
 
+			/**
+			 * Run all examples
+			 */
+			async function runAll() {
+				const blurAmount = getInputAsInt("radius");
+				const threshold = getInputAsInt("threshold");
+				await runPngExample({ blurAmount, threshold });
+				await runJpgExample({ blurAmount, threshold });
+			}
+
+			// On initial load, run the examples
 			window.onload = async function () {
-				/**
-				 * TODO: fix up this function for re-use
-				 */
-				const [flatBg, thresholdMask] = await runSilhouette();
-				// Debug: render the flattened background image
-				const flatBgBase64 = await flatBg.getBase64("image/jpeg");
-				const outputElem = document.getElementById("output-01");
-				outputElem.src = flatBgBase64;
-				// Render the threshold image
-				const thresholdBase64 = await thresholdMask.getBase64("image/jpeg");
-				const thresholdElem = document.getElementById("output-02");
-				thresholdElem.src = thresholdBase64;
+				updateDisplayValue("threshold", getInputAsInt("threshold"));
+				updateDisplayValue("radius", getInputAsInt("radius"));
+				// Run all examples
+				await runAll();
 			};
+
+			// Assign runAll() to the global scope so we can use it in onchanges
+			window.runAll = runAll;
+
+			/**
+			 * Update the display value of an elemente associated with an input
+			 */
+			function updateDisplayValue(id, value) {
+				const valueElem = document.getElementById(id + "-value");
+				if (valueElem) {
+					valueElem.innerHTML = value;
+				}
+			}
+
+			/**
+			 * Handle changes on setting inputs
+			 */
+			async function handleChange(value, id) {
+				// Update the display value
+				updateDisplayValue(id, value);
+				// Re-run the silhouetting
+				await runAll();
+			}
+
+			window.handleChange = handleChange;
 		</script>
 	</head>
 	<body>
-		<h1>Jimp Demo (replace image-js?)</h1>
+		<h1>Demo Jimp - Silhouette</h1>
+		<p>
+			Threshold
+			<input
+				onchange="handleChange(this.value, this.id)"
+				id="threshold"
+				type="range"
+				min="0"
+				max="255"
+				value="220"
+			/>
+			<span id="threshold-value"></span>
+		</p>
+		<p>
+			Blur radius
+			<input
+				onchange="handleChange(this.value, this.id)"
+				id="radius"
+				type="range"
+				min="1"
+				max="10"
+				value="1"
+			/>
+			<span id="radius-value"></span>
+		</p>
+
 		<h2>PNG (original | flattened | threshold)</h2>
-		<div style="background: dodgerblue; display: flex">
-			<img src="/demo/demo-jimp/images/sample-char-art-01-small.png" />
-			<img id="output-01" />
-			<img id="output-02" />
+		<div style="background: dodgerblue; display: flex; align-items: center">
+			<img
+				width="181"
+				height="320"
+				src="/demo/demo-jimp/images/sample-char-art-01-small.png"
+			/>
+			<img id="png-output-01" />
+			<img id="png-output-02" />
 		</div>
 
-		<h2 style="color: magenta">JPEG (original | flattened | threshold)</h2>
-		<div style="background: dodgerblue; display: flex">
-			<img src="/demo/demo-jimp/images/sample-char-art-01-small.jpeg" />
-			<img id="output-01" />
-			<img id="output-02" />
+		<h2>JPEG (original | flattened | threshold)</h2>
+		<div style="background: dodgerblue; display: flex; align-items: center">
+			<img
+				width="181"
+				height="320"
+				src="/demo/demo-jimp/images/sample-char-art-01-small.jpeg"
+			/>
+			<img id="jpg-output-01" />
+			<img id="jpg-output-02" />
 		</div>
 	</body>
 </html>
