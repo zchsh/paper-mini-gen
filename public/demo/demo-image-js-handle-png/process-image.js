@@ -24,15 +24,26 @@ async function processImage(imgSrc, radius, threshold) {
 	 * Maybe there'd be a way to show an intermediate step with the
 	 * PNG conversion to JPEG shown?
 	 */
+	let withAlphaMaskSrc = null;
 	// Get the alpha channel.
-	const alphaChannel = image.getChannel(3);
-	console.log({ alphaChannel });
-	// Create a binary mask on the transparent pixels (255 = opaque).
-	const mask = alphaChannel.mask({ threshold: 255, invert: true });
-	// Paint the pixels from the mask in white.
-	image.paintMasks(mask, { color: "magenta" });
-	// Convert to JPEG
-	const withAlphaMaskSrc = image.toDataURL();
+	const hasAlphaChannel = image.alpha;
+	const colorModel = image.colorModel;
+	const extension = image.extension;
+	console.log({ extension, hasAlphaChannel, colorModel });
+	if (hasAlphaChannel) {
+		// Convert to JPEG
+		withAlphaMaskSrc = image.toDataURL();
+		// Convert to RGB
+		// image = image.toRGB();
+	}
+	// const alphaChannel = image.getChannel(3);
+	// console.log({ alphaChannel });
+	// // Create a binary mask on the transparent pixels (255 = opaque).
+	// const mask = alphaChannel.mask({ threshold: 255, invert: true });
+	// // Paint the pixels from the mask in white.
+	// image.paintMasks(mask, { color: "magenta" });
+	// // Convert to JPEG
+	// const withAlphaMaskSrc = image.toDataURL();
 
 	const thresholdAuto = await getFallbackThreshold(image);
 	const finalThreshold = useAuto ? thresholdAuto : threshold;

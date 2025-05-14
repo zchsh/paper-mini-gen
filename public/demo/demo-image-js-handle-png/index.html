@@ -4,7 +4,8 @@
 		<!-- https://www.lactame.com/lib/image-js/0.21.2/image.min.js -->
 		<!-- IMAGE UPLOAD  -->
 		<script src="/demo/demo-image-js-handle-png/on-image-selection.js"></script>
-		<script src="/demo/demo-image-js-handle-png/image.min.js"></script>
+		<!-- <script src="/demo/demo-image-js-handle-png/global/image.min.js"></script> -->
+		<script src="/demo/demo-image-js-handle-png/global/image-js-0-37-0.js"></script>
 		<script src="/demo/demo-image-js-handle-png/get-input-as-int.js"></script>
 		<script src="/demo/demo-image-js-handle-png/apply-threshold.js"></script>
 		<script src="/demo/demo-image-js-handle-png/get-fallback-threshold.js"></script>
@@ -45,7 +46,7 @@
 					threshold
 				);
 				outputElem.src = processedResult;
-				if (alphaElemId) {
+				if (alphaElemId && alphaResult) {
 					alphaElem = document.getElementById(alphaElemId);
 					alphaElem.src = alphaResult;
 				}
@@ -77,8 +78,8 @@
 				id="raw-image-png"
 				src="/demo/demo-image-js-handle-png/images/sample-char-art-01-small.png"
 			/>
-			<img id="alpha-image-png" />
-			<img id="processed-image-png" />
+			<img style="border: 1px solid green" id="alpha-image-png" />
+			<img style="border: 1px solid dodgerblue" id="processed-image-png" />
 		</div>
 
 		<h3>JPEG</h3>
@@ -95,7 +96,7 @@
 				id="raw-image-jpg"
 				src="/demo/demo-image-js-handle-png/images/sample-char-art-01-small.jpeg"
 			/>
-			<img id="processed-image-jpg" />
+			<img style="border: 1px solid dodgerblue" id="processed-image-jpg" />
 		</div>
 	</body>
 </html>

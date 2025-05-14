@@ -9,6 +9,11 @@
   - One approach is make a threshold mask based on the alpha channel, then apply that mask
   - 2025-05-13 at 21:06 - next step is probably to grab a newer version of ImageJS... which one has the best documentation? 0.37.0 is latest... Pretty sure I'm currently using <https://www.lactame.com/lib/image-js/0.21.2/image.min.js>. There's a directory listing at <https://www.lactame.com/lib/image-js/>. Docs for 0.37.0 are at <https://image-js.github.io/image-js/>.
 
+- [ ] Clean up `main.js` and that whole setup generally
+  - `<script>` content in `index.html` could be moved to `main.js`
+  - This would remove the need for all those `window.<someFunction> = <someFunction>` assignments, then you could split out `<someFunction>.js` as a module and import it into `main.js`
+  - Moving away from the numbered module directories probably makes sense... it feels close though, seems like it's more useful to organize purely by functionality (`parse`, `render`, `trace`, `polygon-manipulation` which is where clipper stuff could live)
+
 ### Later
 
 #### Consider post-trace option to "remove interior voids"
