@@ -8,6 +8,7 @@
   - [x] Add second example with identical image, but it's a transparent PNG
   - One approach is make a threshold mask based on the alpha channel, then apply that mask
   - 2025-05-13 at 21:06 - next step is probably to grab a newer version of ImageJS... which one has the best documentation? 0.37.0 is latest... Pretty sure I'm currently using <https://www.lactame.com/lib/image-js/0.21.2/image.min.js>. There's a directory listing at <https://www.lactame.com/lib/image-js/>. Docs for 0.37.0 are at <https://image-js.github.io/image-js/>.
+  - 2025-05-14 at 07:43 - swapped in new version, currently working on <http://localhost:3000/demo/demo-image-js-handle-png>
 
 - [ ] Clean up `main.js` and that whole setup generally
   - `<script>` content in `index.html` could be moved to `main.js`
