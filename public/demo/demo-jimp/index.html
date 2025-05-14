@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Demo - Jimp</title>
+		<script
+			type="module"
+			src="/demo/demo-jimp/modules/jimp-globalizer.js"
+		></script>
+		<script>
+			window.onload = async function () {
+				console.log({ in: "index.html", Jimp: window.Jimp });
+				const loadedImage = await Jimp.read(
+					"/demo/demo-jimp/images/sample-char-art-01-small.png"
+				);
+				const width = loadedImage.bitmap.width;
+				const height = loadedImage.bitmap.height;
+				console.log({ loadedImage, width, height });
+
+				const flatBg = new Jimp({
+					width,
+					height,
+					color: 0xff00ffff,
+				});
+				const flatBgBase64 = await flatBg.getBase64("image/jpeg");
+				const outputElem = document.getElementById("output-01");
+				console.log({ outputElem, flatBgBase64 });
+				outputElem.src = flatBgBase64;
+			};
+		</script>
+	</head>
+	<body>
+		PNG, original
+		<br />
+		<div style="background: dodgerblue; display: inline-block">
+			<img src="/demo/demo-jimp/images/sample-char-art-01-small.png" />
+		</div>
+
+		<br />
+		<br />
+
+		PNG, modified
+		<br />
+		<div style="background: dodgerblue; display: inline-block">
+			TODO: merge original image onto flat background image (below)
+			<br />
+			<img id="output-01" />
+		</div>
+	</body>
+</html>
