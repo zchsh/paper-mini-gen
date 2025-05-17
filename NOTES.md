@@ -7,10 +7,16 @@
   - This would remove the need for all those `window.<someFunction> = <someFunction>` assignments, then you could split out `<someFunction>.js` as a module and import it into `main.js`
   - Moving away from the numbered module directories probably makes sense... it feels close though, seems like it's more useful to organize purely by functionality (`parse`, `render`, `trace`, `polygon-manipulation` which is where clipper stuff could live)
 
+### Later
+
+#### Replace example images with NOT random art ripped from the internet
+
 - [ ] Replace example images with NOT random art ripped from the internet
   - It's been fine and has felt okay during development, but doesn't feel right if I'm going to share this tool at all
   - Original art might be fun, alternately, look up creative commons or public domain work and attribute it
   - Steamboat Willie's in the public domain, that'd be fun, and call attention to public domain stuff which i love
+
+#### Reconsider offset ordering for better consistency
 
 - [ ] Reconsider offset ordering for better consistency
   - Currently I think it's, offset first, scale after?
@@ -18,23 +24,11 @@
   - Cause as is... a "tall" piece of art will get scaled down less, and the offset therefore looks thicker... where a "short" piece of art gets scaled down a lot, and the offset gets scaled down as well, and thus looks thinner
   - This would be a relatively significant refactor, so seems to make sense to clean things up first.
 
-- [ ] Look into bug with voids in inverted shape
-  - See `notes/2025-05-17-invert-issue-in-dnd-mini-tool.png`
-  - Doesn't seem to be consistent, and not that big a deal anyways
-  - Might make more sense to elimited voids in the final output anyways, pretty sure very few people will wanna go in there with an X-Acto knife... though for bigger pieces of art maybe? Debatable. In any case the maybe-bug doesn't seem that big a deal relative to other cleanup work.
-
-### Later
-
-#### Consider post-trace option to "remove interior voids"
-  
-- I've been thinking about doing _line drawings_. This would leave significant "holes", or interior shapes, within a larger main shape.
-- Could there be an option to remove these interior voids? Option to remove them completely could make sense.
-- Another way to implement this option, more manual maybe a separate thing, would be manual removal of specific shapes, eg by clicking on them and having them change colour
-- Possible first cut option... a given polygon is made up of many REGIONS. Group the regions of a given polygon based on whether they overlap - any overlapping regions should be placed in a single group. Determining overlap might be done with a "minowski diff"? <https://sourceforge.net/p/jsclipper/wiki/documentation/#clipperlibclipperminkowskidiff>. In longer form, running an intersection of the two regions, and then determining whether the intersection has a surface area greater than zero might be another option. Once you have a group of overlapping regions, then determine the surface area of each region, with <https://sourceforge.net/p/jsclipper/wiki/documentation/#clipperlibjsareaofpolygon>. Finally, sort by surface area, and keep only the region with the largest surface area.
-
 #### Explore path smoothing after boolean addition
 
-- [ ] Explore path smoothing, so scissors-based cutout is easier
+- [ ] Explore path smoothing after boolean addition
+  - Currently, scissors-based cutout is kinda not realistic with the actual path
+  - Would be nice to be able to smooth out... not sure how to do this while ensuring offset? Maybe there's some kind of algorithm that ensures the area doesn't decrease? Like a kind of 2D shrink-wrap?
   - <https://www.smoothsvg.com/> is a starting point
     - this was the first search result, could probably dive deeper
   - also this: <https://stackoverflow.com/a/28722732>
@@ -43,6 +37,20 @@
   - 2025-04-13 at 18:05 - stubbedin `demo-smooth-to-polyline`
   - 2025-05-10 at 10:27 - there's a Figma plugin for this that might be worth trying: <https://www.figma.com/community/plugin/809139536998662893/simplify>. Might make sense to set up "Copy SVG" at every step for debug purposes... then you can test the smoothing process in Figma, see if it works, and if it does and the plugin is licensed appropriately, swipe the code and integrate it here.
   - 2025-05-13 at 09:41 - <https://mourner.github.io/simplify-js/> looks perfect
+
+### Look into bug with voids in inverted shape
+
+- [ ] Look into bug with voids in inverted shape
+  - See `notes/2025-05-17-invert-issue-in-dnd-mini-tool.png`
+  - Doesn't seem to be consistent, and not that big a deal anyways
+  - Might make more sense to elimited voids in the final output anyways, pretty sure very few people will wanna go in there with an X-Acto knife... though for bigger pieces of art maybe? Debatable. In any case the maybe-bug doesn't seem that big a deal relative to other cleanup work.
+
+#### Consider post-trace option to "remove interior voids"
+  
+- I've been thinking about doing _line drawings_. This would leave significant "holes", or interior shapes, within a larger main shape.
+- Could there be an option to remove these interior voids? Option to remove them completely could make sense.
+- Another way to implement this option, more manual maybe a separate thing, would be manual removal of specific shapes, eg by clicking on them and having them change colour
+- Possible first cut option... a given polygon is made up of many REGIONS. Group the regions of a given polygon based on whether they overlap - any overlapping regions should be placed in a single group. Determining overlap might be done with a "minowski diff"? <https://sourceforge.net/p/jsclipper/wiki/documentation/#clipperlibclipperminkowskidiff>. In longer form, running an intersection of the two regions, and then determining whether the intersection has a surface area greater than zero might be another option. Once you have a group of overlapping regions, then determine the surface area of each region, with <https://sourceforge.net/p/jsclipper/wiki/documentation/#clipperlibjsareaofpolygon>. Finally, sort by surface area, and keep only the region with the largest surface area.
 
 #### Support "backside" images
 
