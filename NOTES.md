@@ -2,8 +2,14 @@
 
 ## Next steps
 
-- [ ] Try porting over `create-silhouette.js` with `Jimp` to main tool
+- [x] Try porting over `create-silhouette.js` with `Jimp` to main tool
   - Grab your work from `demo/demo-jimp`
+  - 2025-05-17 at 12:35 - also fixed Y positioning for bottom image... should be more accurate now!
+
+- [ ] Update limitations
+  - PNG image should now be supported
+  - Should no longer have any issues with the trace & offset process
+  - Worth double-checking, then update warning notes on main page
 
 - [ ] Clean up `main.js` and that whole setup generally
   - `<script>` content in `index.html` could be moved to `main.js`
