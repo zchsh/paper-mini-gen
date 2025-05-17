@@ -8,6 +8,8 @@ import { onImageSelection } from "/modules/01-upload/on-image-selection.js";
 import { resetSettings } from "/modules/01-upload/reset-settings.js";
 // SILHOUETTE
 import { processImage } from "/modules/02-silhouette/process-image.js";
+// import { Jimp } from "/modules/raster-processing/jimp/jimp-globalizer.js";
+import { createSilhouette } from "/modules/raster-processing/create-silhouette.js";
 // TRACE
 import { reduceClusteredPoints } from "/modules/03-trace/reduce-clustered-points.js";
 import { cleanRegions } from "/modules/clipperjs-wrappers/clean-regions.js";
@@ -47,15 +49,30 @@ async function silhouetteExecute(imgSrcId, imgDestId, resizeMax) {
 	 * Might make later calculations related to placing the original
 	 * image correctly a little easier.
 	 */
-	const [processedSrc, width, height] = await processImage(
-		inputElem.src,
-		radius,
-		threshold,
-		resizeMax
-	);
+	const {
+		thresholdBase64: processedSrc,
+		width,
+		height,
+		widthOriginal,
+		heightOriginal,
+		scaleFactor,
+		blurExtension: paddingBeforeTrace,
+	} = await createSilhouette(inputElem.src, radius, threshold, resizeMax);
+	// const [processedSrc, width, height] = await processImage(
+	// 	inputElem.src,
+	// 	radius,
+	// 	threshold,
+	// 	resizeMax
+	// );
 	outputElem.src = processedSrc;
-	const paddingBeforeTrace = radius * 2;
-	return [paddingBeforeTrace, width, height];
+	return {
+		width,
+		height,
+		widthOriginal,
+		heightOriginal,
+		scaleFactor,
+		paddingBeforeTrace,
+	};
 }
 window.silhouetteExecute = silhouetteExecute;
 
@@ -339,8 +356,10 @@ function arrangeForUnion(rawPolygons, targetContainer) {
 	const rawReflection = visitPoints(polygons, ([x, y]) => {
 		return [x, y * -1];
 	});
+	const reflectedPolygonOffsetY =
+		originalBottom * 2 + (baseSize - baseOverlap) * 2;
 	const polygonsReflected = visitPoints(rawReflection, ([x, y]) => {
-		const offset = originalBottom * 2 + (baseSize - baseOverlap) * 2;
+		const offset = reflectedPolygonOffsetY;
 		return [x, y + offset];
 	});
 
@@ -374,6 +393,7 @@ function arrangeForUnion(rawPolygons, targetContainer) {
 		boundingHeight,
 		boundingBox: { minX, minY, maxX, maxY },
 		arrangeOffset: [arrangeOffsetX, arrangeOffsetY],
+		reflectedPolygonOffsetY,
 		baseCenters,
 	};
 }
@@ -447,26 +467,24 @@ window.applyUnion = applyUnion;
 /**
  * TODO: implement layout
  *
- * - [ ] refactor to prepare to compose a single SVG from many shapes
-         (currently, we get an SVG string... but we want to put
-				 multiple elements in the same SVG...)
- * - [ ] update SVG styling of polygon object
- * - [ ] add original image, in any location
- * - [ ] adjust image location (may need more args)
- * - [ ] add dotted lines
+ * THINKING THROUGH POSITIONING...
+ *
+ * - image is scaled to fit 400 x 400
+ * - image is padded with (radius * 4) pixels on all sides
+ * - image is traced
+ * - image is offset, viewBox is altered to account for offset
+ * - ... arrangement, should affect position of top image
+ *
+ * Need to position the top image so that it's in the same place as the traced
+ * outline.
  */
 async function applyLayout(
 	polygonObj,
 	{
-		paddingBeforeTrace,
-		scale,
-		arrangeOffset,
-		imgResizeMax,
-		imgWidth,
-		imgHeight,
-		boundingWidth,
-		boundingHeight,
-		boundingBox,
+		paddingBeforeTrace: paddingBeforeSilhouette,
+		scaleBeforeSilhouette,
+		scale: scalePostTrace,
+		heightOriginal: imgHeight,
 		baseSize,
 		baseOverlap,
 		baseCenters,
@@ -481,7 +499,14 @@ async function applyLayout(
 	});
 
 	// Set up the SVG node
-	const [minX, minY, svgWidth, svgHeight] = viewBox;
+	// const [minX, minY, svgWidth, svgHeight] = viewBox;
+	const DEV_PADDING = 72;
+	const [minX, minY, svgWidth, svgHeight] = [
+		viewBox[0] - DEV_PADDING,
+		viewBox[1] - DEV_PADDING,
+		viewBox[2] + DEV_PADDING * 2,
+		viewBox[3] + DEV_PADDING * 2,
+	];
 	const svgNode = buildSvgNode("svg", {
 		width: svgWidth,
 		height: svgHeight,
@@ -524,50 +549,59 @@ async function applyLayout(
 	);
 	/**
 	 * Grab the image element, embed into the SVG,
-	 * positioning it carefully to match the union'd shape.
+	 * positioning the top image carefully to match the union'd shape.
 	 */
-	const scalePostTrace = scale;
-	const maxImgDimension = Math.max(imgWidth, imgHeight);
-	const scalePreTrace = imgResizeMax / maxImgDimension;
-	const finalImgScale = scalePreTrace * scalePostTrace;
-	const imageElem = document.getElementById("raw-image");
-	const scaledPadding = paddingBeforeTrace * scalePostTrace;
+	const imgScaleFinal = scaleBeforeSilhouette * scalePostTrace;
+	const scaledPadding = paddingBeforeSilhouette * scalePostTrace;
 	const imgTopX = scaledPadding;
 	const imgTopY = scaledPadding;
-	const svgImageTop = await getImageNode(imageElem, finalImgScale, {
+	const imageElem = document.getElementById("raw-image");
+	const svgImageTop = await getImageNode(imageElem, imgScaleFinal, {
 		x: imgTopX,
 		y: imgTopY,
 		style: "opacity: 1;",
-		// "clip-path": "url(#unionclip)",
 	});
-	const imgBottomX = scaledPadding;
-	const polygonHeightOffset = -1.0 * boundingHeight;
-	const imgBottomReflectOffset = -1.0 * (imgHeight * finalImgScale);
-	const imgBottomBaseOffset = 2.0 * (baseSize - baseOverlap);
-	const [arrangeOffsetX, arrangeOffsetY] = arrangeOffset;
 
-	// Transforms happen AFTER the clipping mask is applied...
-	// The clipping mask is applied to the image at the "top" position...
-	// and then the image is SCALED (inverted), then TRANSLATED to the "bottom"
-	// position.
-
-	// const imgBottomTranslateY =
-	// 	polygonHeightOffset +
-	// 	imgBottomBaseOffset * -1 +
-	// 	imgBottomReflectOffset -
-	// 	// arrangeOffsetY * 2 -
-	// 	// scaledPadding -
-	// 	// 4.66; // TODO: why the heck is this needed? rounding? meh, ignoring... for now
-	// 	7.36;
-	// console.log({
-	// 	imgTopY,
-	// 	scaledPadding,
-	// 	arrangeOffsetY,
-	// });
+	/**
+	 * Position the bottom image, as with the top image.
+	 */
+	/**
+	 * The final image height is the original image height, scaled
+	 * by the scale factors applied before tracing and during arrangement.
+	 */
+	const imgHeightFinal = imgHeight * imgScaleFinal;
+	/**
+	 * The "float distance" is the distance between the bottom edge
+	 * of the top image and the fold line for the top image.
+	 */
+	const foldLineTopY = baseCenters[0][1];
+	const imgTopLowerY = imgTopY + imgHeightFinal;
+	const imgFloatDistance = foldLineTopY - imgTopLowerY;
+	/**
+	 * The imgBottomBaseOffset is the distance between the top fold line
+	 * and the bottom fold line... which is made up of two full bases
+	 * (half the top "base", the middle base, and half the bottom base), minus
+	 * the overlap between bases (which occurs twice between the three bases).
+	 */
+	const imgBottomBaseOffset = 2.0 * baseSize - 2.0 * baseOverlap;
+	/**
+	 * imgTopY + boundingHeight + imgBottomBaseOffset + arrangeOffsetY
+	 *
+	 * - imgTopY would result in the bottom image being positioned in the
+	 *   same place as the top image.
+	 * - + imgHeightFinal aligns the top of the bottom image with the
+	 * 	 bottom of the top image. At this point, the bottom image should be
+	 *   directly next to the top image.
+	 * - + imgFloatDistance * 2 moves the bottom image so that the distance
+	 *   from the top of the bottom image to the top fold matches the distance
+	 *   from the bottom of the top image to the top fold. After this,
+	 *   the bottom image should appear reflected about the top fold line.
+	 * - imgBottomBaseOffset moves the bottom image down so that it's as close
+	 *   to the bottom fold as it was to the top fold.
+	 */
 	const imgBottomY =
-		imgTopY + boundingHeight + imgBottomBaseOffset + arrangeOffsetY * 2;
-	// const imgWidthFinal = imgWidth * finalImgScale;
-	const imgHeightFinal = imgHeight * finalImgScale;
+		imgTopY + imgHeightFinal + imgFloatDistance * 2 + imgBottomBaseOffset;
+
 	/**
 	 * When we reflect the image, it's reflected about the origin point (0,0).
 	 * This means the image is flipped up way outside the viewbox. To compensate,
@@ -578,11 +612,10 @@ async function applyLayout(
 	 * https://developer.mozilla.org/en-US/docs/Web/SVG/Reference/Attribute/transform-origin
 	 */
 	const imgBottomReflectionTranslate = -1 * (imgBottomY * 2 + imgHeightFinal);
-	const svgImageBottom = await getImageNode(imageElem, finalImgScale, {
+	const svgImageBottom = await getImageNode(imageElem, imgScaleFinal, {
 		transform: `scale(1, -1) translate(0, ${imgBottomReflectionTranslate})`,
-		x: imgBottomX,
+		x: imgTopX,
 		y: imgBottomY,
-		style: "opacity: 1;",
 	});
 
 	/**
@@ -658,7 +691,13 @@ function buildSvgNode(nodeType, values) {
 	return node;
 }
 
-async function getImageNode(imageElem, scale, moreAttributes = {}) {
+async function getImageNode(
+	imageElem,
+	scale,
+	moreAttributes = {},
+	debugFill = null,
+	debugStroke = null
+) {
 	const imgSrc = imageElem.getAttribute("src");
 	const imgDataUrl = await toDataUrl(imgSrc);
 	const imgHeight = imageElem.naturalHeight;
@@ -669,8 +708,24 @@ async function getImageNode(imageElem, scale, moreAttributes = {}) {
 		"xlink:href": imgDataUrl,
 		...moreAttributes,
 	});
-	return imgNode;
-	// svgElem.insertBefore(imgNode, svgElem.firstChild);
+	//
+	if (debugFill === null && debugStroke === null) {
+		return imgNode;
+	}
+	//
+	const groupNode = buildSvgNode("g");
+	const devOutlineNode = buildSvgNode("rect", {
+		x: moreAttributes.x,
+		y: moreAttributes.y,
+		width: imgWidth * scale,
+		height: imgHeight * scale,
+		fill: debugFill,
+		stroke: debugStroke,
+		"stroke-width": 0.5,
+	});
+	groupNode.appendChild(imgNode);
+	groupNode.appendChild(devOutlineNode);
+	return groupNode;
 }
 
 window.applyLayout = applyLayout;
