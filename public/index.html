@@ -155,7 +155,7 @@
 				rawImageElement.src = newImageSrc;
 				rawImageElement.onload = async () => {
 					// Update settings
-					console.log({ settings });
+					// console.log({ settings });
 					for (const [key, value] of Object.entries(settings)) {
 						document.getElementById(key).value = value;
 					}
@@ -184,24 +184,26 @@
 				PLEASE NOTE
 			</p>
 			<p>
-				This tool is a rough work in progress. It works with a pretty narrow
-				range of images. Uploaded images:
+				This tool is a rough work in progress. This tool works with images that
+				meet the following criteria:
 			</p>
 			<ul>
 				<li>
-					MUST have blank background.
-					<a href="https://www.remove.bg/">https://www.remove.bg/</a> is a quick
-					way to remove a background from an image (you'll have to convert to
-					JPEG after though).
+					Images SHOULD have a blank white background. This is helpful for
+					tracing, and also prints nicely. If you need a way to remove a
+					background,
+					<a href="https://www.remove.bg/">https://www.remove.bg/</a> works
+					well, the small image sizes you get for free are great for minis.
 				</li>
-				<li>
+				<!-- <li>
 					MUST be a JPEG. If you have a PNG, you can use whatever tool you're
 					most familiar with on your computer, or a quick online tool like
 					<a href="https://convertio.co/png-jpeg/">Convertio</a>.
-				</li>
+				</li> -->
 				<li>
-					SHOULD be not-too-big. Under 100 kB is ideal. If you want an online
-					image resizing tool, many have annoying ads, but
+					Images SHOULD be under 1000 pixels square, so file sizes aren't too
+					large. If you need an online image resizing tool, many have annoying
+					ads, but
 					<a href="https://www.adobe.com/express/feature/image/resize"
 						>Adobe Express's resize tool</a
 					>
@@ -210,8 +212,8 @@
 			</ul>
 			<p>
 				EVEN IF you have an image that perfectly meets all these criteria, you
-				will likely still need to twiddle some knobs to get this tool to work.
-				Thanks for your patience!
+				will may want or even need to twiddle some knobs to get this tool to
+				work how you expect. Thanks for your patience!
 			</p>
 		</div>
 
@@ -246,34 +248,24 @@
 				sample-char-art-00.jpeg
 			</button>
 			<button
-				onclick="updateImage('/sample-art/sample-char-art-01.jpeg', {
-				heightMm: 35,
-				radius: 2,
-				arrangeOffsetX: -5,
-				offset: 30
-			})"
+				onclick="updateImage('/sample-art/sample-char-art-01.jpeg', { heightMm: 35, radius: 2, arrangeOffsetX: -5, offset: 30 })"
 			>
 				sample-char-art-01.jpeg
 			</button>
 			<button
-				onclick="updateImage('/sample-art/sample-char-art-02.jpeg', {
-			heightMm: 25,
-			radius:2,
-			arrangeOffsetX: 0,
-			offset: 30
-		})"
+				onclick="updateImage('/sample-art/sample-char-art-02.jpeg', { heightMm: 25, radius: 2, arrangeOffsetX: 0, offset: 30 })"
 			>
 				sample-char-art-02.jpeg
 			</button>
 			<button
-				onclick="updateImage('/sample-art/sample-char-art-03.jpeg', {
-		heightMm: 35,
-		radius: 6,
-		arrangeOffsetX: 0,
-		offset: 30
-	})"
+				onclick="updateImage('/sample-art/sample-char-art-03.jpeg', { heightMm: 35, radius: 3, arrangeOffsetX: 0, offset: 30 })"
 			>
 				sample-char-art-03.jpeg
+			</button>
+			<button
+				onclick="updateImage('/sample-art/sample-char-art-transparent-04.png', { heightMm: 35, radius: 3, arrangeOffsetX: 0, offset: 30 })"
+			>
+				sample-char-art-transparent-04.png
 			</button>
 		</p>
 
@@ -301,8 +293,8 @@
 
 		<h3>Silhouette tweaks</h3>
 		<p>
-			Threshold
-			<input id="threshold" type="number" min="0" max="254" value="200" />
+			Threshold (0-255)
+			<input id="threshold" type="number" min="0" max="255" value="200" />
 		</p>
 		<p>
 			Blur radius
@@ -349,18 +341,18 @@
 		<!--  -->
 		<!--  -->
 
-		<p class="note" style="color: magenta">
+		<!-- <p class="note" style="color: magenta">
 			NOTE: sometimes (... quite often actually), the "offset" step fails! I'm
 			still trying to figure out the root cause and fix it... but for now, first
 			tweak the "threshold" value to make sure you have a good silhouette. If
 			the silhouette already looks good, then try twiddling the "blur radius"
 			input by one unit up or down in the silhouette step seems to help.
-		</p>
+		</p> -->
 		<div id="offset-svg"></div>
 		<h3>Offset tweaks</h3>
 		<p>
 			Offset amount:
-			<input id="offset" type="number" min="0" max="100" value="2" />
+			<input id="offset" type="number" min="0" max="100" value="30" />
 		</p>
 		<button onClick="runAll()">Apply offset tweaks</button>
 

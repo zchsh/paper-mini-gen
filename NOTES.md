@@ -2,19 +2,26 @@
 
 ## Next steps
 
-- [x] Try porting over `create-silhouette.js` with `Jimp` to main tool
-  - Grab your work from `demo/demo-jimp`
-  - 2025-05-17 at 12:35 - also fixed Y positioning for bottom image... should be more accurate now!
-
-- [ ] Update limitations
-  - PNG image should now be supported
-  - Should no longer have any issues with the trace & offset process
-  - Worth double-checking, then update warning notes on main page
-
 - [ ] Clean up `main.js` and that whole setup generally
   - `<script>` content in `index.html` could be moved to `main.js`
   - This would remove the need for all those `window.<someFunction> = <someFunction>` assignments, then you could split out `<someFunction>.js` as a module and import it into `main.js`
   - Moving away from the numbered module directories probably makes sense... it feels close though, seems like it's more useful to organize purely by functionality (`parse`, `render`, `trace`, `polygon-manipulation` which is where clipper stuff could live)
+
+- [ ] Replace example images with NOT random art ripped from the internet
+  - It's been fine and has felt okay during development, but doesn't feel right if I'm going to share this tool at all
+  - Original art might be fun, alternately, look up creative commons or public domain work and attribute it
+  - Steamboat Willie's in the public domain, that'd be fun, and call attention to public domain stuff which i love
+
+- [ ] Reconsider offset ordering for better consistency
+  - Currently I think it's, offset first, scale after?
+  - Maybe it should be... scale first, then offset?
+  - Cause as is... a "tall" piece of art will get scaled down less, and the offset therefore looks thicker... where a "short" piece of art gets scaled down a lot, and the offset gets scaled down as well, and thus looks thinner
+  - This would be a relatively significant refactor, so seems to make sense to clean things up first.
+
+- [ ] Look into bug with voids in inverted shape
+  - See `notes/2025-05-17-invert-issue-in-dnd-mini-tool.png`
+  - Doesn't seem to be consistent, and not that big a deal anyways
+  - Might make more sense to elimited voids in the final output anyways, pretty sure very few people will wanna go in there with an X-Acto knife... though for bigger pieces of art maybe? Debatable. In any case the maybe-bug doesn't seem that big a deal relative to other cleanup work.
 
 ### Later
 

@@ -418,7 +418,6 @@ window.arrangeForUnion = arrangeForUnion;
  * TODO: finish and clean up below
  */
 function applyUnion(polygonObjs, renderId, debugId01, debugId02) {
-	console.log({ debugId01, debugId02 });
 	// Debug individual shapes
 	if (debugId01) {
 		const container = document.getElementById(debugId01);
@@ -500,7 +499,7 @@ async function applyLayout(
 
 	// Set up the SVG node
 	// const [minX, minY, svgWidth, svgHeight] = viewBox;
-	const DEV_PADDING = 72;
+	const DEV_PADDING = 0;
 	const [minX, minY, svgWidth, svgHeight] = [
 		viewBox[0] - DEV_PADDING,
 		viewBox[1] - DEV_PADDING,
