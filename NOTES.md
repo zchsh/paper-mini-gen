@@ -3,9 +3,24 @@
 ## Next steps
 
 - [ ] Clean up `main.js` and that whole setup generally
-  - `<script>` content in `index.html` could be moved to `main.js`
+  - [x] `<script>` content in `index.html` could be moved to `main.js`
   - This would remove the need for all those `window.<someFunction> = <someFunction>` assignments, then you could split out `<someFunction>.js` as a module and import it into `main.js`
   - Moving away from the numbered module directories probably makes sense... it feels close though, seems like it's more useful to organize purely by functionality (`parse`, `render`, `trace`, `polygon-manipulation` which is where clipper stuff could live)
+  - [x] Clean up `silhouetteExecute` in `main.js`
+  - 2025-05-19 at 15:01 - starting to clean this up... feeling a little better already. Lots to learn!
+  - [ ] Split out `traceExecute` and `cleanupTrace`
+    - [ ] Get out of `main.js` and into separate modules
+  - [ ] Split out `renderAppliedOffset` and `applyOffsetV2` (latter could be renamed)
+  - [ ] Split out `translatePolygon` and `translatePolygons`
+  - [ ] Split out `arrangeForUnion`
+  - [ ] Split out `unionPolygonObjects`
+  - [ ] Split out `applyUnion`
+  - [ ] Split out `applyLayout`
+  - [ ] Split out `buildSvgNode`
+  - [ ] Split out `getImageNode` and `toDataUrl`
+
+- [ ] Think through new tool layout and workflow
+  - Maybe worth doing in Figma? Sketching on paper, as always, probably a nice place to start
 
 ### Later
 

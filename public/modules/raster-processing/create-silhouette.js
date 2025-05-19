@@ -31,10 +31,10 @@ export async function createSilhouette(
 	const widthOriginal = loadedImage.bitmap.width;
 	const heightOriginal = loadedImage.bitmap.height;
 	const maxImgDimension = Math.max(widthOriginal, heightOriginal);
-	const scaleFactor = resizeMax / maxImgDimension;
+	const scaleBeforeSilhouette = resizeMax / maxImgDimension;
 	loadedImage.resize({
-		w: scaleFactor * widthOriginal,
-		h: scaleFactor * heightOriginal,
+		w: scaleBeforeSilhouette * widthOriginal,
+		h: scaleBeforeSilhouette * heightOriginal,
 	});
 	// loadedImage.contain({ w: resizeMax, h: resizeMax });
 	const widthContained = loadedImage.bitmap.width;
@@ -51,6 +51,8 @@ export async function createSilhouette(
 	/**
 	 * Composite the loaded image onto the flat background.
 	 * Note we add x,y positioning to account for blur space.
+	 *
+	 * TODO: could probably split out the "create background, composite" step?
 	 */
 	const compositePosition = { x: blurExtension, y: blurExtension };
 	flatBg.composite(loadedImage, compositePosition.x, compositePosition.y);
@@ -72,19 +74,18 @@ export async function createSilhouette(
 	/**
 	 * Convert the created iamges to base64
 	 */
-	const flatBgBase64 = await flatBg.getBase64("image/jpeg");
-	const thresholdBase64 = await thresholdMask.getBase64("image/jpeg");
+	const silhouetteBase64 = await thresholdMask.getBase64("image/jpeg");
 	/**
 	 * Return both the images
 	 */
 	return {
-		flatBgBase64,
-		thresholdBase64,
-		widthOriginal,
-		heightOriginal,
-		scaleFactor,
-		width,
-		height,
+		/**
+		 * TODO: split out process of getting `sizeOriginal`?
+		 * doesn't feel all that relevant to this function.
+		 */
+		sizeOriginal: { width: widthOriginal, height: heightOriginal },
+		scaleBeforeSilhouette,
 		blurExtension,
+		silhouetteBase64,
 	};
 }

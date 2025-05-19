@@ -25,60 +25,9 @@ import {
 } from "/modules/05-arrange/visit-points.js";
 
 /**
- * SILHOUETTE
- */
-async function silhouetteExecute(imgSrcId, imgDestId, resizeMax) {
-	// Gather settings
-	const threshold = getInputAsInt("threshold");
-	const radius = getInputAsInt("radius");
-	// Gather elements
-	const inputElem = document.getElementById(imgSrcId);
-	const outputElem = document.getElementById(imgDestId);
-	// Execute
-	/**
-	 * TODO: should maybe pad the silhouette image extra?
-	 * That way, we'd account for `offset` in one go.
-	 * Might make later calculations related to placing the original
-	 * image correctly a little easier.
-	 */
-	const {
-		thresholdBase64: processedSrc,
-		width,
-		height,
-		widthOriginal,
-		heightOriginal,
-		scaleFactor,
-		blurExtension: paddingBeforeTrace,
-	} = await createSilhouette(inputElem.src, radius, threshold, resizeMax);
-	// const [processedSrc, width, height] = await processImage(
-	// 	inputElem.src,
-	// 	radius,
-	// 	threshold,
-	// 	resizeMax
-	// );
-	outputElem.src = processedSrc;
-	return {
-		width,
-		height,
-		widthOriginal,
-		heightOriginal,
-		scaleFactor,
-		paddingBeforeTrace,
-	};
-}
-
-/**
  * TRACE
  *
- * TODO: improve curve flattening.
- * Have `demo-flatten-svg` for this.
- * Note that flattenSvg takes in an SVG element.
- * So, probably fine to keep existing workflow of writing to SVG element.
- *
- * If you ever get concerned about visible thrash, you could
- * run the whole process in a hidden SVG element, I think... falttenSvg
- * seems to walk the DOM, doesn't seem to rely on the element being
- * visibly rendered.
+ * TODO: split out this function, along with cleanupTrace, to its own module
  */
 async function traceExecute(imgElemId, svgContainerId) {
 	return new Promise((resolve, reject) => {
@@ -471,10 +420,10 @@ function unionPolygonObjects(polygons) {
 async function applyLayout(
 	polygonObj,
 	{
-		paddingBeforeTrace: paddingBeforeSilhouette,
+		blurExtension,
 		scaleBeforeSilhouette,
-		scale: scalePostTrace,
-		heightOriginal: imgHeight,
+		scalePostTrace,
+		heightOriginal,
 		baseSize,
 		baseOverlap,
 		baseCenters,
@@ -542,7 +491,7 @@ async function applyLayout(
 	 * positioning the top image carefully to match the union'd shape.
 	 */
 	const imgScaleFinal = scaleBeforeSilhouette * scalePostTrace;
-	const scaledPadding = paddingBeforeSilhouette * scalePostTrace;
+	const scaledPadding = blurExtension * scalePostTrace;
 	const imgTopX = scaledPadding;
 	const imgTopY = scaledPadding;
 	const imageElem = document.getElementById("raw-image");
@@ -559,7 +508,7 @@ async function applyLayout(
 	 * The final image height is the original image height, scaled
 	 * by the scale factors applied before tracing and during arrangement.
 	 */
-	const imgHeightFinal = imgHeight * imgScaleFinal;
+	const imgHeightFinal = heightOriginal * imgScaleFinal;
 	/**
 	 * The "float distance" is the distance between the bottom edge
 	 * of the top image and the fold line for the top image.
@@ -746,15 +695,28 @@ async function getImageNode(
  * come naturally from refactoring each individual function.
  */
 async function runAll() {
+	// Gather image source and settings for silhouette
+	const inputSrc = document.getElementById("raw-image").src;
 	const imgResizeMax = 400;
+	const threshold = getInputAsInt("threshold");
+	const radius = getInputAsInt("radius");
+
+	/**
+	 * Create the silhouette
+	 *
+	 * TODO maybe split out the scaling step as a separate thing?
+	 */
 	const {
-		width: widthSilhouette,
-		height: heightSilhouette,
-		widthOriginal,
-		heightOriginal,
-		scaleFactor: scaleBeforeSilhouette,
-		paddingBeforeTrace,
-	} = await silhouetteExecute("raw-image", "processed-image", imgResizeMax);
+		sizeOriginal,
+		scaleBeforeSilhouette,
+		blurExtension,
+		silhouetteBase64,
+	} = await createSilhouette(inputSrc, radius, threshold, imgResizeMax);
+
+	// Render the silhouette
+	const silhouetteImgElem = document.getElementById("processed-image");
+	silhouetteImgElem.src = silhouetteBase64;
+
 	const cleanTracePolygons = await traceExecute("processed-image", "trace-svg");
 	const [polygons_offset, offset] = applyOffsetV2(
 		"trace-svg",
@@ -763,7 +725,7 @@ async function runAll() {
 	);
 	const {
 		polygons_arranged,
-		scale,
+		scale: scalePostTrace,
 		baseSize,
 		baseOverlap,
 		boundingWidth,
@@ -786,22 +748,13 @@ async function runAll() {
 	await applyLayout(
 		polygons_union,
 		{
-			scale,
+			blurExtension,
 			scaleBeforeSilhouette,
-			imgResizeMax,
-			paddingBeforeTrace,
-			widthSilhouette,
-			heightSilhouette,
-			widthOriginal,
-			heightOriginal,
-			arrangeOffset,
-			boundingHeight,
-			boundingWidth,
-			boundingBox,
+			scalePostTrace,
+			heightOriginal: sizeOriginal.height,
 			baseSize,
 			baseOverlap,
 			baseCenters,
-			reflectedPolygonOffsetY,
 		},
 		"layout-container"
 	);
