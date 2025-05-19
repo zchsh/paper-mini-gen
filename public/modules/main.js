@@ -3,21 +3,19 @@ import { getInputAsInt } from "/modules/00-common/get-input-as-int.js";
 import { getFallbackViewBox } from "/modules/00-common/get-fallback-viewbox.js";
 import { getBoundingPoints } from "/modules/00-common/get-bounding-points.js";
 import { pathDataStringFromRegions } from "/modules/00-common/path-data-string-from-regions.js";
+import { copyTextToClipboard } from "/modules/00-common/copy-text-to-clipboard.js";
 // UPLOAD
 import { onImageSelection } from "/modules/01-upload/on-image-selection.js";
+import { updateImage } from "/modules/upload/update-image.js";
 import { resetSettings } from "/modules/01-upload/reset-settings.js";
 // SILHOUETTE
-import { processImage } from "/modules/02-silhouette/process-image.js";
-// import { Jimp } from "/modules/raster-processing/jimp/jimp-globalizer.js";
 import { createSilhouette } from "/modules/raster-processing/create-silhouette.js";
 // TRACE
 import { reduceClusteredPoints } from "/modules/03-trace/reduce-clustered-points.js";
 import { cleanRegions } from "/modules/clipperjs-wrappers/clean-regions.js";
 import { simplifyRegions } from "/modules/clipperjs-wrappers/simplify-regions.js";
 import { svgNodeFromPolygons } from "./render/svg-node-from-polygons.js";
-
 // OFFSET
-// import { applyOffset } from "/modules/04-offset/apply-offset.js";
 import { applyOffsetToRegions } from "/modules/clipperjs-wrappers/apply-offset-to-regions.js";
 import { parseSvgViewbox } from "/modules/04-offset/parse-svg-viewbox.js";
 // ARRANGE
@@ -25,12 +23,6 @@ import {
 	visitPoints,
 	visitPointsPolygon,
 } from "/modules/05-arrange/visit-points.js";
-
-/**
- * UPLOAD
- */
-window.onImageSelection = onImageSelection;
-window.resetSettings = resetSettings;
 
 /**
  * SILHOUETTE
@@ -74,7 +66,6 @@ async function silhouetteExecute(imgSrcId, imgDestId, resizeMax) {
 		paddingBeforeTrace,
 	};
 }
-window.silhouetteExecute = silhouetteExecute;
 
 /**
  * TRACE
@@ -146,7 +137,6 @@ async function traceExecute(imgElemId, svgContainerId) {
 		);
 	});
 }
-window.traceExecute = traceExecute;
 
 /**
  * TRACE - CLEANUP, CONVERT TO POLYGON
@@ -284,7 +274,6 @@ function applyOffsetV2(
 	renderAppliedOffset(polygonsWithOffset, offset, svgSrcNode, destNode);
 	return [polygonsWithOffset, offset];
 }
-window.applyOffset = applyOffsetV2;
 
 /**
  * ARRANGEMENT
@@ -410,8 +399,6 @@ function translatePolygon(polygon, offset) {
 	});
 }
 
-window.arrangeForUnion = arrangeForUnion;
-
 /**
  * UNION
  *
@@ -451,6 +438,12 @@ function applyUnion(polygonObjs, renderId, debugId01, debugId02) {
 	return unionPolygonObj;
 }
 
+/**
+ * TODO: could probably swap in ClipperJS here?
+ *
+ * @param {*} polygons
+ * @returns
+ */
 function unionPolygonObjects(polygons) {
 	var segments = PolyBool.segments(polygons[0]);
 	for (var i = 1; i < polygons.length; i++) {
@@ -460,8 +453,6 @@ function unionPolygonObjects(polygons) {
 	}
 	return PolyBool.polygon(segments);
 }
-
-window.applyUnion = applyUnion;
 
 /**
  * TODO: implement layout
@@ -727,4 +718,105 @@ async function getImageNode(
 	return groupNode;
 }
 
-window.applyLayout = applyLayout;
+/**
+ *
+ *
+ *
+ *
+ *
+ */
+
+/**
+ * TODO: refactor so runAll() can start from specific step.
+ * Eg, when adjusting `offset`, should re-run from `applyOffset()`
+ * onwards, everything before is already done.
+ *
+ * In fact, there'd even be sub-steps. Eg, when adjusting the "offset"
+ * in the "arrange" phase, really only need to re-run PART of a step.
+ * That level of optimization could come later... but may be worth
+ * thinking through, when you're deciding exactly HOW to refactor.
+ * Maybe the answer is just... if you want to break a single step
+ * down into two parts, then maybe that step should really be two steps.
+ * And for the "arrange" step at least, seems totally fine to do a little
+ * extra redundant math WITHIN the step... it'll be wasteful but
+ * fast anyways.
+ *
+ * TODO: all these variables being passed around are a bit of a mess.
+ * Would be great to simplify and clean up, I think that'll large
+ * come naturally from refactoring each individual function.
+ */
+async function runAll() {
+	const imgResizeMax = 400;
+	const {
+		width: widthSilhouette,
+		height: heightSilhouette,
+		widthOriginal,
+		heightOriginal,
+		scaleFactor: scaleBeforeSilhouette,
+		paddingBeforeTrace,
+	} = await silhouetteExecute("raw-image", "processed-image", imgResizeMax);
+	const cleanTracePolygons = await traceExecute("processed-image", "trace-svg");
+	const [polygons_offset, offset] = applyOffsetV2(
+		"trace-svg",
+		"offset-svg",
+		cleanTracePolygons
+	);
+	const {
+		polygons_arranged,
+		scale,
+		baseSize,
+		baseOverlap,
+		boundingWidth,
+		boundingHeight,
+		boundingBox,
+		arrangeOffset,
+		reflectedPolygonOffsetY,
+		baseCenters,
+	} = arrangeForUnion(
+		polygons_offset,
+		document.getElementById("arrange-container")
+	);
+	const polygons_union = applyUnion(
+		polygons_arranged,
+		"union-container"
+		// "union-shapes-debug",
+		// "union-arrange-debug"
+	);
+	// TODO: grab polygon width and height, probs from "arrange for union"
+	await applyLayout(
+		polygons_union,
+		{
+			scale,
+			scaleBeforeSilhouette,
+			imgResizeMax,
+			paddingBeforeTrace,
+			widthSilhouette,
+			heightSilhouette,
+			widthOriginal,
+			heightOriginal,
+			arrangeOffset,
+			boundingHeight,
+			boundingWidth,
+			boundingBox,
+			baseSize,
+			baseOverlap,
+			baseCenters,
+			reflectedPolygonOffsetY,
+		},
+		"layout-container"
+	);
+}
+
+async function resetAndRunAll() {
+	resetSettings();
+	await runAll();
+}
+
+/**
+ * GLOBAL FUNCTION ASSIGNMENT
+ */
+window.copyTextToClipboard = copyTextToClipboard;
+window.onImageSelection = onImageSelection;
+window.resetAndRunAll = resetAndRunAll;
+window.runAll = runAll;
+window.updateImage = updateImage;

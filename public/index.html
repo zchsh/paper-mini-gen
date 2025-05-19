@@ -5,163 +5,31 @@
 		<script src="/modules/03-trace/flatten-svg/path-data-polyfill.js"></script>
 		<script src="/modules/global/clipper.js"></script>
 		<script src="/modules/global/pathseg-polyfill.js"></script>
-		<!-- COMMON -->
-		<script src="/modules/00-common/copy-text-to-clipboard.js"></script>
-		<!-- SILHOUETTE - could try to figure out how to include as a module? -->
-		<script src="/modules/02-silhouette/image.min.js"></script>
 		<!-- TRACE - could try to figure out how to include as a module? -->
 		<script src="/modules/03-trace/imagetracer_v1.2.6.js"></script>
 		<!-- TRACE CLEANUP -->
 		<script src="/modules/03-trace/flatten-svg/svg-to-paths.js"></script>
-		<!-- OFFSET -->
-		<script src="/modules/04-offset/bezier.js"></script>
-		<script src="/modules/04-offset/browser.maker.js"></script>
-		<script src="/modules/04-offset/flatten-svg-to-paths.js"></script>
 		<!-- ARRANGE -->
 		<script src="/modules/05-arrange/create-circular-polygon.js"></script>
 		<!-- UNION -->
 		<script src="/modules/06-union/polybooljs-1.2.2/dist/polybool.js"></script>
 		<!-- main module -->
 		<script type="module" src="/modules/main.js"></script>
-		<!-- main execution -->
+		<!-- CSS -->
+		<link rel="stylesheet" href="/style.css" />
+		<!-- NOTES -->
 		<script>
 			/**
-			 * TODO: refactor so runAll() can start from specific step.
-			 * Eg, when adjusting `offset`, should re-run from `applyOffset()`
-			 * onwards, everything before is already done.
+			 * Note the following functions should be available globally:
 			 *
-			 * In fact, there'd even be sub-steps. Eg, when adjusting the "offset"
-			 * in the "arrange" phase, really only need to re-run PART of a step.
-			 * That level of optimization could come later... but may be worth
-			 * thinking through, when you're deciding exactly HOW to refactor.
-			 * Maybe the answer is just... if you want to break a single step
-			 * down into two parts, then maybe that step should really be two steps.
-			 * And for the "arrange" step at least, seems totally fine to do a little
-			 * extra redundant math WITHIN the step... it'll be wasteful but
-			 * fast anyways.
+			 * - copyTextToClipboard
+			 * - onImageSelection
+			 * - resetAndRunAll
+			 * - runAll
+			 * - updateImage
+			 *
+			 * These should all be made availbale in the main.js file.
 			 */
-			async function runAll() {
-				const imgResizeMax = 400;
-				const {
-					width: widthSilhouette,
-					height: heightSilhouette,
-					widthOriginal,
-					heightOriginal,
-					scaleFactor: scaleBeforeSilhouette,
-					paddingBeforeTrace,
-				} = await silhouetteExecute(
-					"raw-image",
-					"processed-image",
-					imgResizeMax
-				);
-				const cleanTracePolygons = await traceExecute(
-					"processed-image",
-					"trace-svg"
-				);
-				const svgSourceContainer = document.getElementById("trace-svg");
-				const svgSource = svgSourceContainer.querySelector("svg");
-				const [polygons_offset, offset] = applyOffset(
-					"trace-svg",
-					"offset-svg",
-					cleanTracePolygons
-				);
-				const {
-					polygons_arranged,
-					scale,
-					baseSize,
-					baseOverlap,
-					boundingWidth,
-					boundingHeight,
-					boundingBox,
-					arrangeOffset,
-					reflectedPolygonOffsetY,
-					baseCenters,
-				} = arrangeForUnion(
-					polygons_offset,
-					document.getElementById("arrange-container")
-				);
-				const polygons_union = applyUnion(
-					polygons_arranged,
-					"union-container"
-					// "union-shapes-debug",
-					// "union-arrange-debug"
-				);
-				// TODO: grab polygon width and height, probs from "arrange for union"
-				await applyLayout(
-					polygons_union,
-					{
-						scale,
-						scaleBeforeSilhouette,
-						imgResizeMax,
-						paddingBeforeTrace,
-						widthSilhouette,
-						heightSilhouette,
-						widthOriginal,
-						heightOriginal,
-						arrangeOffset,
-						boundingHeight,
-						boundingWidth,
-						boundingBox,
-						baseSize,
-						baseOverlap,
-						baseCenters,
-						reflectedPolygonOffsetY,
-					},
-					"layout-container"
-				);
-			}
-
-			async function resetAndRunAll() {
-				resetSettings();
-				await runAll();
-			}
-		</script>
-		<style>
-			body {
-				display: flex;
-				flex-direction: column;
-				align-items: center;
-			}
-
-			.raw-image-container {
-				width: 400px;
-				height: 400px;
-			}
-
-			.raw-image-container img {
-				width: 100%;
-				height: 100%;
-				object-fit: contain;
-			}
-
-			.processed-image-container {
-				width: 450px;
-				height: 450px;
-				display: flex;
-				align-items: center;
-				justify-content: center;
-			}
-
-			.note {
-				font-style: italic;
-				max-width: 30em;
-				margin: 0 auto;
-				text-align: center;
-			}
-		</style>
-		<script>
-			function updateImage(newImageSrc, settings = {}) {
-				const rawImageElement = document.getElementById("raw-image");
-				rawImageElement.src = newImageSrc;
-				rawImageElement.onload = async () => {
-					// Update settings
-					// console.log({ settings });
-					for (const [key, value] of Object.entries(settings)) {
-						document.getElementById(key).value = value;
-					}
-					await runAll();
-				};
-			}
 		</script>
 	</head>
 	<body
@@ -169,7 +37,7 @@
 		heightMm: 30,
 		radius: 2,
 		arrangeOffsetX: -5
-	})"
+	}, runAll)"
 	>
 		<h1>Paper Miniature Generator</h1>
 		<div
@@ -230,7 +98,7 @@
 				type="file"
 				id="image-input"
 				accept="image/png, image/jpeg"
-				onchange="onImageSelection(this, 'raw-image', resetAndRunAll)"
+				runAll="onImageSelection(this, 'raw-image', resetAndRunAll)"
 			/>
 		</p>
 
@@ -243,27 +111,27 @@
 				radius: 2,
 				arrangeOffsetX: -5,
 				offset: 5
-			})"
+			}, runAll)"
 			>
 				sample-char-art-00.jpeg
 			</button>
 			<button
-				onclick="updateImage('/sample-art/sample-char-art-01.jpeg', { heightMm: 35, radius: 2, arrangeOffsetX: -5, offset: 30 })"
+				onclick="updateImage('/sample-art/sample-char-art-01.jpeg', { heightMm: 35, radius: 2, arrangeOffsetX: -5, offset: 30 }, runAll)"
 			>
 				sample-char-art-01.jpeg
 			</button>
 			<button
-				onclick="updateImage('/sample-art/sample-char-art-02.jpeg', { heightMm: 25, radius: 2, arrangeOffsetX: 0, offset: 30 })"
+				onclick="updateImage('/sample-art/sample-char-art-02.jpeg', { heightMm: 25, radius: 2, arrangeOffsetX: 0, offset: 30 }, runAll)"
 			>
 				sample-char-art-02.jpeg
 			</button>
 			<button
-				onclick="updateImage('/sample-art/sample-char-art-03.jpeg', { heightMm: 35, radius: 3, arrangeOffsetX: 0, offset: 30 })"
+				onclick="updateImage('/sample-art/sample-char-art-03.jpeg', { heightMm: 35, radius: 3, arrangeOffsetX: 0, offset: 30 }, runAll)"
 			>
 				sample-char-art-03.jpeg
 			</button>
 			<button
-				onclick="updateImage('/sample-art/sample-char-art-transparent-04.png', { heightMm: 35, radius: 3, arrangeOffsetX: 0, offset: 30 })"
+				onclick="updateImage('/sample-art/sample-char-art-transparent-04.png', { heightMm: 35, radius: 3, arrangeOffsetX: 0, offset: 30 }, runAll)"
 			>
 				sample-char-art-transparent-04.png
 			</button>

@@ -1,4 +1,4 @@
-async function copyTextToClipboard(text) {
+export async function copyTextToClipboard(text) {
 	const blobText = new Blob([text], { type: "text/plain" });
 	const data = [
 		new ClipboardItem({
