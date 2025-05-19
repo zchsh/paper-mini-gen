@@ -5,13 +5,13 @@
 		<script src="/modules/03-trace/flatten-svg/path-data-polyfill.js"></script>
 		<script src="/modules/global/clipper.js"></script>
 		<script src="/modules/global/pathseg-polyfill.js"></script>
-		<!-- TRACE - could try to figure out how to include as a module? -->
+		<!-- TRACE - TODO: could try to figure out how to include as a module? -->
 		<script src="/modules/03-trace/imagetracer_v1.2.6.js"></script>
 		<!-- TRACE CLEANUP -->
 		<script src="/modules/03-trace/flatten-svg/svg-to-paths.js"></script>
 		<!-- ARRANGE -->
 		<script src="/modules/05-arrange/create-circular-polygon.js"></script>
-		<!-- UNION -->
+		<!-- UNION - TODO: replace with ClipperJS? -->
 		<script src="/modules/06-union/polybooljs-1.2.2/dist/polybool.js"></script>
 		<!-- main module -->
 		<script type="module" src="/modules/main.js"></script>
@@ -63,11 +63,6 @@
 					<a href="https://www.remove.bg/">https://www.remove.bg/</a> works
 					well, the small image sizes you get for free are great for minis.
 				</li>
-				<!-- <li>
-					MUST be a JPEG. If you have a PNG, you can use whatever tool you're
-					most familiar with on your computer, or a quick online tool like
-					<a href="https://convertio.co/png-jpeg/">Convertio</a>.
-				</li> -->
 				<li>
 					Images SHOULD be under 1000 pixels square, so file sizes aren't too
 					large. If you need an online image resizing tool, many have annoying
@@ -209,13 +204,6 @@
 		<!--  -->
 		<!--  -->
 
-		<!-- <p class="note" style="color: magenta">
-			NOTE: sometimes (... quite often actually), the "offset" step fails! I'm
-			still trying to figure out the root cause and fix it... but for now, first
-			tweak the "threshold" value to make sure you have a good silhouette. If
-			the silhouette already looks good, then try twiddling the "blur radius"
-			input by one unit up or down in the silhouette step seems to help.
-		</p> -->
 		<div id="offset-svg"></div>
 		<h3>Offset tweaks</h3>
 		<p>
