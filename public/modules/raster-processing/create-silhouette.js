@@ -1,4 +1,5 @@
 import { Jimp } from "./jimp/index.js";
+import { flattenImage } from "./flatten-image.js";
 
 /**
  * Given an image source, a blur amount, and a threshold,
@@ -21,11 +22,8 @@ export async function createSilhouette(
 	resizeMax
 ) {
 	/**
-	 * Load the original image
-	 *
-	 * TODO: could probably clean up scaling here?
-	 * Maybe it should be a separate step?
-	 * Maybe the "padding" part should be a separate step too?
+	 * Scale the image
+	 * TODO: split this out to resize-image-contain
 	 */
 	const loadedImage = await Jimp.read(imageSrc);
 	const widthOriginal = loadedImage.bitmap.width;
@@ -36,26 +34,17 @@ export async function createSilhouette(
 		w: scaleBeforeSilhouette * widthOriginal,
 		h: scaleBeforeSilhouette * heightOriginal,
 	});
-	// loadedImage.contain({ w: resizeMax, h: resizeMax });
-	const widthContained = loadedImage.bitmap.width;
-	const heightContained = loadedImage.bitmap.height;
-	/**
-	 * Create a flattened background image
-	 * Note we add width and height to account for blur space.
-	 */
+	// Flatten the image, adding padding to account for blur
 	const blurExtension = Math.ceil(blurAmount * 4);
-	const width = widthContained + blurExtension * 2;
-	const height = heightContained + blurExtension * 2;
-
-	const flatBg = new Jimp({ width, height, color: 0xffffffff });
-	/**
-	 * Composite the loaded image onto the flat background.
-	 * Note we add x,y positioning to account for blur space.
-	 *
-	 * TODO: could probably split out the "create background, composite" step?
-	 */
-	const compositePosition = { x: blurExtension, y: blurExtension };
-	flatBg.composite(loadedImage, compositePosition.x, compositePosition.y);
+	const flatBg = await flattenImage(loadedImage, {
+		padding: {
+			top: blurExtension,
+			left: blurExtension,
+			bottom: blurExtension,
+			right: blurExtension,
+		},
+		backgroundColor: 0xffffffff,
+	});
 	/**
 	 * Create a threshold image
 	 */

@@ -1,6 +1,12 @@
 import { Jimp } from "./jimp/index.js";
 
 /**
+ * JSDOC type for a loaded Jimp image
+ *
+ * @typedef {import("./jimp/index.js").Jimp} JimpImage
+ */
+
+/**
  * TODO: refactor so this is only the "resize to fit resizeMax" part.
  *
  * Given an image source, a blur amount, and a threshold,
@@ -13,7 +19,7 @@ import { Jimp } from "./jimp/index.js";
  * @param {number} blurAmount - The amount of blur to apply to the image.
  * @param {number} threshold - The threshold value for the silhouette effect.
  * @param {number} resizeMax - The size of a containing square to resize the image into before processing.
- * @returns {Promise<string[]>} - A promise that resolves to a tuple of two
+ * @returns {Promise<JimpImage>} - A promise that resolves to a tuple of two
  * base64 encoded image strings.
  */
 export async function resizeImage(imageSrc, blurAmount, threshold, resizeMax) {
@@ -24,6 +30,7 @@ export async function resizeImage(imageSrc, blurAmount, threshold, resizeMax) {
 	 * Maybe it should be a separate step?
 	 * Maybe the "padding" part should be a separate step too?
 	 */
+	imageSrc;
 	const loadedImage = await Jimp.read(imageSrc);
 	const widthOriginal = loadedImage.bitmap.width;
 	const heightOriginal = loadedImage.bitmap.height;
