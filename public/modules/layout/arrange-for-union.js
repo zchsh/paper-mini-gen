@@ -24,9 +24,9 @@ export function arrangeForUnion(rawPolygons, targetContainer) {
 	const rawHeightMm = (rawHeight / PIXELS_PER_INCH) * MM_PER_INCH;
 	const heightInputMm = getInputAsInt("heightMm");
 	// Scale the polygons about the 0,0 origin
-	const scale = heightInputMm / rawHeightMm;
+	const scalePostTrace = heightInputMm / rawHeightMm;
 	const polygons = visitPoints(rawPolygons, ([x, y]) => {
-		return [x * scale, y * scale];
+		return [x * scalePostTrace, y * scalePostTrace];
 	});
 
 	const allPoints = polygons.map((p) => p.regions.flat()).flat();
@@ -86,7 +86,7 @@ export function arrangeForUnion(rawPolygons, targetContainer) {
 		return [x, y + offset];
 	});
 
-	const arrangedPolygons = [
+	const polygonsArranged = [
 		...polygons,
 		...translatePolygons(polygonsReflected, [0, arrangeOffsetY * 2]),
 		circleBaseTop,
@@ -96,28 +96,17 @@ export function arrangeForUnion(rawPolygons, targetContainer) {
 
 	const viewBoxPadding = 9; // 1/8 inch
 
-	const viewBox = getFallbackViewBox(arrangedPolygons, viewBoxPadding);
-	const svgNodeArranged = svgNodeFromPolygons(arrangedPolygons, viewBox);
+	const viewBox = getFallbackViewBox(polygonsArranged, viewBoxPadding);
+	const svgNodeArranged = svgNodeFromPolygons(polygonsArranged, viewBox);
 	targetContainer.innerHTML = "";
 	targetContainer.appendChild(svgNodeArranged);
 
-	// const svgStringArranged = renderPolygonsAsPathSvg(
-	// 	arrangedPolygons,
-	// 	viewBoxPadding
-	// );
-	// targetContainer.innerHTML = svgStringArranged;
-
 	return {
-		polygons_arranged: arrangedPolygons,
-		scale,
-		baseSize,
-		baseOverlap,
-		boundingWidth,
-		boundingHeight,
-		boundingBox: { minX, minY, maxX, maxY },
-		arrangeOffset: [arrangeOffsetX, arrangeOffsetY],
-		reflectedPolygonOffsetY,
 		baseCenters,
+		baseOverlap,
+		baseSize,
+		polygonsArranged,
+		scalePostTrace,
 	};
 }
 

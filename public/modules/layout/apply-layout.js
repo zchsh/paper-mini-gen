@@ -1,9 +1,10 @@
 // COMMON
-import { getFallbackViewBox } from "/modules/00-common/get-fallback-viewbox.js";
-import { pathDataStringFromRegions } from "/modules/00-common/path-data-string-from-regions.js";
+import { pathDataStringFromRegions } from "/modules/render/path-data-string-from-regions.js";
+import { getFallbackViewBox } from "/modules/render/get-fallback-viewbox.js";
+import { createSvgElem } from "/modules/render/create-svg-elem.js";
 
 /**
- * TODO: implement layout
+ * TODO: clean this up, haven't touched it since prototyping
  *
  * THINKING THROUGH POSITIONING...
  *
@@ -45,7 +46,7 @@ export async function applyLayout(
 		viewBox[2] + DEV_PADDING * 2,
 		viewBox[3] + DEV_PADDING * 2,
 	];
-	const svgNode = buildSvgNode("svg", {
+	const svgNode = createSvgElem("svg", {
 		width: svgWidth,
 		height: svgHeight,
 		viewBox: `${minX} ${minY} ${svgWidth} ${svgHeight}`,
@@ -53,14 +54,14 @@ export async function applyLayout(
 
 	// Set up path nodes, representing the traced, offset, & union'd shapes
 	const pathsUnionBackground = pathStrings.map((pathString) => {
-		return buildSvgNode("path", {
+		return createSvgElem("path", {
 			"fill-rule": "nonzero",
 			fill: "white",
 			d: pathString,
 		});
 	});
 	const pathsUnionOutline = pathStrings.map((pathString) => {
-		return buildSvgNode("path", {
+		return createSvgElem("path", {
 			"fill-rule": "nonzero",
 			fill: "none",
 			stroke: OUTLINE_COLOR,
@@ -73,12 +74,12 @@ export async function applyLayout(
 	});
 
 	// Set up a clip-path, using the union'd shape
-	const clipPathUnion = buildSvgNode("clipPath", {
+	const clipPathUnion = createSvgElem("clipPath", {
 		id: "unionclip",
 	});
 	clipPathUnion.append(
 		...pathStrings.map((pathString) => {
-			return buildSvgNode("path", {
+			return createSvgElem("path", {
 				"fill-rule": "nonzero",
 				fill: "white",
 				d: pathString,
@@ -159,14 +160,14 @@ export async function applyLayout(
 	/**
 	 * Build a group for the two images, which includes a clip-path
 	 */
-	const svgGroupImages = buildSvgNode("g", {
+	const svgGroupImages = createSvgElem("g", {
 		"clip-path": "url(#unionclip)",
 	});
 
 	/**
 	 * Add some dotted lines to the SVG
 	 */
-	const dottedLineTop = buildSvgNode("line", {
+	const dottedLineTop = createSvgElem("line", {
 		x1: baseCenters[0][0] - baseSize / 2,
 		y1: baseCenters[0][1],
 		x2: baseCenters[0][0] + baseSize / 2,
@@ -175,7 +176,7 @@ export async function applyLayout(
 		"stroke-width": 0.5,
 		"stroke-dasharray": "2, 2",
 	});
-	const dottedLineBottom = buildSvgNode("line", {
+	const dottedLineBottom = createSvgElem("line", {
 		x1: baseCenters[2][0] - baseSize / 2,
 		y1: baseCenters[2][1],
 		x2: baseCenters[2][0] + baseSize / 2,
@@ -215,20 +216,6 @@ function toDataUrl(url) {
 	});
 }
 
-function buildSvgNode(nodeType, values) {
-	const node = document.createElementNS("http://www.w3.org/2000/svg", nodeType);
-	for (const key in values) {
-		const namespace =
-			key === "xlink:href" ? "http://www.w3.org/1999/xlink" : null;
-		if (namespace !== null) {
-			node.setAttributeNS(namespace, key, values[key]);
-		} else {
-			node.setAttribute(key, values[key]);
-		}
-	}
-	return node;
-}
-
 async function getImageNode(
 	imageElem,
 	scale,
@@ -240,7 +227,7 @@ async function getImageNode(
 	const imgDataUrl = await toDataUrl(imgSrc);
 	const imgHeight = imageElem.naturalHeight;
 	const imgWidth = imageElem.naturalWidth;
-	const imgNode = buildSvgNode("image", {
+	const imgNode = createSvgElem("image", {
 		width: imgWidth * scale,
 		height: imgHeight * scale,
 		"xlink:href": imgDataUrl,
@@ -251,8 +238,8 @@ async function getImageNode(
 		return imgNode;
 	}
 	//
-	const groupNode = buildSvgNode("g");
-	const devOutlineNode = buildSvgNode("rect", {
+	const groupNode = createSvgElem("g");
+	const devOutlineNode = createSvgElem("rect", {
 		x: moreAttributes.x,
 		y: moreAttributes.y,
 		width: imgWidth * scale,

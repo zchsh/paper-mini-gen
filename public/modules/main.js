@@ -39,15 +39,13 @@ import { updateImage } from "/modules/upload/update-image.js";
 async function runAll() {
 	// Gather image source and settings for silhouette
 	const inputSrc = document.getElementById("raw-image").src;
-	const imgResizeMax = 400;
 	const threshold = getInputAsInt("threshold");
 	const radius = getInputAsInt("radius");
-
-	/**
-	 * Create the silhouette
-	 *
-	 * TODO maybe split out the scaling step as a separate thing?
-	 */
+	// Scale the image before creating the silhouette
+	// TODO: split out the scaling step from `createSilhouette()`
+	const imgResizeMax = 400;
+	// Apply threshold to create silhouette image data
+	// TODO: split out the thresholding step from `createSilhouette()`
 	const {
 		sizeOriginal,
 		scaleBeforeSilhouette,
@@ -66,22 +64,17 @@ async function runAll() {
 		cleanTracePolygons
 	);
 	const {
-		polygons_arranged,
-		scale: scalePostTrace,
-		baseSize,
-		baseOverlap,
-		boundingWidth,
-		boundingHeight,
-		boundingBox,
-		arrangeOffset,
-		reflectedPolygonOffsetY,
 		baseCenters,
+		baseOverlap,
+		baseSize,
+		polygonsArranged,
+		scalePostTrace,
 	} = arrangeForUnion(
 		polygons_offset,
 		document.getElementById("arrange-container")
 	);
 	const polygons_union = applyUnion(
-		polygons_arranged,
+		polygonsArranged,
 		"union-container"
 		// "union-shapes-debug",
 		// "union-arrange-debug"
