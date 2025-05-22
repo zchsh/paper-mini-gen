@@ -11,7 +11,14 @@ import { svgNodeFromPolygons } from "../render/svg-node-from-polygons.js";
  * Traces the `img` element specified by `imgElemId`
  * and appends theresulting SVG to the `svgContainerId` element.
  *
- * TODO: split out this function, along with cleanupTrace, to its own module
+ * TODO: see if you can trace directly from an image source.
+ * Goal is imageSrc => polygons.
+ * https://github.com/jankovicsandras/imagetracerjs
+ * `imagedataToTracedata` looks promising.
+ *
+ * In subsequent cleanup, `flattenSvg` can take in an <svg> element.
+ * This could be constructed from the polygons yielded by the trace, I hope?
+ * Rather than having to render to the DOM and then read back in again.
  */
 export async function traceImage(imgElemId, svgContainerId) {
 	return new Promise((resolve, reject) => {

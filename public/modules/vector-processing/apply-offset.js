@@ -30,10 +30,9 @@ function renderAppliedOffset(polygons, offset, svgSrcNode, destNode) {
 export function applyOffset(
 	svgSourceContainerId,
 	svgDestContainerId,
-	sourcePolygons
+	sourcePolygons,
+	offset
 ) {
-	const offset = getInputAsInt("offset");
-
 	const allRegions = [];
 	for (const polygon of sourcePolygons) {
 		allRegions.push(...polygon.regions);
@@ -49,5 +48,5 @@ export function applyOffset(
 	const svgSrcNode = svgSourceContainer.querySelector("svg");
 	const destNode = document.getElementById(svgDestContainerId);
 	renderAppliedOffset(polygonsWithOffset, offset, svgSrcNode, destNode);
-	return [polygonsWithOffset, offset];
+	return polygonsWithOffset;
 }

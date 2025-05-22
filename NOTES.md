@@ -17,8 +17,15 @@
   - [x] Split out `applyLayout`
   - [x] Split out `buildSvgNode`
 
-- [ ] Split out `flatten-image.js`
-- [ ] Split out `resize-image.js`
+- [x] Split out `flatten-image.js`
+- [x] Split out `resize-image.js`
+
+- [ ] Refactor `traceImage` to accept image data, and yield polygon data
+  - [ ] Experiment with refactoring the tracing part, namely `imagedataToTracedata`
+    - Need to construct `ImageData`... see <https://developer.mozilla.org/en-US/docs/Web/API/ImageData/ImageData#dataarray> maybe?
+    - `jimpImage.bitmap.data` is a `Buffer` or raw image data...
+    - can turn that `Buffer` into Unit8ClampedArray... see <https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Uint8ClampedArray/Uint8ClampedArray>
+  - [ ] Experiment with refactoring the `flattenSvg` part
 
 - [ ] Think through new tool layout and workflow
   - Maybe worth doing in Figma? Sketching on paper, as always, probably a nice place to start

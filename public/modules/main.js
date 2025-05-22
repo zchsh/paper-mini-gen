@@ -42,19 +42,16 @@ import { updateImage } from "/modules/upload/update-image.js";
  * come naturally from refactoring each individual function.
  */
 async function runAll() {
-	// Gather image source and settings for silhouette
+	// Load the input image
 	const inputSrc = document.getElementById("raw-image").src;
+	const inputImage = await Jimp.read(inputSrc);
+	// Get settings for the silhouette
 	const threshold = getInputAsInt("threshold");
 	const radius = getInputAsInt("radius");
-	// Load the image
-	const inputImage = await Jimp.read(inputSrc);
 	// Scale the image before creating the silhouette
 	const sizeOriginal = getImageSize(inputImage);
-	const imgResizeMax = 400;
-	const [scaledImage, scaleBeforeSilhouette] = await containImage(
-		inputImage,
-		imgResizeMax
-	);
+	const size = 400;
+	const [scaledImage, scalePreTrace] = await containImage(inputImage, size);
 	// Flatten the image, adding padding to account for potential blurring
 	const padding = Math.ceil(radius * 4);
 	const blurExtension = padding;
@@ -70,12 +67,15 @@ async function runAll() {
 	 */
 	const silhouetteImgElem = document.getElementById("processed-image");
 	silhouetteImgElem.src = await silhouetteImage.getBase64("image/jpeg");
-
+	// Trace the silhouette image
 	const cleanTracePolygons = await traceImage("processed-image", "trace-svg");
-	const [polygons_offset, offset] = applyOffset(
+	// Offset the traced polygons
+	const offset = getInputAsInt("offset");
+	const polygons_offset = applyOffset(
 		"trace-svg",
 		"offset-svg",
-		cleanTracePolygons
+		cleanTracePolygons,
+		offset
 	);
 	const {
 		baseCenters,
@@ -98,7 +98,7 @@ async function runAll() {
 		polygons_union,
 		{
 			blurExtension,
-			scaleBeforeSilhouette,
+			scalePreTrace,
 			scalePostTrace,
 			heightOriginal: sizeOriginal.height,
 			baseSize,

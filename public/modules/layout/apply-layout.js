@@ -21,7 +21,7 @@ export async function applyLayout(
 	polygonObj,
 	{
 		blurExtension,
-		scaleBeforeSilhouette,
+		scalePreTrace,
 		scalePostTrace,
 		heightOriginal,
 		baseSize,
@@ -90,7 +90,7 @@ export async function applyLayout(
 	 * Grab the image element, embed into the SVG,
 	 * positioning the top image carefully to match the union'd shape.
 	 */
-	const imgScaleFinal = scaleBeforeSilhouette * scalePostTrace;
+	const imgScaleFinal = scalePreTrace * scalePostTrace;
 	const scaledPadding = blurExtension * scalePostTrace;
 	const imgTopX = scaledPadding;
 	const imgTopY = scaledPadding;
