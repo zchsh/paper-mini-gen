@@ -2,22 +2,23 @@
 
 ## Next steps
 
-- [ ] Clean up `main.js` and that whole setup generally
+- [x] Clean up `main.js` and that whole setup generally
   - [x] `<script>` content in `index.html` could be moved to `main.js`
   - This would remove the need for all those `window.<someFunction> = <someFunction>` assignments, then you could split out `<someFunction>.js` as a module and import it into `main.js`
   - Moving away from the numbered module directories probably makes sense... it feels close though, seems like it's more useful to organize purely by functionality (`parse`, `render`, `trace`, `polygon-manipulation` which is where clipper stuff could live)
   - [x] Clean up `silhouetteExecute` in `main.js`
   - 2025-05-19 at 15:01 - starting to clean this up... feeling a little better already. Lots to learn!
-  - [ ] Split out `traceExecute` and `cleanupTrace`
-    - [ ] Get out of `main.js` and into separate modules
-  - [ ] Split out `renderAppliedOffset` and `applyOffsetV2` (latter could be renamed)
-  - [ ] Split out `translatePolygon` and `translatePolygons`
-  - [ ] Split out `arrangeForUnion`
-  - [ ] Split out `unionPolygonObjects`
-  - [ ] Split out `applyUnion`
-  - [ ] Split out `applyLayout`
-  - [ ] Split out `buildSvgNode`
-  - [ ] Split out `getImageNode` and `toDataUrl`
+  - [x] Split out `traceExecute` and `cleanupTrace`
+    - [x] Get out of `main.js` and into separate modules
+  - [x] Split out `renderAppliedOffset` and `applyOffsetV2` (latter could be renamed)
+  - [x] Split out `arrangeForUnion`
+  - [x] Split out `unionPolygonObjects`
+  - [x] Split out `applyUnion`
+  - [x] Split out `applyLayout`
+  - [x] Split out `buildSvgNode`
+
+- [ ] Split out `flatten-image.js`
+- [ ] Split out `resize-image.js`
 
 - [ ] Think through new tool layout and workflow
   - Maybe worth doing in Figma? Sketching on paper, as always, probably a nice place to start
