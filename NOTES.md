@@ -26,6 +26,7 @@
     - `jimpImage.bitmap.data` is a `Buffer` or raw image data...
     - can turn that `Buffer` into Unit8ClampedArray... see <https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Uint8ClampedArray/Uint8ClampedArray>
   - [ ] Experiment with refactoring the `flattenSvg` part
+  - 2025-05-22 at 15:54 - experimentation in progress in `trace-image-data.js`. Seems promising so far.
 
 - [ ] Think through new tool layout and workflow
   - Maybe worth doing in Figma? Sketching on paper, as always, probably a nice place to start

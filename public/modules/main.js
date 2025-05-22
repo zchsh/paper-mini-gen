@@ -12,6 +12,7 @@ import { thresholdImage } from "./raster-processing/threshold-image.js";
 import { getImageSize } from "./raster-processing/get-image-size.js";
 // TRACE
 import { traceImage } from "/modules/raster-processing/trace-image.js";
+import { traceImageData } from "./raster-processing/trace-image-data.js";
 // OFFSET
 import { applyOffset } from "/modules/vector-processing/apply-offset.js";
 // ARRANGE
@@ -21,6 +22,7 @@ import { applyLayout } from "./layout/apply-layout.js";
 // GLOBAL STUFF
 import { onImageSelection } from "/modules/01-upload/on-image-selection.js";
 import { updateImage } from "/modules/upload/update-image.js";
+import { renderPathDataStrings } from "./render/render-path-data-strings.js";
 
 /**
  * TODO: refactor so runAll() can start from specific step.
@@ -67,6 +69,22 @@ async function runAll() {
 	 */
 	const silhouetteImgElem = document.getElementById("processed-image");
 	silhouetteImgElem.src = await silhouetteImage.getBase64("image/jpeg");
+	/**
+	 * TODO: stubbed alternate in, not working yet
+	 */
+	const pathomit = getInputAsInt("pathomit");
+	const devTraceData = await traceImageData(silhouetteImage, pathomit);
+	const devWidth = devTraceData.width;
+	const devHeight = devTraceData.height;
+	console.log({ devTraceData, devWidth, devHeight });
+	const devTraceDataSvg = renderPathDataStrings(
+		devTraceData.pathDataStrings,
+		devTraceData.width,
+		devTraceData.height
+	);
+	console.log({ devTraceData, devTraceDataSvg });
+	// TODO: uncomment line below to see a preview of the traced path strings
+	// document.body.appendChild(devTraceDataSvg);
 	// Trace the silhouette image
 	const cleanTracePolygons = await traceImage("processed-image", "trace-svg");
 	// Offset the traced polygons
