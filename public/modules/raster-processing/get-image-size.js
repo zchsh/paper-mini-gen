@@ -12,7 +12,7 @@
  * @returns {Promise<{ width: number, height: number}>} - A promise that
  * resolves to an object with the width and height of the flattened image.
  */
-export async function getImageSize(jimpImage) {
+export function getImageSize(jimpImage) {
 	const { width, height } = jimpImage.bitmap;
 	return { width, height };
 }

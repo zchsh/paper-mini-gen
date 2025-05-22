@@ -5,6 +5,15 @@ import { thresholdImage } from "./threshold-image.js";
 import { getImageSize } from "./get-image-size.js";
 
 /**
+ * JSDoc definition of the return value of the createSilhouette function.
+ * @typedef {Object} CreateSilhouetteResult
+ * @property {{ width: number, height: number}} sizeOriginal - The original size of the image.
+ * @property {number} scaleBeforeSilhouette - The scale factor used to resize the image.
+ * @property {number} blurExtension - The amount of padding added to the image for blur.
+ * @property {string} silhouetteBase64 - The base64 encoded silhouette image.
+ */
+
+/**
  * TODO: refactor to accept a JimpImage instead of a string.
  * Maybe could also return a JimpImage?
  *
@@ -14,37 +23,34 @@ import { getImageSize } from "./get-image-size.js";
  *
  * NOTE: this function requires the Jimp library to exist in the global scope.
  *
- * @param {string} imageSrc - The source of the image to be processed.
+ * @param {JimpImage} imageSrc - The source of the image to be processed.
  * @param {number} blurAmount - The amount of blur to apply to the image.
  * @param {number} threshold - The threshold value for the silhouette effect.
- * @param {number} resizeMax - The size of a containing square to resize the image into before processing.
- * @returns {Promise<string[]>} - A promise that resolves to a tuple of two
- * base64 encoded image strings.
+ * @param {number} size - The size of a containing square to resize the image
+ * into before processing.
+ * @returns {Promise<CreateSilhouetteResult>} - A promise that resolves to an object
+ * containing the original image size, scale factor, blur extension,
+ * and the base64 encoded silhouette image.
  */
 export async function createSilhouette(
-	imageSrc,
-	blurAmount,
-	threshold,
-	resizeMax
+	jimpImage,
+	{ threshold, radius, padding }
 ) {
-	// Scale the image to contain it in a square of the provided size
-	const imageLoaded = await Jimp.read(imageSrc);
-	const [scaledImage, scaleFactor] = await containImage(imageLoaded, resizeMax);
 	// Flatten the image, adding padding to account for blur
-	const padding = Math.ceil(blurAmount * 4);
-	const imageFlat = await flattenImage(scaledImage, { padding });
+
+	const imageFlat = await flattenImage(jimpImage, { padding });
 	// Apply a blur to the image, if applicable
-	if (blurAmount > 0) {
-		imageFlat.blur(blurAmount);
+	if (radius > 0) {
+		imageFlat.blur(radius);
 	}
 	// Apply a threshold to the image
 	const imageThreshold = await thresholdImage(imageFlat, threshold);
 	// Return a bundle of stuff
-	// TODO: maybe unbundle this?
-	return {
-		sizeOriginal: getImageSize(imageLoaded),
-		scaleBeforeSilhouette: scaleFactor,
-		blurExtension: padding,
-		silhouetteBase64: await imageThreshold.getBase64("image/jpeg"),
-	};
+	// return {
+	// 	sizeOriginal: getImageSize(imageLoaded),
+	// 	scaleBeforeSilhouette: scaleFactor,
+	// 	blurExtension: padding,
+	// 	silhouetteBase64: await imageThreshold.getBase64("image/jpeg"),
+	// };
+	return imageThreshold;
 }

@@ -4,7 +4,12 @@ import { copyTextToClipboard } from "/modules/00-common/copy-text-to-clipboard.j
 // UPLOAD
 import { resetSettings } from "/modules/01-upload/reset-settings.js";
 // SILHOUETTE
-import { createSilhouette } from "/modules/raster-processing/create-silhouette.js";
+// import { createSilhouette } from "/modules/raster-processing/create-silhouette.js";
+import { Jimp } from "./raster-processing/jimp/index.js";
+import { flattenImage } from "./raster-processing/flatten-image.js";
+import { containImage } from "./raster-processing/contain-image.js";
+import { thresholdImage } from "./raster-processing/threshold-image.js";
+import { getImageSize } from "./raster-processing/get-image-size.js";
 // TRACE
 import { traceImage } from "/modules/raster-processing/trace-image.js";
 // OFFSET
@@ -41,21 +46,30 @@ async function runAll() {
 	const inputSrc = document.getElementById("raw-image").src;
 	const threshold = getInputAsInt("threshold");
 	const radius = getInputAsInt("radius");
+	// Load the image
+	const inputImage = await Jimp.read(inputSrc);
 	// Scale the image before creating the silhouette
-	// TODO: split out the scaling step from `createSilhouette()`
+	const sizeOriginal = getImageSize(inputImage);
 	const imgResizeMax = 400;
-	// Apply threshold to create silhouette image data
-	// TODO: split out the thresholding step from `createSilhouette()`
-	const {
-		sizeOriginal,
-		scaleBeforeSilhouette,
-		blurExtension,
-		silhouetteBase64,
-	} = await createSilhouette(inputSrc, radius, threshold, imgResizeMax);
-
-	// Render the silhouette
+	const [scaledImage, scaleBeforeSilhouette] = await containImage(
+		inputImage,
+		imgResizeMax
+	);
+	// Flatten the image, adding padding to account for potential blurring
+	const padding = Math.ceil(radius * 4);
+	const blurExtension = padding;
+	const imageFlat = await flattenImage(scaledImage, { padding });
+	// Apply a blur to the image, if applicable
+	if (radius > 0) imageFlat.blur(radius);
+	// Apply a threshold to the image, creating the silhouette
+	const silhouetteImage = await thresholdImage(imageFlat, threshold);
+	// Render the silhouette image
+	/**
+	 * TODO: tracing picks up the rendered silhouette image...
+	 * would it be possible to pass it directly? Must be right?
+	 */
 	const silhouetteImgElem = document.getElementById("processed-image");
-	silhouetteImgElem.src = silhouetteBase64;
+	silhouetteImgElem.src = await silhouetteImage.getBase64("image/jpeg");
 
 	const cleanTracePolygons = await traceImage("processed-image", "trace-svg");
 	const [polygons_offset, offset] = applyOffset(
