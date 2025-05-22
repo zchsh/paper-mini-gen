@@ -10,9 +10,9 @@ import { Jimp } from "./jimp/index.js";
  * Given a loaded JimpImage, flatten the image onto a white background, and
  * Return the flattened image as a JimpImage.
  *
- * @param {string} imageSrc - The source of the image to be processed.
+ * @param {JimpImage} jimpImage - The source of the image to be processed.
  * @param {Object} settings - The settings for flattening the image.
- * @param {Object} settings.padding - The padding to apply to the image.
+ * @param {Object | number} settings.padding - The padding to apply to the image.
  * @param {number} settings.padding.top - The top padding.
  * @param {number} settings.padding.left - The left padding.
  * @param {number} settings.padding.bottom - The bottom padding.
@@ -23,6 +23,15 @@ import { Jimp } from "./jimp/index.js";
  * representing the flattened image.
  */
 export async function flattenImage(jimpImage, settings = {}) {
+	// Convert the incoming padding value to an object if it's a number
+	if (typeof settings.padding === "number") {
+		settings.padding = {
+			top: settings.padding,
+			left: settings.padding,
+			bottom: settings.padding,
+			right: settings.padding,
+		};
+	}
 	// Merge provided settings with defaults
 	const settingsDefault = {
 		padding: { top: 0, left: 0, bottom: 0, right: 0 },

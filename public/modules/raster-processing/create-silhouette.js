@@ -1,7 +1,13 @@
 import { Jimp } from "./jimp/index.js";
 import { flattenImage } from "./flatten-image.js";
+import { containImage } from "./contain-image.js";
+import { thresholdImage } from "./threshold-image.js";
+import { getImageSize } from "./get-image-size.js";
 
 /**
+ * TODO: refactor to accept a JimpImage instead of a string.
+ * Maybe could also return a JimpImage?
+ *
  * Given an image source, a blur amount, and a threshold,
  * Return a version of the original image and the silhouette
  * in a tuple of base64 encoded strings.
@@ -21,60 +27,24 @@ export async function createSilhouette(
 	threshold,
 	resizeMax
 ) {
-	/**
-	 * Scale the image
-	 * TODO: split this out to resize-image-contain
-	 */
-	const loadedImage = await Jimp.read(imageSrc);
-	const widthOriginal = loadedImage.bitmap.width;
-	const heightOriginal = loadedImage.bitmap.height;
-	const maxImgDimension = Math.max(widthOriginal, heightOriginal);
-	const scaleBeforeSilhouette = resizeMax / maxImgDimension;
-	loadedImage.resize({
-		w: scaleBeforeSilhouette * widthOriginal,
-		h: scaleBeforeSilhouette * heightOriginal,
-	});
+	// Scale the image to contain it in a square of the provided size
+	const imageLoaded = await Jimp.read(imageSrc);
+	const [scaledImage, scaleFactor] = await containImage(imageLoaded, resizeMax);
 	// Flatten the image, adding padding to account for blur
-	const blurExtension = Math.ceil(blurAmount * 4);
-	const flatBg = await flattenImage(loadedImage, {
-		padding: {
-			top: blurExtension,
-			left: blurExtension,
-			bottom: blurExtension,
-			right: blurExtension,
-		},
-		backgroundColor: 0xffffffff,
-	});
-	/**
-	 * Create a threshold image
-	 */
-	const thresholdMask = flatBg.clone();
+	const padding = Math.ceil(blurAmount * 4);
+	const imageFlat = await flattenImage(scaledImage, { padding });
+	// Apply a blur to the image, if applicable
 	if (blurAmount > 0) {
-		thresholdMask.blur(blurAmount);
+		imageFlat.blur(blurAmount);
 	}
-	// Invert so the subject to silhouette is light
-	thresholdMask.invert();
-	// Replace any light pixels that meet the threshold with white pixels
-	thresholdMask.threshold({ max: 255 - threshold });
-	// Invert the image again, now the high-contrast white silhouette is black
-	thresholdMask.invert();
-	// There will still be gray pixels, replace any gray pixels with white
-	thresholdMask.threshold({ max: 1, replace: 255 });
-	/**
-	 * Convert the created iamges to base64
-	 */
-	const silhouetteBase64 = await thresholdMask.getBase64("image/jpeg");
-	/**
-	 * Return both the images
-	 */
+	// Apply a threshold to the image
+	const imageThreshold = await thresholdImage(imageFlat, threshold);
+	// Return a bundle of stuff
+	// TODO: maybe unbundle this?
 	return {
-		/**
-		 * TODO: split out process of getting `sizeOriginal`?
-		 * doesn't feel all that relevant to this function.
-		 */
-		sizeOriginal: { width: widthOriginal, height: heightOriginal },
-		scaleBeforeSilhouette,
-		blurExtension,
-		silhouetteBase64,
+		sizeOriginal: getImageSize(imageLoaded),
+		scaleBeforeSilhouette: scaleFactor,
+		blurExtension: padding,
+		silhouetteBase64: await imageThreshold.getBase64("image/jpeg"),
 	};
 }
