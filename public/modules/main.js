@@ -12,6 +12,9 @@ import { getImageSize } from "./raster-processing/get-image-size.js";
 // TRACE
 import { traceImage } from "/modules/raster-processing/trace-image.js";
 import { traceImageData } from "./raster-processing/trace-image-data.js";
+import { flattenPathDataStrings } from "./vector-processing/flatten-path-data-strings.js";
+import { parseSvgViewbox } from "/modules/04-offset/parse-svg-viewbox.js";
+import { svgNodeFromPolygons } from "./render/svg-node-from-polygons.js";
 // OFFSET
 import { applyOffset } from "/modules/vector-processing/apply-offset.js";
 // ARRANGE
@@ -69,21 +72,40 @@ async function runAll() {
 	const silhouetteImgElem = document.getElementById("processed-image");
 	silhouetteImgElem.src = await silhouetteImage.getBase64("image/jpeg");
 	/**
-	 * TODO: stubbed alternate in, not working yet
+	 * TODO: stubbed alternate in, not working yet START
 	 */
 	const pathomit = getInputAsInt("pathomit");
 	const devTraceData = await traceImageData(silhouetteImage, pathomit);
-	const devWidth = devTraceData.width;
-	const devHeight = devTraceData.height;
-	console.log({ devTraceData, devWidth, devHeight });
+	// Preview the SVG path data immediately after tracing
 	const devTraceDataSvg = renderPathDataStrings(
 		devTraceData.pathDataStrings,
 		devTraceData.width,
 		devTraceData.height
 	);
-	console.log({ devTraceData, devTraceDataSvg });
 	// TODO: uncomment line below to see a preview of the traced path strings
 	// document.body.appendChild(devTraceDataSvg);
+	const devCleanTracePolygons = flattenPathDataStrings(
+		devTraceData.pathDataStrings,
+		devTraceData.width,
+		devTraceData.height
+	);
+	console.log({ devCleanTracePolygons });
+	/**
+	 * render out devCleanTracePolygons to debug
+	 *
+	 * TODO: clean this up, so far just prototyped
+	 */
+	const showDebugPoints = true;
+	const viewBox = [0, 0, devTraceData.width, devTraceData.height];
+	const devPolygonsSvg = svgNodeFromPolygons(devCleanTracePolygons, viewBox, {
+		showDebug: showDebugPoints,
+	});
+	// TODO: uncomment line below to see a preview of the traced polygons
+	// document.body.appendChild(devPolygonsSvg);
+
+	/**
+	 * TODO: stubbed alternte in, not working yet END
+	 */
 	// Trace the silhouette image
 	const cleanTracePolygons = await traceImage("processed-image", "trace-svg");
 	// Offset the traced polygons

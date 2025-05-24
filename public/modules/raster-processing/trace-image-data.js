@@ -1,13 +1,27 @@
 import { pathDataStringsFromTraceData } from "./imagetracejs-remixes/path-data-strings-from-trace-data.js";
 
 /**
- * TODO: this is a work in progress. finish implementation.
+ * JSDOC type for a loaded Jimp image
  *
- * TODO: write description and add JSDoc for this function, once done.
+ * @typedef {import("./jimp/index.js").Jimp} JimpImage
+ */
+
+/**
+ * Given a Jimp image, and a pathomit value which sets the minimum
+ * size of traced feature to be included,
+ * Return <path /> data strings representing a traced version
+ * of the image.
  *
- * @param {*} jimpImage
- * @param {*} pathomit
- * @returns
+ * Note that we expect the incoming Jimp image to be a black
+ * silhouette, on a white background. We trace and return the
+ * foreground black shapes only.
+ *
+ * @param {JimpImage} pathomit
+ * @returns {Promise<{
+ * 	pathDataStrings: string[],
+ * 	width: number,
+ * 	height: number,
+ * }>}
  */
 export async function traceImageData(jimpImage, pathomit) {
 	return new Promise((resolve, reject) => {
@@ -17,6 +31,7 @@ export async function traceImageData(jimpImage, pathomit) {
 		// Create a new ImageData object
 		const imageDataObj = new ImageData(imageDataArray, width, height);
 		// Gather settings for the trace
+		const foregroundColor = { r: 0, g: 0, b: 0, a: 255 };
 		const backgroundColor = { r: 245, g: 245, b: 245, a: 255 };
 		const traceSettings = {
 			pathomit,
@@ -31,7 +46,7 @@ export async function traceImageData(jimpImage, pathomit) {
 			 * - black (foreground shapes)
 			 * - nearly-white (background shapes, will remove in later step)
 			 */
-			pal: [{ r: 0, g: 0, b: 0, a: 255 }, backgroundColor],
+			pal: [foregroundColor, backgroundColor],
 		};
 		// Trace the image
 		const traceData = ImageTracer.imagedataToTracedata(
@@ -39,8 +54,7 @@ export async function traceImageData(jimpImage, pathomit) {
 			traceSettings
 		);
 		/**
-		 * TODO: convert traceData to polygons.
-		 * Work in progress...
+		 * Convert the traced data to path data strings.
 		 */
 		const pathDataStrings = pathDataStringsFromTraceData(
 			traceData,
@@ -53,25 +67,11 @@ export async function traceImageData(jimpImage, pathomit) {
 				return !isBackgroundPath && !isHolePath;
 			}
 		);
-
-		// Resolve with the traced image data
+		// Resolve with path data strings, and dimensions of the SVG bounds
 		resolve({
 			pathDataStrings,
 			width: traceData.width,
 			height: traceData.height,
 		});
-		/**
-		 * TODO: below should be split out to a separate function, I think?
-		 * `flattenPathDataStrings` maybe?
-		 */
-		// TODO: render pathDataStrings into a constructed SVG element
-		// const svgElem = TODO... maybe temporarily create an SVG element
-		// in the DOM, just to make sure it works? Then later try to do it
-		// without the DOM?
-		// TODO: flatten the constructed SVG element using `flattenSVG`
-		// const paths = flattenSVG(svgElem);
-		// TODO: grab the flattened SVG element and return as polygon data?
-		// (see existing code in `trace-image.js`, split out separate function,
-		// like `polygonsFromFlattenSvgPaths`)
 	});
 }
