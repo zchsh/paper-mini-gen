@@ -74,8 +74,21 @@ export function flattenPathDataStrings(pathDataStrings) {
  * @returns
  */
 function polygonsFromFlattenedPaths(paths) {
+	// Group paths by groupId, each group will yield a polygon
+	// const pathsGrouped = {};
+	// for (const path of paths) {
+	// 	const { groupId } = path;
+	// 	if (!pathsGrouped[groupId]) {
+	// 		pathsGrouped[groupId] = [];
+	// 	}
+	// 	pathsGrouped[groupId].push(path);
+	// }
+	/**
+	 * TODO: use pathsGrouped rather than approach below
+	 */
 	// Initialize the polygons array
 	const polygons = [];
+
 	let regions = [];
 	let currentGroupId = null;
 	for (const path of paths) {
