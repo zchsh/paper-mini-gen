@@ -17,6 +17,7 @@ export async function traceImageData(jimpImage, pathomit) {
 		// Create a new ImageData object
 		const imageDataObj = new ImageData(imageDataArray, width, height);
 		// Gather settings for the trace
+		const backgroundColor = { r: 245, g: 245, b: 245, a: 255 };
 		const traceSettings = {
 			pathomit,
 			ltres: 1,
@@ -30,10 +31,7 @@ export async function traceImageData(jimpImage, pathomit) {
 			 * - black (foreground shapes)
 			 * - nearly-white (background shapes, will remove in later step)
 			 */
-			pal: [
-				{ r: 0, g: 0, b: 0, a: 255 },
-				{ r: 245, g: 245, b: 245, a: 255 },
-			],
+			pal: [{ r: 0, g: 0, b: 0, a: 255 }, backgroundColor],
 		};
 		// Trace the image
 		const traceData = ImageTracer.imagedataToTracedata(
@@ -43,15 +41,15 @@ export async function traceImageData(jimpImage, pathomit) {
 		/**
 		 * TODO: convert traceData to polygons.
 		 * Work in progress...
-		 *
-		 * TODO: filter out the nearly-white shapes from the trace data.
 		 */
 		const pathDataStrings = pathDataStringsFromTraceData(
 			traceData,
 			traceSettings,
 			(data, layerIdx, pathIdx) => {
+				// Filter out "hole" paths, these are marked by ImageTracer JS
 				const isHolePath = data.layers[layerIdx][pathIdx].isholepath;
-				const isBackgroundPath = data.palette[layerIdx].r === 245;
+				// Filter out "background" paths, we marked these with a custom palette
+				const isBackgroundPath = data.palette[layerIdx].r === backgroundColor.r;
 				return !isBackgroundPath && !isHolePath;
 			}
 		);

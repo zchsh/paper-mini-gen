@@ -83,7 +83,7 @@ async function runAll() {
 	);
 	console.log({ devTraceData, devTraceDataSvg });
 	// TODO: uncomment line below to see a preview of the traced path strings
-	document.body.appendChild(devTraceDataSvg);
+	// document.body.appendChild(devTraceDataSvg);
 	// Trace the silhouette image
 	const cleanTracePolygons = await traceImage("processed-image", "trace-svg");
 	// Offset the traced polygons
