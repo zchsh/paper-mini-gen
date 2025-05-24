@@ -28,7 +28,7 @@
   - [x] Experiment with refactoring the `flattenSvg` part
   - 2025-05-22 at 15:54 - experimentation in progress in `trace-image-data.js`. Seems promising so far.
   - 2025-05-24 at 16:03 - working in `flatten-path-data-strings.js`
-  - 2025-05-24 at 16:57 - have swapped in the new tracing flow, still lots of cleanup work to do.
+  - 2025-05-24 at 16:57 - have swapped in the new tracing flow, still lots of cleanup work to do. For example, need to clean up now-unused files... and might be a nice time to move files that are being used into the new directory structure.
 
 - [ ] Think through new tool layout and workflow
   - Maybe worth doing in Figma? Sketching on paper, as always, probably a nice place to start
