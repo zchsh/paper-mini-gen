@@ -46,10 +46,14 @@ export async function traceImageData(jimpImage, pathomit) {
 		 *
 		 * TODO: filter out the nearly-white shapes from the trace data.
 		 */
-		console.log({ traceData });
 		const pathDataStrings = pathDataStringsFromTraceData(
 			traceData,
-			traceSettings
+			traceSettings,
+			(data, layerIdx, pathIdx) => {
+				const isHolePath = data.layers[layerIdx][pathIdx].isholepath;
+				const isBackgroundPath = data.palette[layerIdx].r === 245;
+				return !isBackgroundPath && !isHolePath;
+			}
 		);
 
 		// Resolve with the traced image data

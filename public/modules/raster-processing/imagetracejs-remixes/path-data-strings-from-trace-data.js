@@ -76,7 +76,11 @@ function checkoptions(options) {
 	return options;
 } // End of checkoptions()
 
-export function pathDataStringsFromTraceData(tracedata, rawOptions) {
+export function pathDataStringsFromTraceData(
+	tracedata,
+	rawOptions,
+	includeFunction
+) {
 	//
 	const options = checkoptions(rawOptions);
 	//
@@ -85,9 +89,8 @@ export function pathDataStringsFromTraceData(tracedata, rawOptions) {
 	for (var lcnt = 0; lcnt < tracedata.layers.length; lcnt++) {
 		for (var pcnt = 0; pcnt < tracedata.layers[lcnt].length; pcnt++) {
 			// Adding SVG <path> string
-			const isHolePath = tracedata.layers[lcnt][pcnt].isholepath;
-			const isBackgroundPath = tracedata.palette[lcnt].r === 245;
-			if (!isBackgroundPath && !isHolePath) {
+			const shouldInclude = includeFunction(tracedata, lcnt, pcnt);
+			if (shouldInclude) {
 				const pathData = pathDataFromTraceData(tracedata, lcnt, pcnt, options);
 				pathDataStrings.push(pathData);
 			}

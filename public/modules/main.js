@@ -4,7 +4,6 @@ import { copyTextToClipboard } from "/modules/00-common/copy-text-to-clipboard.j
 // UPLOAD
 import { resetSettings } from "/modules/01-upload/reset-settings.js";
 // SILHOUETTE
-// import { createSilhouette } from "/modules/raster-processing/create-silhouette.js";
 import { Jimp } from "./raster-processing/jimp/index.js";
 import { flattenImage } from "./raster-processing/flatten-image.js";
 import { containImage } from "./raster-processing/contain-image.js";
@@ -84,7 +83,7 @@ async function runAll() {
 	);
 	console.log({ devTraceData, devTraceDataSvg });
 	// TODO: uncomment line below to see a preview of the traced path strings
-	// document.body.appendChild(devTraceDataSvg);
+	document.body.appendChild(devTraceDataSvg);
 	// Trace the silhouette image
 	const cleanTracePolygons = await traceImage("processed-image", "trace-svg");
 	// Offset the traced polygons
