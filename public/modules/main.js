@@ -10,10 +10,8 @@ import { containImage } from "./raster-processing/contain-image.js";
 import { thresholdImage } from "./raster-processing/threshold-image.js";
 import { getImageSize } from "./raster-processing/get-image-size.js";
 // TRACE
-import { traceImage } from "/modules/raster-processing/trace-image.js";
 import { traceImageData } from "./raster-processing/trace-image-data.js";
 import { flattenPathDataStrings } from "./vector-processing/flatten-path-data-strings.js";
-import { parseSvgViewbox } from "/modules/04-offset/parse-svg-viewbox.js";
 import { svgNodeFromPolygons } from "./render/svg-node-from-polygons.js";
 // OFFSET
 import { applyOffset } from "/modules/vector-processing/apply-offset.js";
@@ -24,7 +22,6 @@ import { applyLayout } from "./layout/apply-layout.js";
 // GLOBAL STUFF
 import { onImageSelection } from "/modules/01-upload/on-image-selection.js";
 import { updateImage } from "/modules/upload/update-image.js";
-import { renderPathDataStrings } from "./render/render-path-data-strings.js";
 
 /**
  * TODO: refactor so runAll() can start from specific step.
@@ -65,57 +62,48 @@ async function runAll() {
 	// Apply a threshold to the image, creating the silhouette
 	const silhouetteImage = await thresholdImage(imageFlat, threshold);
 	// Render the silhouette image
-	/**
-	 * TODO: tracing picks up the rendered silhouette image...
-	 * would it be possible to pass it directly? Must be right?
-	 */
 	const silhouetteImgElem = document.getElementById("processed-image");
 	silhouetteImgElem.src = await silhouetteImage.getBase64("image/jpeg");
 	/**
-	 * TODO: stubbed alternate in, not working yet START
+	 * Trace the silhouette image data
 	 */
 	const pathomit = getInputAsInt("pathomit");
-	const devTraceData = await traceImageData(silhouetteImage, pathomit);
-	// Preview the SVG path data immediately after tracing
-	const devTraceDataSvg = renderPathDataStrings(
-		devTraceData.pathDataStrings,
-		devTraceData.width,
-		devTraceData.height
+	const traceData = await traceImageData(silhouetteImage, pathomit);
+	const polygonsTraced = flattenPathDataStrings(
+		traceData.pathDataStrings,
+		traceData.width,
+		traceData.height
 	);
-	// TODO: uncomment line below to see a preview of the traced path strings
-	// document.body.appendChild(devTraceDataSvg);
-	const devCleanTracePolygons = flattenPathDataStrings(
-		devTraceData.pathDataStrings,
-		devTraceData.width,
-		devTraceData.height
-	);
-	console.log({ devCleanTracePolygons });
-	/**
-	 * render out devCleanTracePolygons to debug
-	 *
-	 * TODO: clean this up, so far just prototyped
-	 */
+	// Render the traced polygons
 	const showDebugPoints = true;
-	const viewBox = [0, 0, devTraceData.width, devTraceData.height];
-	const devPolygonsSvg = svgNodeFromPolygons(devCleanTracePolygons, viewBox, {
+	const viewBoxTraced = [0, 0, traceData.width, traceData.height];
+	const svgPolygonsTraced = svgNodeFromPolygons(polygonsTraced, viewBoxTraced, {
 		showDebug: showDebugPoints,
 	});
-	// TODO: uncomment line below to see a preview of the traced polygons
-	// document.body.appendChild(devPolygonsSvg);
-
+	const traceDestNode = document.getElementById("trace-svg");
+	traceDestNode.innerHTML = "";
+	traceDestNode.appendChild(svgPolygonsTraced);
 	/**
-	 * TODO: stubbed alternte in, not working yet END
+	 * Offset the traced polygons
 	 */
-	// Trace the silhouette image
-	const cleanTracePolygons = await traceImage("processed-image", "trace-svg");
-	// Offset the traced polygons
 	const offset = getInputAsInt("offset");
-	const polygons_offset = applyOffset(
-		"trace-svg",
-		"offset-svg",
-		cleanTracePolygons,
-		offset
-	);
+	const polygons_offset = applyOffset(polygonsTraced, offset);
+	// Render the offset polygons
+	const offsetDestNode = document.getElementById("offset-svg");
+	const viewBoxModded = [
+		viewBoxTraced[0] - offset,
+		viewBoxTraced[1] - offset,
+		viewBoxTraced[2] + offset * 2,
+		viewBoxTraced[3] + offset * 2,
+	];
+	const svgNodeFlattened = svgNodeFromPolygons(polygons_offset, viewBoxModded, {
+		showDebug: true,
+	});
+	offsetDestNode.innerHTML = "";
+	offsetDestNode.appendChild(svgNodeFlattened);
+	/**
+	 * Arrange for union
+	 */
 	const {
 		baseCenters,
 		baseOverlap,

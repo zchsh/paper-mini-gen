@@ -21,13 +21,14 @@
 - [x] Split out `resize-image.js`
 
 - [ ] Refactor `traceImage` to accept image data, and yield polygon data
-  - [ ] Experiment with refactoring the tracing part, namely `imagedataToTracedata`
+  - [x] Experiment with refactoring the tracing part, namely `imagedataToTracedata`
     - Need to construct `ImageData`... see <https://developer.mozilla.org/en-US/docs/Web/API/ImageData/ImageData#dataarray> maybe?
     - `jimpImage.bitmap.data` is a `Buffer` or raw image data...
     - can turn that `Buffer` into Unit8ClampedArray... see <https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Uint8ClampedArray/Uint8ClampedArray>
-  - [ ] Experiment with refactoring the `flattenSvg` part
+  - [x] Experiment with refactoring the `flattenSvg` part
   - 2025-05-22 at 15:54 - experimentation in progress in `trace-image-data.js`. Seems promising so far.
   - 2025-05-24 at 16:03 - working in `flatten-path-data-strings.js`
+  - 2025-05-24 at 16:57 - have swapped in the new tracing flow, still lots of cleanup work to do.
 
 - [ ] Think through new tool layout and workflow
   - Maybe worth doing in Figma? Sketching on paper, as always, probably a nice place to start

@@ -1,6 +1,9 @@
 import { buildSvgRootNode } from "../render/build-svg-root-node.js";
 import { createSvgElem } from "../render/create-svg-elem.js";
 import { reduceClusteredPoints } from "../03-trace/reduce-clustered-points.js";
+import { cleanRegions } from "../clipperjs-wrappers/clean-regions.js";
+import { simplifyRegions } from "../clipperjs-wrappers/simplify-regions.js";
+
 /**
  * Given an array of path data strings, flatten all path data into
  * polygon points, and
@@ -20,25 +23,36 @@ export function flattenPathDataStrings(pathDataStrings, svgWidth, svgHeight) {
 		const pathElem = createSvgElem("path", { d: pathDataString });
 		svgElem.appendChild(pathElem);
 	}
-	// Flatten the SVG element into
-	const paths = flattenSVG(svgElem);
-	console.log({ paths });
 	/**
-	 * Convert flattened paths to polygon data
+	 * Flatten the SVG element. This produces a result that's in a format
+	 * specific to https://github.com/nornagon/flatten-svg.
 	 */
-	const polygons = polygonsFromFlattenedPaths(paths);
-	console.log({ polygons });
+	const flattenSvgResult = flattenSVG(svgElem);
+	/**
+	 * Convert flattened paths to polygon data. This takes the format
+	 * specific to https://github.com/nornagon/flatten-svg and converts it
+	 * to polygon objects.
+	 */
+	const polygons = polygonsFromFlattenedPaths(flattenSvgResult);
 
 	/**
 	 * Clean up polygon data with ClipperJS
 	 */
-	// const polygonsCleaned = polygons.map((polygon) => {
-	//   const regionsCleaned = cleanRegions(polygon.regions, 0.2);
-	//   const regionsSimplified = simplifyRegions(regionsCleaned);
-	//   return { regions: regionsSimplified };
-	// });
+	const polygonsCleaned = polygons.map((polygon) => {
+		/**
+		 * TODO: is reduceClusteredPoints really needed here?
+		 * Feels like it might be duplicative of `cleanRegions`,
+		 * or maybe `simplifyRegions`.
+		 */
+		const regionsUnclustered = polygon.regions.map((region) => {
+			return reduceClusteredPoints(region, 2);
+		});
+		const regionsCleaned = cleanRegions(regionsUnclustered, 0.2);
+		const regionsSimplified = simplifyRegions(regionsCleaned);
+		return { regions: regionsSimplified };
+	});
 	// Return
-	return polygons;
+	return polygonsCleaned;
 }
 
 /**
@@ -68,10 +82,7 @@ function polygonsFromFlattenedPaths(paths) {
 		 * Have not implemented any kind of group assignment...
 		 * But somehow things still seem to work?
 		 */
-		const { groupId, points: rawPoints } = path;
-		// TODO: should maybe expose reducedClusteredPoints arg, since it makes
-		// a pretty big difference?
-		const points = reduceClusteredPoints(rawPoints, 2);
+		const { groupId, points } = path;
 
 		const isFirstIteration = currentGroupId === null;
 		const hasGroupId = typeof groupId === "string";
