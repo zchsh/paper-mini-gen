@@ -1,23 +1,24 @@
-import { buildSvgRootNode } from "../render/build-svg-root-node.js";
 import { createSvgElem } from "../render/create-svg-elem.js";
 import { reduceClusteredPoints } from "../03-trace/reduce-clustered-points.js";
 import { cleanRegions } from "../clipperjs-wrappers/clean-regions.js";
 import { simplifyRegions } from "../clipperjs-wrappers/simplify-regions.js";
 
 /**
- * Given an array of path data strings, flatten all path data into
+ * Given an array of path data strings, as well as a width and height
+ * representing the bounds of the pah data, flatten all path data into
  * polygon points, and
  * Return an array of polygon objects, each with a `regions` property,
  * where each region is an array of points.
  *
- * TODO: finish implementing this function
- *
  * @param {string[]} pathDataStrings
+ * @returns {Array<{ regions: Array<Array<{ x: number, y: number }>} >}
  */
-export function flattenPathDataStrings(pathDataStrings, svgWidth, svgHeight) {
-	// Create a new SVG element node
-	const svgViewBox = [0, 0, svgWidth, svgHeight];
-	const svgElem = buildSvgRootNode(svgViewBox);
+export function flattenPathDataStrings(pathDataStrings) {
+	/**
+	 * Create a new SVG element node. We're not rendering the SVG,
+	 * so the SVG width, height, and viewBox don't matter.
+	 */
+	const svgElem = createSvgElem("svg");
 	// Add <path /> elements for each path data string
 	for (const pathDataString of pathDataStrings) {
 		const pathElem = createSvgElem("path", { d: pathDataString });
@@ -34,24 +35,36 @@ export function flattenPathDataStrings(pathDataStrings, svgWidth, svgHeight) {
 	 * to polygon objects.
 	 */
 	const polygons = polygonsFromFlattenedPaths(flattenSvgResult);
-
 	/**
-	 * Clean up polygon data with ClipperJS
+	 * Clean up polygon data, using ClipperJS.
+	 *
+	 * For ClipperJS documentation, see:
+	 * `simplifyPolygon`: https://sourceforge.net/p/jsclipper/wiki/documentation/#clipperlibclippersimplifypolygon
+	 * `cleanPolygon`: https://sourceforge.net/p/jsclipper/wiki/documentation/#clipperlibclippercleanpolygon
 	 */
 	const polygonsCleaned = polygons.map((polygon) => {
 		/**
-		 * TODO: is reduceClusteredPoints really needed here?
-		 * Feels like it might be duplicative of `cleanRegions`,
-		 * or maybe `simplifyRegions`.
+		 * Note: reduceClusteredPoints is a bit redundant here,
+		 * since cleanRegions() does a lot of the same stuff but better,
+		 * but I had fun writing it, so I'm leaving it in.
 		 */
 		const regionsUnclustered = polygon.regions.map((region) => {
-			return reduceClusteredPoints(region, 2);
+			return reduceClusteredPoints(region, 1);
 		});
+		/**
+		 * cleanRegions() is kind of a more robust version of reduceClusteredPoints,
+		 * removing micro-intersections and vertices that are too close together.
+		 */
 		const regionsCleaned = cleanRegions(regionsUnclustered, 0.2);
+		/**
+		 * simplifyRegions() uses SimplifyPolygons() from ClipperJS,
+		 * to remove self-intersections, which makes the polygons
+		 * much more straightforward to work with in subsequent operations.
+		 */
 		const regionsSimplified = simplifyRegions(regionsCleaned);
 		return { regions: regionsSimplified };
 	});
-	// Return
+	// Return the parsed and cleaned polygon data
 	return polygonsCleaned;
 }
 
@@ -61,18 +74,7 @@ export function flattenPathDataStrings(pathDataStrings, svgWidth, svgHeight) {
  * @returns
  */
 function polygonsFromFlattenedPaths(paths) {
-	/**
-	 * Iterate over the returned paths,
-	 * to produce an array of polygons.
-	 * Each polygon may have many regions (eg shapes with cutouts).
-	 *
-	 * Regions may mean filled or un-filled areas, something to do with
-	 * winding order, I don't fully get it but so far it works...
-	 *
-	 * TODO: split this out... maybe look into an alternative to flattenSVG?
-	 * I imagine ClipperJS might be able to handle the flattening...
-	 * probably worth looking into.
-	 */
+	// Initialize the polygons array
 	const polygons = [];
 	let regions = [];
 	let currentGroupId = null;

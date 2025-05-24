@@ -12,7 +12,9 @@ import { Jimp } from "./jimp/index.js";
  *
  * @param {JimpImage} jimpImage - The source of the image to be processed.
  * @param {Object} settings - The settings for flattening the image.
- * @param {Object | number} settings.padding - The padding to apply to the image.
+ * @param {Object | number} settings.padding - The padding to apply to the
+ * image. If a number is provided, it will be applied to all sides. Otherwise,
+ * and object with { top, left, bottom, right } properties should be provided.
  * @param {number} settings.padding.top - The top padding.
  * @param {number} settings.padding.left - The left padding.
  * @param {number} settings.padding.bottom - The bottom padding.

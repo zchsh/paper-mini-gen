@@ -1,8 +1,8 @@
 // COMMON
-import { getInputAsInt } from "/modules/00-common/get-input-as-int.js";
-import { copyTextToClipboard } from "/modules/00-common/copy-text-to-clipboard.js";
+import { getInputAsInt } from "./00-common/get-input-as-int.js";
+import { copyTextToClipboard } from "./00-common/copy-text-to-clipboard.js";
 // UPLOAD
-import { resetSettings } from "/modules/01-upload/reset-settings.js";
+import { resetSettings } from "./01-upload/reset-settings.js";
 // SILHOUETTE
 import { Jimp } from "./raster-processing/jimp/index.js";
 import { flattenImage } from "./raster-processing/flatten-image.js";
@@ -14,14 +14,14 @@ import { traceImageData } from "./raster-processing/trace-image-data.js";
 import { flattenPathDataStrings } from "./vector-processing/flatten-path-data-strings.js";
 import { svgNodeFromPolygons } from "./render/svg-node-from-polygons.js";
 // OFFSET
-import { applyOffset } from "/modules/vector-processing/apply-offset.js";
+import { applyOffset } from "./vector-processing/apply-offset.js";
 // ARRANGE
 import { arrangeForUnion } from "./layout/arrange-for-union.js";
 import { applyUnion } from "./vector-processing/apply-union.js";
 import { applyLayout } from "./layout/apply-layout.js";
 // GLOBAL STUFF
-import { onImageSelection } from "/modules/01-upload/on-image-selection.js";
-import { updateImage } from "/modules/upload/update-image.js";
+import { onImageSelection } from "./01-upload/on-image-selection.js";
+import { updateImage } from "./upload/update-image.js";
 
 /**
  * TODO: refactor so runAll() can start from specific step.
@@ -54,16 +54,15 @@ async function runAll() {
 	const size = 400;
 	const [scaledImage, scalePreTrace] = await containImage(inputImage, size);
 	// Flatten the image, adding padding to account for potential blurring
-	const padding = Math.ceil(radius * 4);
-	const blurExtension = padding;
-	const imageFlat = await flattenImage(scaledImage, { padding });
+	const blurPadding = Math.ceil(radius * 4);
+	const imageFlat = await flattenImage(scaledImage, { padding: blurPadding });
 	// Apply a blur to the image, if applicable
 	if (radius > 0) imageFlat.blur(radius);
 	// Apply a threshold to the image, creating the silhouette
 	const silhouetteImage = await thresholdImage(imageFlat, threshold);
 	// Render the silhouette image
-	const silhouetteImgElem = document.getElementById("processed-image");
-	silhouetteImgElem.src = await silhouetteImage.getBase64("image/jpeg");
+	const destNodeSilhouette = document.getElementById("processed-image");
+	destNodeSilhouette.src = await silhouetteImage.getBase64("image/jpeg");
 	/**
 	 * Trace the silhouette image data
 	 */
@@ -75,32 +74,31 @@ async function runAll() {
 		traceData.height
 	);
 	// Render the traced polygons
-	const showDebugPoints = true;
 	const viewBoxTraced = [0, 0, traceData.width, traceData.height];
 	const svgPolygonsTraced = svgNodeFromPolygons(polygonsTraced, viewBoxTraced, {
-		showDebug: showDebugPoints,
+		showDebug: true,
 	});
-	const traceDestNode = document.getElementById("trace-svg");
-	traceDestNode.innerHTML = "";
-	traceDestNode.appendChild(svgPolygonsTraced);
+	const destNodeTrace = document.getElementById("trace-svg");
+	destNodeTrace.innerHTML = "";
+	destNodeTrace.appendChild(svgPolygonsTraced);
 	/**
 	 * Offset the traced polygons
 	 */
 	const offset = getInputAsInt("offset");
 	const polygons_offset = applyOffset(polygonsTraced, offset);
 	// Render the offset polygons
-	const offsetDestNode = document.getElementById("offset-svg");
-	const viewBoxModded = [
+	const destNodeOffset = document.getElementById("offset-svg");
+	const viewBoxOffset = [
 		viewBoxTraced[0] - offset,
 		viewBoxTraced[1] - offset,
 		viewBoxTraced[2] + offset * 2,
 		viewBoxTraced[3] + offset * 2,
 	];
-	const svgNodeFlattened = svgNodeFromPolygons(polygons_offset, viewBoxModded, {
+	const svgNodeFlattened = svgNodeFromPolygons(polygons_offset, viewBoxOffset, {
 		showDebug: true,
 	});
-	offsetDestNode.innerHTML = "";
-	offsetDestNode.appendChild(svgNodeFlattened);
+	destNodeOffset.innerHTML = "";
+	destNodeOffset.appendChild(svgNodeFlattened);
 	/**
 	 * Arrange for union
 	 */
@@ -124,7 +122,7 @@ async function runAll() {
 	await applyLayout(
 		polygons_union,
 		{
-			blurExtension,
+			blurPadding,
 			scalePreTrace,
 			scalePostTrace,
 			heightOriginal: sizeOriginal.height,

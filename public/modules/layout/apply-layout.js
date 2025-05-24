@@ -20,7 +20,7 @@ import { createSvgElem } from "/modules/render/create-svg-elem.js";
 export async function applyLayout(
 	polygonObj,
 	{
-		blurExtension,
+		blurPadding,
 		scalePreTrace,
 		scalePostTrace,
 		heightOriginal,
@@ -91,7 +91,7 @@ export async function applyLayout(
 	 * positioning the top image carefully to match the union'd shape.
 	 */
 	const imgScaleFinal = scalePreTrace * scalePostTrace;
-	const scaledPadding = blurExtension * scalePostTrace;
+	const scaledPadding = blurPadding * scalePostTrace;
 	const imgTopX = scaledPadding;
 	const imgTopY = scaledPadding;
 	const imageElem = document.getElementById("raw-image");
