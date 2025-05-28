@@ -20,7 +20,7 @@
 - [x] Split out `flatten-image.js`
 - [x] Split out `resize-image.js`
 
-- [ ] Refactor `traceImage` to accept image data, and yield polygon data
+- [x] Refactor `traceImage` to accept image data, and yield polygon data
   - [x] Experiment with refactoring the tracing part, namely `imagedataToTracedata`
     - Need to construct `ImageData`... see <https://developer.mozilla.org/en-US/docs/Web/API/ImageData/ImageData#dataarray> maybe?
     - `jimpImage.bitmap.data` is a `Buffer` or raw image data...
@@ -31,8 +31,17 @@
   - 2025-05-24 at 16:57 - have swapped in the new tracing flow, still lots of cleanup work to do. For example, need to clean up now-unused files... and might be a nice time to move files that are being used into the new directory structure.
   - 2025-05-24 at 18:36 - continue to clean up `flatten-path-data-strings.js`, specifically working on `polygonsFromFlattenedPaths`
 
+- [ ] Clean up `arrange-for-union.js`
+  - First define what you want the function signature to be... return `polygons` probably?
+
+- [ ] Clean up `apply-layout`
+  - Return value should be SVG string maybe? Haven't thought about it much.
+
 - [ ] Think through new tool layout and workflow
   - Maybe worth doing in Figma? Sketching on paper, as always, probably a nice place to start
+
+- [ ] Clean up `imagetracejs-remixes`
+  - I'm not concerned about this for now, cause it's working fine for my purposes... if I had to worry about abstracting all the cases in which it'd probably break, that'd be another story, but for now I think I can just not care.
 
 ### Later
 

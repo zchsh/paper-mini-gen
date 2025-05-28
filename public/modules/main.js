@@ -67,17 +67,13 @@ async function runAll() {
 	 * Trace the silhouette image data
 	 */
 	const pathomit = getInputAsInt("pathomit");
-	const traceData = await traceImageData(silhouetteImage, pathomit);
-	const polygonsTraced = flattenPathDataStrings(
-		traceData.pathDataStrings,
-		traceData.width,
-		traceData.height
-	);
+	const traceResult = await traceImageData(silhouetteImage, pathomit);
 	// Render the traced polygons
-	const viewBoxTraced = [0, 0, traceData.width, traceData.height];
-	const svgPolygonsTraced = svgNodeFromPolygons(polygonsTraced, viewBoxTraced, {
-		showDebug: true,
-	});
+	const svgPolygonsTraced = svgNodeFromPolygons(
+		traceResult.polygons,
+		traceResult.viewBox,
+		{ showDebug: true }
+	);
 	const destNodeTrace = document.getElementById("trace-svg");
 	destNodeTrace.innerHTML = "";
 	destNodeTrace.appendChild(svgPolygonsTraced);
@@ -85,16 +81,16 @@ async function runAll() {
 	 * Offset the traced polygons
 	 */
 	const offset = getInputAsInt("offset");
-	const polygons_offset = applyOffset(polygonsTraced, offset);
+	const polygonsOffset = applyOffset(traceResult.polygons, offset);
 	// Render the offset polygons
 	const destNodeOffset = document.getElementById("offset-svg");
 	const viewBoxOffset = [
-		viewBoxTraced[0] - offset,
-		viewBoxTraced[1] - offset,
-		viewBoxTraced[2] + offset * 2,
-		viewBoxTraced[3] + offset * 2,
+		traceResult.viewBox[0] - offset,
+		traceResult.viewBox[1] - offset,
+		traceResult.viewBox[2] + offset * 2,
+		traceResult.viewBox[3] + offset * 2,
 	];
-	const svgNodeFlattened = svgNodeFromPolygons(polygons_offset, viewBoxOffset, {
+	const svgNodeFlattened = svgNodeFromPolygons(polygonsOffset, viewBoxOffset, {
 		showDebug: true,
 	});
 	destNodeOffset.innerHTML = "";
@@ -109,7 +105,7 @@ async function runAll() {
 		polygonsArranged,
 		scalePostTrace,
 	} = arrangeForUnion(
-		polygons_offset,
+		polygonsOffset,
 		document.getElementById("arrange-container")
 	);
 	const polygons_union = applyUnion(

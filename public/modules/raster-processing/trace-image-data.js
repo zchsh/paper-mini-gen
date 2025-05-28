@@ -1,4 +1,5 @@
 import { pathDataStringsFromTraceData } from "./imagetracejs-remixes/path-data-strings-from-trace-data.js";
+import { flattenPathDataStrings } from "../vector-processing/flatten-path-data-strings.js";
 
 /**
  * JSDOC type for a loaded Jimp image
@@ -18,9 +19,8 @@ import { pathDataStringsFromTraceData } from "./imagetracejs-remixes/path-data-s
  *
  * @param {JimpImage} pathomit
  * @returns {Promise<{
- * 	pathDataStrings: string[],
- * 	width: number,
- * 	height: number,
+ *  polygons: { regions: [number, number][][] }[],
+ * 	viewBox: [number, number, number, number],
  * }>}
  */
 export async function traceImageData(jimpImage, pathomit) {
@@ -35,6 +35,7 @@ export async function traceImageData(jimpImage, pathomit) {
 		const backgroundColor = { r: 245, g: 245, b: 245, a: 255 };
 		const traceSettings = {
 			pathomit,
+			// I don't have tons of experience with these settings, this seems to work
 			ltres: 1,
 			qtres: 1,
 			colorsampling: 0,
@@ -67,11 +68,18 @@ export async function traceImageData(jimpImage, pathomit) {
 				return !isBackgroundPath && !isHolePath;
 			}
 		);
+		/**
+		 * Convert the path data strings to polygons
+		 *
+		 * Note: this approach probably only works for tracing with the specific
+		 * settings above, with a two-color palette, which includes a background
+		 * color that we ignore and filter out.
+		 */
+		const polygons = flattenPathDataStrings(pathDataStrings);
 		// Resolve with path data strings, and dimensions of the SVG bounds
 		resolve({
-			pathDataStrings,
-			width: traceData.width,
-			height: traceData.height,
+			polygons,
+			viewBox: [0, 0, traceData.width, traceData.height],
 		});
 	});
 }

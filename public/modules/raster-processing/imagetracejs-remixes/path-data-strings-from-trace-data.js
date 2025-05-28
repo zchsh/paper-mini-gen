@@ -76,6 +76,14 @@ function checkoptions(options) {
 	return options;
 } // End of checkoptions()
 
+/**
+ * TODO: write description
+ *
+ * @param {*} tracedata
+ * @param {*} rawOptions
+ * @param {*} includeFunction
+ * @returns
+ */
 export function pathDataStringsFromTraceData(
 	tracedata,
 	rawOptions,
