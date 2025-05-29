@@ -42,6 +42,13 @@
   - Maybe this is a "fillType" thing?
   - <https://sourceforge.net/p/jsclipper/wiki/documentation/#clipperlibclipperexecute>
   - Working in `clipperjs-wrappers/apply-union.js`
+  - 2025-05-29 at 12:39 - cleaned this up, and abunch of other stuff too
+
+- [x] Look into bug with voids in inverted shape
+  - See `notes/2025-05-17-invert-issue-in-dnd-mini-tool.png`
+  - Doesn't seem to be consistent, and not that big a deal anyways
+  - Might make more sense to elimited voids in the final output anyways, pretty sure very few people will wanna go in there with an X-Acto knife... though for bigger pieces of art maybe? Debatable. In any case the maybe-bug doesn't seem that big a deal relative to other cleanup work.
+  - 2025-05-29 at 12:39 - seems fine now with ClipperJS based boolean union approach
 
 - [ ] Clean up `apply-layout`
   - Return value should be SVG string maybe? Haven't thought about it much.
@@ -82,13 +89,6 @@
   - 2025-04-13 at 18:05 - stubbedin `demo-smooth-to-polyline`
   - 2025-05-10 at 10:27 - there's a Figma plugin for this that might be worth trying: <https://www.figma.com/community/plugin/809139536998662893/simplify>. Might make sense to set up "Copy SVG" at every step for debug purposes... then you can test the smoothing process in Figma, see if it works, and if it does and the plugin is licensed appropriately, swipe the code and integrate it here.
   - 2025-05-13 at 09:41 - <https://mourner.github.io/simplify-js/> looks perfect
-
-### Look into bug with voids in inverted shape
-
-- [ ] Look into bug with voids in inverted shape
-  - See `notes/2025-05-17-invert-issue-in-dnd-mini-tool.png`
-  - Doesn't seem to be consistent, and not that big a deal anyways
-  - Might make more sense to elimited voids in the final output anyways, pretty sure very few people will wanna go in there with an X-Acto knife... though for bigger pieces of art maybe? Debatable. In any case the maybe-bug doesn't seem that big a deal relative to other cleanup work.
 
 #### Consider post-trace option to "remove interior voids"
   
