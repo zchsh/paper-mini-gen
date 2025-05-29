@@ -17,7 +17,7 @@ const MM_PER_INCH = 25.4;
  *
  * TODO: finish and clean up below
  */
-export function arrangeForUnion(polygons, targetContainer) {
+export function arrangeForUnion(polygons) {
 	/**
 	 * Split out the below
 	 * Generate circular base shapes around the polygons
@@ -53,6 +53,10 @@ export function arrangeForUnion(polygons, targetContainer) {
 
 	// Add X and Y offset. Note that we move the "base" pieces,
 	// and leave the original piece in place.
+	/**
+	 * TODO: consider how baseCenters is used elsewhere...
+	 * maybe worth trying out different ways of splitting things out?
+	 */
 	const baseCenters = rawBaseCenters.map(([x, y]) => {
 		return [x - arrangeOffsetX, y + arrangeOffsetY];
 	});
@@ -94,15 +98,6 @@ export function arrangeForUnion(polygons, targetContainer) {
 		circleBase,
 		circleBaseBottom,
 	];
-
-	/**
-	 * Split out the below - rendering the polygons
-	 */
-	const viewBoxPadding = 9; // 1/8 inch
-	const viewBox = getFallbackViewBox(polygonsArranged, viewBoxPadding);
-	const svgNodeArranged = svgNodeFromPolygons(polygonsArranged, viewBox);
-	targetContainer.innerHTML = "";
-	targetContainer.appendChild(svgNodeArranged);
 
 	return {
 		baseCenters,

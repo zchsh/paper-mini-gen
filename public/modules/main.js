@@ -23,6 +23,7 @@ import { applyLayout } from "./layout/apply-layout.js";
 import { onImageSelection } from "./01-upload/on-image-selection.js";
 import { updateImage } from "./upload/update-image.js";
 import { scaleToTargetHeight } from "./layout/scale-to-target-height.js";
+import { getFallbackViewBox } from "./render/get-fallback-viewbox.js";
 
 /**
  * TODO: refactor so runAll() can start from specific step.
@@ -108,10 +109,23 @@ async function runAll() {
 	 * Arrange for union
 	 */
 	const { baseCenters, baseOverlap, baseSize, polygonsArranged } =
-		arrangeForUnion(
-			polygonsScaled,
-			document.getElementById("arrange-container")
-		);
+		arrangeForUnion(polygonsScaled);
+	/**
+	 * Render the arranged polygons
+	 */
+	const arrangeContainer = document.getElementById("arrange-container");
+	const viewBoxArrangePadding = 9; // 1/8 inch
+	const viewBoxArrange = getFallbackViewBox(
+		polygonsArranged,
+		viewBoxArrangePadding
+	);
+	const svgNodeArranged = svgNodeFromPolygons(polygonsArranged, viewBoxArrange);
+	arrangeContainer.innerHTML = "";
+	arrangeContainer.appendChild(svgNodeArranged);
+
+	/**
+	 * Apply union to the arranged polygons
+	 */
 	const polygons_union = applyUnion(
 		polygonsArranged,
 		"union-container"
