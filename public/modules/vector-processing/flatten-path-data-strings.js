@@ -2,6 +2,7 @@ import { createSvgElem } from "../render/create-svg-elem.js";
 import { reduceClusteredPoints } from "../03-trace/reduce-clustered-points.js";
 import { cleanRegions } from "../clipperjs-wrappers/clean-regions.js";
 import { simplifyRegions } from "../clipperjs-wrappers/simplify-regions.js";
+import { flattenSVG } from "./flatten-svg/svg-to-paths.js";
 
 /**
  * Given an array of path data strings, as well as a width and height

@@ -1,5 +1,6 @@
 import { pathDataStringsFromTraceData } from "./imagetracejs-remixes/path-data-strings-from-trace-data.js";
 import { flattenPathDataStrings } from "../vector-processing/flatten-path-data-strings.js";
+import ImageTracer from "./imagetracejs-remixes/imagetracer_v1.2.6_module.js";
 
 /**
  * JSDOC type for a loaded Jimp image
