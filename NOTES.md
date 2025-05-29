@@ -100,6 +100,12 @@
 - May remove need for roundtrip through `<svg>` element, which I think is currently being done?
 - As with other steps... data transformation happens outside the DOM, rendering to DOM is a convenience that happens in the browser
 
+#### Consider alternate approach to offsetting shapes
+
+As-is, traced polygons are centered with "offset" based on their bounding box... which kind of works, but feels like it could be better.
+
+What if you found the "center of mass" of the incoming polygon, and used that as a "base" offset? The input offset could be applied on top of that "base" offset.
+
 #### Look into performance
 
 - Seems way worse on my M1 laptop than on M1 mac mini... why?

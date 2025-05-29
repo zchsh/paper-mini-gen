@@ -9,37 +9,30 @@ import {
 	visitPointsPolygon,
 } from "/modules/05-arrange/visit-points.js";
 
+const PIXELS_PER_INCH = 72;
+const MM_PER_INCH = 25.4;
+
 /**
  * ARRANGEMENT
  *
  * TODO: finish and clean up below
  */
-export function arrangeForUnion(rawPolygons, targetContainer) {
-	// Determine the scale factor to meet the target height in mm
-	const PIXELS_PER_INCH = 72;
-	const MM_PER_INCH = 25.4;
-	const rawPoints = rawPolygons.map((p) => p.regions.flat()).flat();
-	const rawBoundingBox = getBoundingPoints(rawPoints);
-	const rawHeight = rawBoundingBox.maxY - rawBoundingBox.minY;
-	const rawHeightMm = (rawHeight / PIXELS_PER_INCH) * MM_PER_INCH;
-	const heightInputMm = getInputAsInt("heightMm");
-	// Scale the polygons about the 0,0 origin
-	const scalePostTrace = heightInputMm / rawHeightMm;
-	const polygons = visitPoints(rawPolygons, ([x, y]) => {
-		return [x * scalePostTrace, y * scalePostTrace];
-	});
-
-	const allPoints = polygons.map((p) => p.regions.flat()).flat();
-	const { minX, minY, maxX, maxY } = getBoundingPoints(allPoints);
+export function arrangeForUnion(polygons, targetContainer) {
+	/**
+	 * Split out the below
+	 * Generate circular base shapes around the polygons
+	 */
+	const baseSizeMm = getInputAsInt("baseSizeMm");
+	const points = polygons.map((p) => p.regions.flat()).flat();
+	const { minX, minY, maxX, maxY } = getBoundingPoints(points);
 
 	const boundingHeight = maxY - minY;
-	const boundingWidth = maxX - minX;
 	const boundingCenterX = (minX + maxX) / 2;
 
 	const originalBottom = minY + boundingHeight;
 
 	// Add some circular polygons for the base and stuff
-	const baseSizeMm = getInputAsInt("baseSizeMm");
+
 	const baseSize = baseSizeMm * (PIXELS_PER_INCH / MM_PER_INCH);
 	const baseOverlap = Math.ceil(baseSize / 10);
 
@@ -49,18 +42,17 @@ export function arrangeForUnion(rawPolygons, targetContainer) {
 		[boundingCenterX, originalBottom + (baseSize - baseOverlap) * 2],
 	];
 
-	// Add X and Y offset. Note that we move the "base" pieces,
-	// and leave the original piece in place.
 	/**
-	 * TODO: neat idea... what if you found the "center of mass"
-	 * of the incoming polygon, and used that as a "base" offset?
-	 * The input offset would be applied on top of that "base" offset.
-	 * As-is, polygons are centered based on bounding boxes... which is
-	 * a little bit different!
+	 * Split out the below
+	 * Apply arrangement offset to the base centers
+	 *
+	 * NOTE: that arrangeOffsetY is also applied to the reflected polygons.
 	 */
 	const arrangeOffsetX = getInputAsInt("arrangeOffsetX");
 	const arrangeOffsetY = getInputAsInt("arrangeOffsetY");
 
+	// Add X and Y offset. Note that we move the "base" pieces,
+	// and leave the original piece in place.
 	const baseCenters = rawBaseCenters.map(([x, y]) => {
 		return [x - arrangeOffsetX, y + arrangeOffsetY];
 	});
@@ -75,7 +67,12 @@ export function arrangeForUnion(rawPolygons, targetContainer) {
 		regions: [createCircularPolygon(baseSize / 2, 24, baseCenters[2])],
 	};
 
-	// Add a reflected duplicate for the "other side"
+	//
+
+	/**
+	 * Split out the below
+	 * Add a reflected duplicate for the "other side"
+	 */
 	const rawReflection = visitPoints(polygons, ([x, y]) => {
 		return [x, y * -1];
 	});
@@ -86,6 +83,10 @@ export function arrangeForUnion(rawPolygons, targetContainer) {
 		return [x, y + offset];
 	});
 
+	/**
+	 * Split out the below - combining the polygons
+	 * and the circular bases into one big array of polygons
+	 */
 	const polygonsArranged = [
 		...polygons,
 		...translatePolygons(polygonsReflected, [0, arrangeOffsetY * 2]),
@@ -94,8 +95,10 @@ export function arrangeForUnion(rawPolygons, targetContainer) {
 		circleBaseBottom,
 	];
 
+	/**
+	 * Split out the below - rendering the polygons
+	 */
 	const viewBoxPadding = 9; // 1/8 inch
-
 	const viewBox = getFallbackViewBox(polygonsArranged, viewBoxPadding);
 	const svgNodeArranged = svgNodeFromPolygons(polygonsArranged, viewBox);
 	targetContainer.innerHTML = "";
@@ -106,7 +109,6 @@ export function arrangeForUnion(rawPolygons, targetContainer) {
 		baseOverlap,
 		baseSize,
 		polygonsArranged,
-		scalePostTrace,
 	};
 }
 

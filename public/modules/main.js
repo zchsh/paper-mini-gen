@@ -22,6 +22,7 @@ import { applyLayout } from "./layout/apply-layout.js";
 // GLOBAL STUFF
 import { onImageSelection } from "./01-upload/on-image-selection.js";
 import { updateImage } from "./upload/update-image.js";
+import { scaleToTargetHeight } from "./layout/scale-to-target-height.js";
 
 /**
  * TODO: refactor so runAll() can start from specific step.
@@ -96,18 +97,21 @@ async function runAll() {
 	destNodeOffset.innerHTML = "";
 	destNodeOffset.appendChild(svgNodeFlattened);
 	/**
+	 * Scale the polygons to a target height
+	 */
+	const heightInputMm = getInputAsInt("heightMm");
+	const [polygonsScaled, scalePostTrace] = scaleToTargetHeight(
+		polygonsOffset,
+		heightInputMm
+	);
+	/**
 	 * Arrange for union
 	 */
-	const {
-		baseCenters,
-		baseOverlap,
-		baseSize,
-		polygonsArranged,
-		scalePostTrace,
-	} = arrangeForUnion(
-		polygonsOffset,
-		document.getElementById("arrange-container")
-	);
+	const { baseCenters, baseOverlap, baseSize, polygonsArranged } =
+		arrangeForUnion(
+			polygonsScaled,
+			document.getElementById("arrange-container")
+		);
 	const polygons_union = applyUnion(
 		polygonsArranged,
 		"union-container"
