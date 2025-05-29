@@ -18,14 +18,14 @@ import { createSvgElem } from "/modules/render/create-svg-elem.js";
  * outline.
  */
 export async function applyLayout(
-	polygonObj,
+	polygons,
 	{ blurPadding, scalePreTrace, scalePostTrace, sizeOriginal, baseData },
 	renderId
 ) {
 	const OUTLINE_COLOR = "#DDDDDD";
 
-	const viewBox = getFallbackViewBox([polygonObj], 9);
-	const pathStrings = [polygonObj].map((polygon) => {
+	const viewBox = getFallbackViewBox(polygons, 9);
+	const pathStrings = polygons.map((polygon) => {
 		return pathDataStringFromRegions(polygon.regions);
 	});
 

@@ -131,13 +131,19 @@ async function runAll() {
 	/**
 	 * Apply union to the arranged polygons
 	 */
-	const polygons_union = applyUnion(
-		polygonsArranged,
-		"union-container"
-		// "union-shapes-debug",
-		// "union-arrange-debug"
-	);
-	// TODO: grab polygon width and height, probs from "arrange for union"
+	const outline_union = applyUnion(polygonsArranged);
+	const polygons_union = [outline_union];
+	// Render the unioned polygons
+	const unionViewBox = getFallbackViewBox(polygons_union, 9);
+	const unionSvgNode = svgNodeFromPolygons(polygons_union, unionViewBox);
+	const unionContainer = document.getElementById("union-container");
+	unionContainer.innerHTML = "";
+	unionContainer.appendChild(unionSvgNode);
+	/**
+	 * Layout the outline union shape with final print elements,
+	 * including the original image, a reverse-side image,
+	 * the outline union shape, and fold lines.
+	 */
 	await applyLayout(
 		polygons_union,
 		{
