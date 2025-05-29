@@ -34,6 +34,10 @@
 - [x] Clean up `arrange-for-union.js`
   - First define what you want the function signature to be... return `polygons` probably?
 
+- [x] Clean up `apply-union`
+
+- [ ] Try swapping an `apply-union` function that uses `ClipperJS`
+
 - [ ] Clean up `apply-layout`
   - Return value should be SVG string maybe? Haven't thought about it much.
 
