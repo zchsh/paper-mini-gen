@@ -50,7 +50,7 @@
   - Might make more sense to elimited voids in the final output anyways, pretty sure very few people will wanna go in there with an X-Acto knife... though for bigger pieces of art maybe? Debatable. In any case the maybe-bug doesn't seem that big a deal relative to other cleanup work.
   - 2025-05-29 at 12:39 - seems fine now with ClipperJS based boolean union approach
 
-- [ ] Clean up `apply-layout`
+- [x] Clean up `apply-layout`
   - Return value should be SVG string maybe? Haven't thought about it much.
 
 - [ ] Think through new tool layout and workflow

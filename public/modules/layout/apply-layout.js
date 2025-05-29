@@ -1,58 +1,72 @@
-// COMMON
 import { pathDataStringFromRegions } from "../render/path-data-string-from-regions.js";
 import { getFallbackViewBox } from "../render/get-fallback-viewbox.js";
 import { createSvgElem } from "../render/create-svg-elem.js";
 
+const OUTLINE_COLOR = "#DDDDDD";
+
 /**
- * TODO: clean this up, haven't touched it since prototyping
+ * Given a set of polygons representing the outline of a cutout shape,
+ * an HTMLImageElement containing the original image artwork, and
+ * options for the layout, this function assembles and
+ * Returns an SVG element that represents the final layout art for
+ * printing a paper miniature.
  *
- * THINKING THROUGH POSITIONING...
- *
- * - image is scaled to fit 400 x 400
- * - image is padded with (radius * 4) pixels on all sides
- * - image is traced
- * - image is offset, viewBox is altered to account for offset
- * - ... arrangement, should affect position of top image
- *
- * Need to position the top image so that it's in the same place as the traced
- * outline.
+ * @param {{ regions: [number, number][][] }[]} outlinePolygons - The polygons
+ * representing the outline of the cutout shape.
+ * @param {Object} imgData - The original artwork image data.
+ * @param {string} imgData.dataUrl - The data URL of the original image.
+ * @param {number} imgData.width - The width of the original image in pixels.
+ * @param {number} imgData.height - The height of the original image in pixels.
+ * @param {Object} options - Options for the layout
+ * @param {number} options.blurPadding - The padding we applied to the original
+ * image to prevent blurring artifacts during tracing.
+ * @param {number} options.scalePreTrace - The scale factor applied to the
+ * original image before tracing.
+ * @param {number} options.scalePostTrace - The scale factor applied to the
+ * original image after tracing, to match the height set by the user.
+ * @param {Object} options.sizeOriginal - The pixel size of the original image,
+ * containing `width` and `height` properties.
+ * @param {Object} options.baseData - Data about the base size and arrangement.
+ * This includes, in pixels, the `size` of each base and the  `overlap` between
+ * bases, as well as an array of `centers` for the bases, which are each
+ * represented as `[x, y]` coordinates.
+ * @returns {Promise<SVGElement>} The SVG element with the final layout art.
  */
 export async function applyLayout(
-	polygons,
-	{ blurPadding, scalePreTrace, scalePostTrace, sizeOriginal, baseData },
-	renderId
+	outlinePolygons,
+	imgData,
+	{ blurPadding, scalePreTrace, scalePostTrace, sizeOriginal, baseData }
 ) {
-	const OUTLINE_COLOR = "#DDDDDD";
-
-	const viewBox = getFallbackViewBox(polygons, 9);
-	const pathStrings = polygons.map((polygon) => {
-		return pathDataStringFromRegions(polygon.regions);
-	});
-
-	// Set up the SVG node
-	// const [minX, minY, svgWidth, svgHeight] = viewBox;
-	const DEV_PADDING = 0;
-	const [minX, minY, svgWidth, svgHeight] = [
-		viewBox[0] - DEV_PADDING,
-		viewBox[1] - DEV_PADDING,
-		viewBox[2] + DEV_PADDING * 2,
-		viewBox[3] + DEV_PADDING * 2,
-	];
+	/**
+	 * Set up the parent SVG container
+	 */
+	// Add 9 pixels of padding to the viewBox, so borders don't bleed out
+	const [minX, minY, svgWidth, svgHeight] = getFallbackViewBox(
+		outlinePolygons,
+		9
+	);
 	const svgNode = createSvgElem("svg", {
 		width: svgWidth,
 		height: svgHeight,
 		viewBox: `${minX} ${minY} ${svgWidth} ${svgHeight}`,
 	});
-
-	// Set up path nodes, representing the traced, offset, & union'd shapes
-	const pathsUnionBackground = pathStrings.map((pathString) => {
+	/**
+	 * Set up shapes based on the cut-out outline
+	 */
+	// Convert the outline polygons to path data strings
+	const outlinePathStrings = outlinePolygons.map((polygon) => {
+		return pathDataStringFromRegions(polygon.regions);
+	});
+	// Use the outline shape for a white background
+	const outlineBackground = outlinePathStrings.map((pathString) => {
 		return createSvgElem("path", {
 			"fill-rule": "nonzero",
 			fill: "white",
 			d: pathString,
 		});
 	});
-	const pathsUnionOutline = pathStrings.map((pathString) => {
+	// Use the outline shape for a gray cutting line
+	const outlineCutLine = outlinePathStrings.map((pathString) => {
 		return createSvgElem("path", {
 			"fill-rule": "nonzero",
 			fill: "none",
@@ -64,13 +78,16 @@ export async function applyLayout(
 			d: pathString,
 		});
 	});
-
-	// Set up a clip-path, using the union'd shape
-	const clipPathUnion = createSvgElem("clipPath", {
-		id: "unionclip",
-	});
-	clipPathUnion.append(
-		...pathStrings.map((pathString) => {
+	/**
+	 * Use the outline shape for a clipping path.
+	 *
+	 * We'll place the original image artwork within this clip path,
+	 * which will prevent the image from bleeding outside the outline shape.
+	 */
+	const outlineClipPathId = "unionClipPath";
+	const outlineClipPath = createSvgElem("clipPath", { id: outlineClipPathId });
+	outlineClipPath.append(
+		...outlinePathStrings.map((pathString) => {
 			return createSvgElem("path", {
 				"fill-rule": "nonzero",
 				fill: "white",
@@ -79,26 +96,32 @@ export async function applyLayout(
 		})
 	);
 	/**
-	 * Grab the image element, embed into the SVG,
-	 * positioning the top image carefully to match the union'd shape.
+	 * Position the top image.
+	 *
+	 * We do some finicky positioning here to ensure the position of
+	 * the top image matches the position of the outline shape.
 	 */
 	const imgScaleFinal = scalePreTrace * scalePostTrace;
 	const scaledPadding = blurPadding * scalePostTrace;
-	const imgTopX = scaledPadding;
-	const imgTopY = scaledPadding;
-	const imageElem = document.getElementById("raw-image");
-	const svgImageTop = await getImageNode(imageElem, imgScaleFinal, {
-		x: imgTopX,
-		y: imgTopY,
-		style: "opacity: 1;",
+	const imgTopPosn = { x: scaledPadding, y: scaledPadding };
+	// const svgImageTop = await buildImageNode(
+	// 	imageElem,
+	// 	imgScaleFinal,
+	// 	imgTopPosn
+	// );
+	const svgImageTop = createSvgElem("image", {
+		"xlink:href": imgData.dataUrl,
+		width: imgData.width * imgScaleFinal,
+		height: imgData.height * imgScaleFinal,
+		x: imgTopPosn.x,
+		y: imgTopPosn.y,
 	});
-
 	/**
 	 * Position the bottom image, as with the top image.
 	 */
 	/**
-	 * The final image height is the original image height, scaled
-	 * by the scale factors applied before tracing and during arrangement.
+	 * The final image height is the original image height, scaled by the
+	 * combined scale factors applied before tracing and during arrangement.
 	 */
 	const imgHeightFinal = sizeOriginal.height * imgScaleFinal;
 	/**
@@ -106,7 +129,7 @@ export async function applyLayout(
 	 * of the top image and the fold line for the top image.
 	 */
 	const foldLineTopY = baseData.centers[0][1];
-	const imgTopLowerY = imgTopY + imgHeightFinal;
+	const imgTopLowerY = imgTopPosn.y + imgHeightFinal;
 	const imgFloatDistance = foldLineTopY - imgTopLowerY;
 	/**
 	 * The imgBottomBaseOffset is the distance between the top fold line
@@ -116,9 +139,9 @@ export async function applyLayout(
 	 */
 	const imgBottomBaseOffset = 2.0 * baseData.size - 2.0 * baseData.overlap;
 	/**
-	 * imgTopY + boundingHeight + imgBottomBaseOffset + arrangeOffsetY
+	 * imgTopPosn.y + boundingHeight + imgBottomBaseOffset + arrangeOffsetY
 	 *
-	 * - imgTopY would result in the bottom image being positioned in the
+	 * - imgTopPosn.y would result in the bottom image being positioned in the
 	 *   same place as the top image.
 	 * - + imgHeightFinal aligns the top of the bottom image with the
 	 * 	 bottom of the top image. At this point, the bottom image should be
@@ -131,8 +154,7 @@ export async function applyLayout(
 	 *   to the bottom fold as it was to the top fold.
 	 */
 	const imgBottomY =
-		imgTopY + imgHeightFinal + imgFloatDistance * 2 + imgBottomBaseOffset;
-
+		imgTopPosn.y + imgHeightFinal + imgFloatDistance * 2 + imgBottomBaseOffset;
 	/**
 	 * When we reflect the image, it's reflected about the origin point (0,0).
 	 * This means the image is flipped up way outside the viewbox. To compensate,
@@ -143,104 +165,54 @@ export async function applyLayout(
 	 * https://developer.mozilla.org/en-US/docs/Web/SVG/Reference/Attribute/transform-origin
 	 */
 	const imgBottomReflectionTranslate = -1 * (imgBottomY * 2 + imgHeightFinal);
-	const svgImageBottom = await getImageNode(imageElem, imgScaleFinal, {
-		transform: `scale(1, -1) translate(0, ${imgBottomReflectionTranslate})`,
-		x: imgTopX,
+	const svgImageBottom = createSvgElem("image", {
+		"xlink:href": imgData.dataUrl,
+		width: imgData.width * imgScaleFinal,
+		height: imgData.height * imgScaleFinal,
+		x: imgTopPosn.x,
 		y: imgBottomY,
+		transform: `scale(1, -1) translate(0, ${imgBottomReflectionTranslate})`,
 	});
-
 	/**
-	 * Build a group for the two images, which includes a clip-path
+	 * Build a group for the "top" and "bottom" images. This group includes
+	 * a reference to the outline clip path we created earlier.
 	 */
 	const svgGroupImages = createSvgElem("g", {
-		"clip-path": "url(#unionclip)",
+		"clip-path": `url(#${outlineClipPathId})`,
 	});
-
 	/**
-	 * Add some dotted lines to the SVG
+	 * Add some dotted lines to the SVG, indicating where to fold the paper
 	 */
+	const dottedLineStyle = {
+		stroke: OUTLINE_COLOR,
+		"stroke-width": 0.5,
+		"stroke-dasharray": "2, 2",
+	};
 	const dottedLineTop = createSvgElem("line", {
 		x1: baseData.centers[0][0] - baseData.size / 2,
 		y1: baseData.centers[0][1],
 		x2: baseData.centers[0][0] + baseData.size / 2,
 		y2: baseData.centers[0][1],
-		stroke: OUTLINE_COLOR,
-		"stroke-width": 0.5,
-		"stroke-dasharray": "2, 2",
+		...dottedLineStyle,
 	});
 	const dottedLineBottom = createSvgElem("line", {
 		x1: baseData.centers[2][0] - baseData.size / 2,
 		y1: baseData.centers[2][1],
 		x2: baseData.centers[2][0] + baseData.size / 2,
 		y2: baseData.centers[2][1],
-		stroke: OUTLINE_COLOR,
-		"stroke-width": 0.5,
-		"stroke-dasharray": "2, 2",
+		...dottedLineStyle,
 	});
 	/**
-	 * Build and render the SVG
+	 * Build the final SVG node
 	 */
-	svgNode.appendChild(clipPathUnion);
-	svgNode.append(...pathsUnionBackground);
+	svgNode.appendChild(outlineClipPath);
+	svgNode.append(...outlineBackground);
 	svgGroupImages.appendChild(svgImageTop);
 	svgGroupImages.appendChild(svgImageBottom);
 	svgNode.appendChild(svgGroupImages);
-	svgNode.append(...pathsUnionOutline);
-	// svgNode.append(...pathsDebugUnion);
+	svgNode.append(...outlineCutLine);
 	svgNode.appendChild(dottedLineTop);
 	svgNode.appendChild(dottedLineBottom);
-
-	const renderElem = document.getElementById(renderId);
-	renderElem.innerHTML = "";
-	renderElem.appendChild(svgNode);
-}
-
-function toDataUrl(url) {
-	return new Promise((resolve, reject) => {
-		fetch(url)
-			.then((response) => response.blob())
-			.then((blob) => {
-				const reader = new FileReader();
-				reader.onloadend = () => resolve(reader.result);
-				reader.onerror = reject;
-				reader.readAsDataURL(blob);
-			});
-	});
-}
-
-async function getImageNode(
-	imageElem,
-	scale,
-	moreAttributes = {},
-	debugFill = null,
-	debugStroke = null
-) {
-	const imgSrc = imageElem.getAttribute("src");
-	const imgDataUrl = await toDataUrl(imgSrc);
-	const imgHeight = imageElem.naturalHeight;
-	const imgWidth = imageElem.naturalWidth;
-	const imgNode = createSvgElem("image", {
-		width: imgWidth * scale,
-		height: imgHeight * scale,
-		"xlink:href": imgDataUrl,
-		...moreAttributes,
-	});
-	//
-	if (debugFill === null && debugStroke === null) {
-		return imgNode;
-	}
-	//
-	const groupNode = createSvgElem("g");
-	const devOutlineNode = createSvgElem("rect", {
-		x: moreAttributes.x,
-		y: moreAttributes.y,
-		width: imgWidth * scale,
-		height: imgHeight * scale,
-		fill: debugFill,
-		stroke: debugStroke,
-		"stroke-width": 0.5,
-	});
-	groupNode.appendChild(imgNode);
-	groupNode.appendChild(devOutlineNode);
-	return groupNode;
+	// Return the final SVG node
+	return svgNode;
 }

@@ -18,6 +18,7 @@ import { applyOffset } from "./vector-processing/apply-offset.js";
 import { arrangeForUnion } from "./layout/arrange-for-union.js";
 import { applyUnion } from "./vector-processing/clipperjs-wrappers/apply-union.js";
 import { applyLayout } from "./layout/apply-layout.js";
+import { toDataUrl } from "./render/to-data-url.js";
 // GLOBAL STUFF
 import { onImageSelection } from "./ui/on-image-selection.js";
 import { updateImage } from "./upload/update-image.js";
@@ -144,17 +145,23 @@ async function runAll() {
 	 * including the original image, a reverse-side image,
 	 * the outline union shape, and fold lines.
 	 */
-	await applyLayout(
-		polygons_union,
-		{
-			blurPadding,
-			scalePreTrace,
-			scalePostTrace,
-			sizeOriginal,
-			baseData,
-		},
-		"layout-container"
-	);
+	const imageElem = document.getElementById("raw-image");
+	const imgData = {
+		dataUrl: await toDataUrl(imageElem.getAttribute("src")),
+		height: imageElem.naturalHeight,
+		width: imageElem.naturalWidth,
+	};
+	const finalSvgElem = await applyLayout(polygons_union, imgData, {
+		blurPadding,
+		scalePreTrace,
+		scalePostTrace,
+		sizeOriginal,
+		baseData,
+	});
+	// Render the final SVG layout
+	const finalContainer = document.getElementById("layout-container");
+	finalContainer.innerHTML = "";
+	finalContainer.appendChild(finalSvgElem);
 }
 
 async function resetAndRunAll() {
