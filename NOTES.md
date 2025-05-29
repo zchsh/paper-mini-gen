@@ -31,7 +31,7 @@
   - 2025-05-24 at 16:57 - have swapped in the new tracing flow, still lots of cleanup work to do. For example, need to clean up now-unused files... and might be a nice time to move files that are being used into the new directory structure.
   - 2025-05-24 at 18:36 - continue to clean up `flatten-path-data-strings.js`, specifically working on `polygonsFromFlattenedPaths`
 
-- [ ] Clean up `arrange-for-union.js`
+- [x] Clean up `arrange-for-union.js`
   - First define what you want the function signature to be... return `polygons` probably?
 
 - [ ] Clean up `apply-layout`

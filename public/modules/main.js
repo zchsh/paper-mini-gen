@@ -11,7 +11,6 @@ import { thresholdImage } from "./raster-processing/threshold-image.js";
 import { getImageSize } from "./raster-processing/get-image-size.js";
 // TRACE
 import { traceImageData } from "./raster-processing/trace-image-data.js";
-import { flattenPathDataStrings } from "./vector-processing/flatten-path-data-strings.js";
 import { svgNodeFromPolygons } from "./render/svg-node-from-polygons.js";
 // OFFSET
 import { applyOffset } from "./vector-processing/apply-offset.js";
@@ -106,12 +105,19 @@ async function runAll() {
 		heightInputMm
 	);
 	/**
-	 * Arrange for union
+	 * Arrange the offset trace and base shapes for a union operation.
+	 * This union shape will be the cut-out outline for the paper miniature.
 	 */
-	const { baseCenters, baseOverlap, baseSize, polygonsArranged } =
-		arrangeForUnion(polygonsScaled);
+	const baseSizeMm = getInputAsInt("baseSizeMm");
+	const arrangeOffsetX = getInputAsInt("arrangeOffsetX");
+	const arrangeOffsetY = getInputAsInt("arrangeOffsetY");
+	const [polygonsArranged, baseData] = arrangeForUnion(polygonsScaled, {
+		baseSizeMm,
+		arrangeOffsetX,
+		arrangeOffsetY,
+	});
 	/**
-	 * Render the arranged polygons
+	 * Render the shapes arranged for a union
 	 */
 	const arrangeContainer = document.getElementById("arrange-container");
 	const viewBoxArrangePadding = 9; // 1/8 inch
@@ -122,7 +128,6 @@ async function runAll() {
 	const svgNodeArranged = svgNodeFromPolygons(polygonsArranged, viewBoxArrange);
 	arrangeContainer.innerHTML = "";
 	arrangeContainer.appendChild(svgNodeArranged);
-
 	/**
 	 * Apply union to the arranged polygons
 	 */
@@ -139,10 +144,8 @@ async function runAll() {
 			blurPadding,
 			scalePreTrace,
 			scalePostTrace,
-			heightOriginal: sizeOriginal.height,
-			baseSize,
-			baseOverlap,
-			baseCenters,
+			sizeOriginal,
+			baseData,
 		},
 		"layout-container"
 	);

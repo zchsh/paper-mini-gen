@@ -19,15 +19,7 @@ import { createSvgElem } from "/modules/render/create-svg-elem.js";
  */
 export async function applyLayout(
 	polygonObj,
-	{
-		blurPadding,
-		scalePreTrace,
-		scalePostTrace,
-		heightOriginal,
-		baseSize,
-		baseOverlap,
-		baseCenters,
-	},
+	{ blurPadding, scalePreTrace, scalePostTrace, sizeOriginal, baseData },
 	renderId
 ) {
 	const OUTLINE_COLOR = "#DDDDDD";
@@ -108,12 +100,12 @@ export async function applyLayout(
 	 * The final image height is the original image height, scaled
 	 * by the scale factors applied before tracing and during arrangement.
 	 */
-	const imgHeightFinal = heightOriginal * imgScaleFinal;
+	const imgHeightFinal = sizeOriginal.height * imgScaleFinal;
 	/**
 	 * The "float distance" is the distance between the bottom edge
 	 * of the top image and the fold line for the top image.
 	 */
-	const foldLineTopY = baseCenters[0][1];
+	const foldLineTopY = baseData.centers[0][1];
 	const imgTopLowerY = imgTopY + imgHeightFinal;
 	const imgFloatDistance = foldLineTopY - imgTopLowerY;
 	/**
@@ -122,7 +114,7 @@ export async function applyLayout(
 	 * (half the top "base", the middle base, and half the bottom base), minus
 	 * the overlap between bases (which occurs twice between the three bases).
 	 */
-	const imgBottomBaseOffset = 2.0 * baseSize - 2.0 * baseOverlap;
+	const imgBottomBaseOffset = 2.0 * baseData.size - 2.0 * baseData.overlap;
 	/**
 	 * imgTopY + boundingHeight + imgBottomBaseOffset + arrangeOffsetY
 	 *
@@ -168,19 +160,19 @@ export async function applyLayout(
 	 * Add some dotted lines to the SVG
 	 */
 	const dottedLineTop = createSvgElem("line", {
-		x1: baseCenters[0][0] - baseSize / 2,
-		y1: baseCenters[0][1],
-		x2: baseCenters[0][0] + baseSize / 2,
-		y2: baseCenters[0][1],
+		x1: baseData.centers[0][0] - baseData.size / 2,
+		y1: baseData.centers[0][1],
+		x2: baseData.centers[0][0] + baseData.size / 2,
+		y2: baseData.centers[0][1],
 		stroke: OUTLINE_COLOR,
 		"stroke-width": 0.5,
 		"stroke-dasharray": "2, 2",
 	});
 	const dottedLineBottom = createSvgElem("line", {
-		x1: baseCenters[2][0] - baseSize / 2,
-		y1: baseCenters[2][1],
-		x2: baseCenters[2][0] + baseSize / 2,
-		y2: baseCenters[2][1],
+		x1: baseData.centers[2][0] - baseData.size / 2,
+		y1: baseData.centers[2][1],
+		x2: baseData.centers[2][0] + baseData.size / 2,
+		y2: baseData.centers[2][1],
 		stroke: OUTLINE_COLOR,
 		"stroke-width": 0.5,
 		"stroke-dasharray": "2, 2",
