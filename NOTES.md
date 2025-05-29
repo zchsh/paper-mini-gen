@@ -37,6 +37,11 @@
 - [x] Clean up `apply-union`
 
 - [ ] Try swapping an `apply-union` function that uses `ClipperJS`
+  - Started... but struggling with proper intersection, currently inverted
+  - How are the `subj` vs `objs` clips supposed to work... maybe they can all be `subj`?
+  - Maybe this is a "fillType" thing?
+  - <https://sourceforge.net/p/jsclipper/wiki/documentation/#clipperlibclipperexecute>
+  - Working in `clipperjs-wrappers/apply-union.js`
 
 - [ ] Clean up `apply-layout`
   - Return value should be SVG string maybe? Haven't thought about it much.

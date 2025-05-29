@@ -17,6 +17,7 @@ import { applyOffset } from "./vector-processing/apply-offset.js";
 // ARRANGE
 import { arrangeForUnion } from "./layout/arrange-for-union.js";
 import { applyUnion } from "./vector-processing/apply-union.js";
+// import { applyUnion } from "./clipperjs-wrappers/apply-union.js";
 import { applyLayout } from "./layout/apply-layout.js";
 // GLOBAL STUFF
 import { onImageSelection } from "./01-upload/on-image-selection.js";
