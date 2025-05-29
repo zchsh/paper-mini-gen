@@ -10,7 +10,11 @@
  * @param {[number, number]} centerPoint The point about which the polygon should be centered.
  * @returns {[number, number][]}
  */
-function createCircularPolygon(radius, pointCount, centerPoint = [0, 0]) {
+export function createCircularPolygon(
+	radius,
+	pointCount,
+	centerPoint = [0, 0]
+) {
 	// TODO: code below was spit out by Copilot, may or may not be correct
 	if (radius <= 0) {
 		throw new Error("radius must be greater than 0");

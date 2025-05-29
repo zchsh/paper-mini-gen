@@ -26,11 +26,12 @@ export function applyUnion(polygons) {
 		const objClip = clipperPathsFromPolygon(polygon, preScale);
 		ClipperLib.JS.ScaleUpPaths(objClip, clipperScale);
 		// Add the paths to the clipper
-		c.AddPaths(objClip, ClipperLib.PolyType.ptClip, true);
+		c.AddPaths(objClip, ClipperLib.PolyType.ptSubject, true);
 	}
 	// Execute the union operation
 	let solutionClip = new ClipperLib.Paths();
-	c.Execute(ClipperLib.ClipType.ctUnion, solutionClip);
+	const fillType = ClipperLib.PolyFillType.pftNonZero;
+	c.Execute(ClipperLib.ClipType.ctUnion, solutionClip, fillType, fillType);
 	// Scale down the solution paths
 	ClipperLib.JS.ScaleDownPaths(solutionClip, clipperScale * preScale);
 	// Convert the solution paths to a format we can use

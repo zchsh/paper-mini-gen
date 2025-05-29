@@ -1,6 +1,7 @@
 import { getBoundingPoints } from "/modules/00-common/get-bounding-points.js";
 import { translatePolygons } from "../vector-processing/translate-polygons.js";
 import { visitPoints } from "/modules/05-arrange/visit-points.js";
+import { createCircularPolygon } from "/modules/05-arrange/create-circular-polygon.js";
 
 const PIXELS_PER_INCH = 72;
 const MM_PER_INCH = 25.4;
@@ -77,15 +78,26 @@ export function arrangeForUnion(
 		reflectedPolygonOffsetY + arrangeOffsetY * 2,
 	]);
 	/**
+	 * We need to reverse the order of the regions in each of our reflected
+	 * polygons, so that the winding order is correct
+	 */
+	const polygonsReflectedReversed = polygonsReflected.map((polygon) => {
+		return {
+			regions: polygon.regions.map((region) => {
+				return region.slice().reverse();
+			}),
+		};
+	});
+	/**
 	 * Combine the original trace polygons, the reflected polygons,
 	 * and the circular bases into one big array of polygons
 	 */
 	const polygonsArranged = [
 		...polygons,
-		...polygonsReflected,
 		circleBaseTop,
 		circleBase,
 		circleBaseBottom,
+		...polygonsReflectedReversed,
 	];
 	// Return the arrange polygons, and bundle of info about the bases we added
 	const baseData = {
