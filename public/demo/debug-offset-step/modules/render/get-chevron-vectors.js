@@ -1,4 +1,4 @@
-import { rotatePoint } from "./rotate-point.js";
+import { rotatePoint } from "../vector-processing/rotate-point.js";
 
 /**
  * Given two points, a chevron length, and an angle,

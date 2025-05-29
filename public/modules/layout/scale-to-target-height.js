@@ -1,5 +1,5 @@
-import { getBoundingPoints } from "/modules/00-common/get-bounding-points.js";
-import { visitPointsPolygon } from "/modules/05-arrange/visit-points.js";
+import { getBoundingPoints } from "../vector-processing/get-bounding-points.js";
+import { visitPointsPolygon } from "../vector-processing/visit-points.js";
 
 const PIXELS_PER_INCH = 72;
 const MM_PER_INCH = 25.4;

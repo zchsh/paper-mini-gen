@@ -1,5 +1,5 @@
 // OFFSET
-import { applyOffsetToRegions } from "/modules/clipperjs-wrappers/apply-offset-to-regions.js";
+import { applyOffsetToRegions } from "./clipperjs-wrappers/apply-offset-to-regions.js";
 
 export function applyOffset(sourcePolygons, offset) {
 	const allRegions = [];

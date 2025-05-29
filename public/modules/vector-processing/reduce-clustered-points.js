@@ -1,5 +1,5 @@
-import { getDistanceBetweenPoints } from "/modules/03-trace/get-distance-between-points.js";
-import { getAveragePoint } from "/modules/03-trace/get-average-point.js";
+import { getDistanceBetweenPoints } from "./get-distance-between-points.js";
+import { getAveragePoint } from "./get-average-point.js";
 
 /**
  * Given an array of [x, y] points, and a tolerance distance,

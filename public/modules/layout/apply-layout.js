@@ -1,7 +1,7 @@
 // COMMON
-import { pathDataStringFromRegions } from "/modules/render/path-data-string-from-regions.js";
-import { getFallbackViewBox } from "/modules/render/get-fallback-viewbox.js";
-import { createSvgElem } from "/modules/render/create-svg-elem.js";
+import { pathDataStringFromRegions } from "../render/path-data-string-from-regions.js";
+import { getFallbackViewBox } from "../render/get-fallback-viewbox.js";
+import { createSvgElem } from "../render/create-svg-elem.js";
 
 /**
  * TODO: clean this up, haven't touched it since prototyping

@@ -1,8 +1,8 @@
 // COMMON
-import { getInputAsInt } from "./00-common/get-input-as-int.js";
-import { copyTextToClipboard } from "./00-common/copy-text-to-clipboard.js";
+import { getInputAsInt } from "./ui/get-input-as-int.js";
+import { copyTextToClipboard } from "./ui/copy-text-to-clipboard.js";
 // UPLOAD
-import { resetSettings } from "./01-upload/reset-settings.js";
+import { resetSettings } from "./ui/reset-settings.js";
 // SILHOUETTE
 import { Jimp } from "./raster-processing/jimp/index.js";
 import { flattenImage } from "./raster-processing/flatten-image.js";
@@ -16,10 +16,10 @@ import { svgNodeFromPolygons } from "./render/svg-node-from-polygons.js";
 import { applyOffset } from "./vector-processing/apply-offset.js";
 // ARRANGE
 import { arrangeForUnion } from "./layout/arrange-for-union.js";
-import { applyUnion } from "./clipperjs-wrappers/apply-union.js";
+import { applyUnion } from "./vector-processing/clipperjs-wrappers/apply-union.js";
 import { applyLayout } from "./layout/apply-layout.js";
 // GLOBAL STUFF
-import { onImageSelection } from "./01-upload/on-image-selection.js";
+import { onImageSelection } from "./ui/on-image-selection.js";
 import { updateImage } from "./upload/update-image.js";
 import { scaleToTargetHeight } from "./layout/scale-to-target-height.js";
 import { getFallbackViewBox } from "./render/get-fallback-viewbox.js";

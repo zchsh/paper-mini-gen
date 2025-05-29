@@ -1,4 +1,4 @@
-import { visitPointsPolygon } from "/modules/05-arrange/visit-points.js";
+import { visitPointsPolygon } from "./visit-points.js";
 
 export function translatePolygons(polygons, offset) {
 	return polygons.map((polygon) => {
