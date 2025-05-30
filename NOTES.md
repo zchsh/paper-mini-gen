@@ -89,3 +89,4 @@ What if you found the "center of mass" of the incoming polygon, and used that as
 
 - <https://www.youtube.com/watch?v=ehjWZRPq9JA>
 - Printable chess could be a good spin-off
+- <https://papermini.arkanatools.com/> - existing tool i found after starting this one
