@@ -52,39 +52,23 @@
 - Totally optional
 - Art has to kind of match up from front to back in terms of shape... cutout from front would always be used.
 
-#### Consider use of imagetracer's imagedataToTracedata API
-
-- <https://github.com/jankovicsandras/imagetracerjs?tab=readme-ov-file#api>
-- May remove need for roundtrip through `<svg>` element, which I think is currently being done?
-- As with other steps... data transformation happens outside the DOM, rendering to DOM is a convenience that happens in the browser
-
-#### Consider alternate approach to offsetting shapes
+#### Consider alternate approach to centering traced shapes
 
 As-is, traced polygons are centered with "offset" based on their bounding box... which kind of works, but feels like it could be better.
 
 What if you found the "center of mass" of the incoming polygon, and used that as a "base" offset? The input offset could be applied on top of that "base" offset.
 
-#### Look into performance
-
-- Seems way worse on my M1 laptop than on M1 mac mini... why?
-
 #### Stub in documentation
 
 - <https://documentation.js.org/>
 
-#### Improve curved-to-straight-line conversion
+#### Clean up demos
 
-- Current algorithm grabs all the points, no nuance between the points of an arc
-- Maybe ideal scenario: same as now, but for any curved _segments_, convert to straight lines based on some _angle tolerance_
-  - This same "angle tolerance" principle is what i want for `create-circular-polygon` as well....
+- Many are no longer relevant, i think, since have swapped in a few libraries
 
-#### Revisit image processing
+#### Look into performance
 
-- [ ] Revisit image processing for speed & path simplicity
-  - Currently image processing is the slowest part of the whole thing
-  - In addition, I've noticed the traced paths are pretty complex for large images. More complex than they need to be.
-  - Could the image be scaled down by a certain factor (say, `2`), and then processed and traced, and then the resulting path scaled back up?
-  - Would such a scale-trace-revertscale approach be faster? And would it produce similar results
+- Seems to have gotten better since swapping Jimp in and ripping out ImageJS
 
 #### Final packaging
 
