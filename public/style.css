@@ -4,6 +4,12 @@ body {
 	align-items: center;
 }
 
+.page-container {
+	width: 100%;
+	max-width: 30em;
+	padding: 1rem;
+}
+
 .raw-image-container {
 	width: 400px;
 	height: 400px;
