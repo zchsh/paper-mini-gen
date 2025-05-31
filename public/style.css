@@ -10,6 +10,15 @@ body {
 	padding: 1rem;
 }
 
+.file-input-container {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	background: #efefef;
+	padding: 1rem;
+	border-radius: 8px;
+}
+
 .raw-image-container {
 	width: 400px;
 	height: 400px;

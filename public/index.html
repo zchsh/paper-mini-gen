@@ -29,7 +29,7 @@
 		</script>
 	</head>
 	<body
-		onload="updateImage('/sample-art/sample-char-art-00.jpeg', {
+		onload="updateImage('/sample-art/test-figure.jpeg', {
 		heightMm: 30,
 		radius: 2,
 		arrangeOffsetX: -5
@@ -41,7 +41,14 @@
 				Cut out the boring parts of making paper miniatures. Upload your art,
 				and download a ready-to-print SVG.
 			</p>
+
+			<!--  -->
+			<!--  -->
+			<!--  -->
 			<h2>FAQ</h2>
+			<!--  -->
+			<!--  -->
+			<!--  -->
 
 			<details>
 				<summary>What are paper miniatures?</summary>
@@ -184,17 +191,17 @@
 					It'll help me buy food and pay my rent.
 				</p>
 				<p>
-					If you'd like to contribute code or feedback, you can do so on GitHub
-					at
+					If you'd like to contribute code or feedback, you can do that on
+					GitHub at
 					<a href="https://github.com/zchsh/paper-mini-gen"
 						>zchsh/paper-mini-gen</a
 					>.
 				</p>
 				<p>
 					The spirit of this project is to make a tool that's open source,
-					respects user data by collecting nothing, does one thing really well,
-					and uses file formats that are highly interoperable, so that you can
-					use it in combination with other tools. It's an attempt at taking a
+					account-less, does one thing really well, and uses file formats that
+					are highly interoperable, so that you can use it in combination with
+					other tools. It's an attempt at taking a
 					<a href="https://en.wikipedia.org/wiki/Unix_philosophy"
 						>Unix-like philosophy</a
 					>
@@ -241,64 +248,98 @@
 				</p>
 				<p>Thanks for being here!</p>
 			</details>
+
+			<!--  -->
+			<!--  -->
+			<!--  -->
+			<h2>Character art</h2>
+			<!--  -->
+			<!--  -->
+			<!--  -->
+
+			<p>Upload a file...</p>
+			<div class="file-input-container">
+				<input
+					type="file"
+					id="image-input"
+					accept="image/png, image/jpeg"
+					onchange="onImageSelection(this, 'raw-image', resetAndRunAll)"
+				/>
+			</div>
+			<p>Or choose an example:</p>
+			<p>
+				<button
+					onclick="updateImage('/sample-art/test-figure.jpeg', {
+				heightMm: 30,
+				radius: 2,
+				arrangeOffsetX: -5,
+				offset: 15
+			}, runAll)"
+				>
+					test-figure.jpeg
+				</button>
+				<button
+					onclick="updateImage('/sample-art/chess-piece.png', {
+				heightMm: 30,
+				radius: 2,
+				threshold: 220,
+				arrangeOffsetX: 0,
+				offset: 30
+			}, runAll)"
+				>
+					chess-piece.png
+				</button>
+				<button
+					onclick="updateImage('/sample-art/greek-doll.jpeg', {
+				heightMm: 35,
+				radius: 2,
+				threshold: 220,
+				arrangeOffsetX: 0,
+				offset: 30 }, runAll)"
+				>
+					greek-doll.jpeg
+				</button>
+			</p>
+
+			<!--  -->
+			<!--  -->
+			<!--  -->
+			<h2>Paper miniature</h2>
+			<!--  -->
+			<!--  -->
+			<!--  -->
+
+			<div id="layout-container"></div>
+			<button
+				onClick="copyTextToClipboard(document.getElementById('layout-container').innerHTML)"
+			>
+				Copy SVG to clipboard
+			</button>
+			<!--  -->
+			<!--  -->
+			<!--  -->
+			<!-- TODO: implement download link. At end of runAll(), update href and download="filename.svg" -->
+			<!--  -->
+			<!--  -->
+			<!--  -->
+			<!-- <a
+				id="download-svg-link"
+				href='data:image/svg+xml;utf8,<svg width="91.69999999999999" height="313.79999999999995" viewBox="36.4 23.6 91.69999999999999 313.79999999999995"><path d="M88.1, 33L89.6, 33.6L90.4, 34L91.7, 34.7L92.4, 35.2L93.5, 36.1L94.3, 36.8L95.7, 38.5L96.4, 39.5L97.2, 40.9L97.3, 41L97.8, 40.5L99, 39.6L100.4, 39L101.5, 38.8L103, 38.7L104.8, 38.9L106, 39.1L107.4, 39.6L108.1, 40.1L109, 40.7L110.1, 41.8L110.8, 42.9L111.3, 43.9L111.8, 46L111.9, 47.5L111.8, 49.2L111.5, 50.4L111, 51.9L110.6, 52.6L109.9, 53.4L108.9, 54.5L107.8, 55.3L106.8, 55.7L105.4, 56.2L104.5, 56.3L102.5, 56.4L101, 56.2L100.5, 56.1L100.8, 56.5L101.2, 57.6L107, 79.9L107.2, 81.4L107.2, 84.1L107, 85.6L106.4, 86.9L105.5, 88.1L104.7, 88.8L104.224, 89.166L108.7, 92.6L114.4, 99.9L117.9, 108.5L119.1, 117.7L117.9, 126.8L114.4, 135.4L108.7, 142.7L101.4, 148.3L99.604, 149.061L101.4, 149.8L108.7, 155.5L114.4, 162.8L117.9, 171.4L119.1, 180.5L117.9, 189.7L114.4, 198.2L108.7, 205.6L101.4, 211.2L99.579, 211.95L101.4, 212.7L108.7, 218.3L114.4, 225.7L117.9, 234.2L119.1, 243.4L117.9, 252.6L114.4, 261.1L108.7, 268.4L104.241, 271.882L104.7, 272.2L105.5, 272.9L106.4, 274.1L107, 275.5L107.2, 277L107.2, 279.7L107, 281.2L101.2, 303.5L100.8, 304.5L100.5, 305L101, 304.8L102.5, 304.7L104.5, 304.7L105.4, 304.8L106.8, 305.3L107.8, 305.8L108.9, 306.5L109.9, 307.6L110.6, 308.5L111, 309.2L111.5, 310.6L111.8, 311.8L111.9, 313.5L111.8, 315.1L111.3, 317.2L110.8, 318.1L110.1, 319.3L109, 320.3L108.1, 320.9L107.4, 321.4L106, 321.9L104.8, 322.2L103, 322.3L101.5, 322.2L100.4, 322L99, 321.4L97.8, 320.5L97.3, 320L97.2, 320.2L96.4, 321.6L95.7, 322.6L94.3, 324.2L93.5, 325L92.4, 325.8L91.7, 326.3L90.4, 327.1L89.6, 327.4L88.1, 328L86, 328.4L80.9, 328.4L79.4, 328L76.7, 326.8L75.5, 326.1L74.2, 325.1L73.3, 324.3L72.2, 323L71.8, 322.4L70.8, 321L70.4, 320.2L69.7, 318.6L69.2, 316.9L69, 315.6L69, 312.5L69.1, 311.4L69.5, 309.5L69.8, 308.6L65.8, 308.6L64.8, 308.5L64.6, 308.5L63.5, 308.6L53.4, 308.6L51.6, 308.3L50.4, 307.9L48.5, 306.9L47.5, 305.8L46.5, 304.4L45.6, 302.5L45.4, 301.1L45.4, 294.8L45.6, 293.7L46, 292.2L46.4, 291.5L47.1, 290.4L48.2, 289.3L49.6, 288.6L52.1, 287.7L53.8, 287.3L55.3, 287.4L56.5, 287.6L59.5, 287.5L60.1, 286.3L61.2, 285.3L62.5, 284.6L64, 284.2L65.5, 284.2L66.9, 284.6L68.1, 285.1L68.4, 284.6L68.7, 284.3L67.9, 283.4L67.4, 282L67.2, 280.5L67.2, 274.594L66, 274.1L58.6, 268.4L53, 261.1L49.5, 252.6L48.2, 243.4L49.5, 234.2L53, 225.7L58.6, 218.3L66, 212.7L67.821, 211.95L66, 211.2L58.6, 205.6L53, 198.2L49.5, 189.7L48.2, 180.5L49.5, 171.4L53, 162.8L58.6, 155.5L66, 149.8L67.796, 149.061L66, 148.3L58.6, 142.7L53, 135.4L49.5, 126.8L48.2, 117.7L49.5, 108.5L53, 99.9L58.6, 92.6L66, 87L67.2, 86.492L67.2, 80.6L67.4, 79.1L67.9, 77.7L68.7, 76.7L68.4, 76.4L68.1, 75.9L66.9, 76.4L65.5, 76.8L64, 76.8L62.5, 76.5L61.2, 75.8L60.1, 74.7L59.5, 73.6L56.5, 73.4L55.3, 73.7L53.8, 73.8L52.1, 73.4L49.6, 72.4L48.2, 71.7L47.1, 70.7L46.4, 69.6L46, 68.8L45.6, 67.4L45.4, 66.2L45.4, 60L45.6, 58.5L46.5, 56.6L47.5, 55.2L48.5, 54.2L50.4, 53.1L51.6, 52.7L53.4, 52.4L63.5, 52.4L64.6, 52.5L64.8, 52.6L65.8, 52.4L69.8, 52.4L69.5, 51.6L69.1, 49.6L69, 48.5L69, 45.5L69.2, 44.2L69.7, 42.4L70.4, 40.8L70.8, 40L71.8, 38.6L72.2, 38L73.3, 36.8L74.2, 36L75.5, 35L76.7, 34.3L79.4, 33.1L80.9, 32.7L81.7, 32.6L86, 32.6Z" fill="rgba(255, 0, 255, 0.5)" stroke="rgba(255, 0, 255, 0.5)" stroke-width="0.5"></path></svg>'
+				download="paper-miniature.svg"
+			>
+				Download SVG
+			</a> -->
+		</div>
+
+		<div style="width: 100%">
+			<hr />
+			<hr />
 		</div>
 
 		<!--  -->
 		<!--  -->
 		<!--  -->
-		<h2>UPLOAD</h2>
-		<!--  -->
-		<!--  -->
-		<!--  -->
-
-		<p>
-			<input
-				type="file"
-				id="image-input"
-				accept="image/png, image/jpeg"
-				runAll="onImageSelection(this, 'raw-image', resetAndRunAll)"
-			/>
-		</p>
-
-		<p>Or choose an example:</p>
-
-		<p>
-			<button
-				onclick="updateImage('/sample-art/sample-char-art-00.jpeg', {
-				heightMm: 30,
-				radius: 2,
-				arrangeOffsetX: -5,
-				offset: 5
-			}, runAll)"
-			>
-				sample-char-art-00.jpeg
-			</button>
-			<!-- <button
-				onclick="updateImage('/sample-art/sample-char-art-01.jpeg', { heightMm: 35, radius: 2, arrangeOffsetX: -5, offset: 30 }, runAll)"
-			>
-				sample-char-art-01.jpeg
-			</button>
-			<button
-				onclick="updateImage('/sample-art/sample-char-art-02.jpeg', { heightMm: 25, radius: 2, arrangeOffsetX: 0, offset: 30 }, runAll)"
-			>
-				sample-char-art-02.jpeg
-			</button>
-			<button
-				onclick="updateImage('/sample-art/sample-char-art-03.jpeg', { heightMm: 35, radius: 3, arrangeOffsetX: 0, offset: 30 }, runAll)"
-			>
-				sample-char-art-03.jpeg
-			</button>
-			<button
-				onclick="updateImage('/sample-art/sample-char-art-transparent-04.png', { heightMm: 35, radius: 3, arrangeOffsetX: 0, offset: 30 }, runAll)"
-			>
-				sample-char-art-transparent-04.png
-			</button> -->
-		</p>
-
-		<!--  -->
-		<!--  -->
-		<!--  -->
-		<h2>SILHOUETTE</h2>
+		<h2>Silhouette Tweaks</h2>
 		<!--  -->
 		<!--  -->
 		<!--  -->
@@ -313,10 +354,16 @@
 			</div>
 		</div>
 
-		<h3>Silhouette tweaks</h3>
 		<p>
 			Threshold (0-255)
-			<input id="threshold" type="number" min="0" max="255" value="200" />
+			<input
+				id="threshold"
+				type="number"
+				min="0"
+				max="255"
+				value="200"
+				onchange="runAll()"
+			/>
 		</p>
 		<p>
 			Blur radius
@@ -341,10 +388,6 @@
 		<!--  -->
 		<!--  -->
 
-		<p class="note">
-			NOTE: image tracing can take a bit of time. But it should run pretty
-			reliably though.
-		</p>
 		<div id="trace-svg"></div>
 		<h3>Trace tweaks</h3>
 		<p>
@@ -412,45 +455,6 @@
 		<div id="union-shapes-debug"></div>
 		<div id="union-arrange-debug"></div>
 		<div id="union-container"></div>
-
-		<!--  -->
-		<!--  -->
-		<!--  -->
-		<h2>LAYOUT</h2>
-		<!--  -->
-		<!--  -->
-		<!--  -->
-
-		<div id="layout-container"></div>
-		<button
-			onClick="copyTextToClipboard(document.getElementById('layout-container').innerHTML)"
-		>
-			Copy SVG to clipboard
-		</button>
-		<div style="height: 3em"></div>
-		<div
-			style="
-				max-width: 30em;
-				padding: 2em;
-				border: 1px solid magenta;
-				border-radius: 8px;
-			"
-		>
-			<p style="color: magenta; font-weight: bold; text-align: center">
-				WHAT NEXT?
-			</p>
-			<p>
-				You probably want to print the SVG above somehow! You'll need a tool
-				that lets you paste an SVG from your clipboard, and arrange it on a
-				page. You can usually fit many different miniatures on a single page.
-			</p>
-			<p>
-				<a href="https://www.figma.com/">Figma</a> is likely the easiest option
-				if you're unfamiliar. <a href="https://inkscape.org/">Inkscape</a> is
-				another option, it's a free and open-source vector graphics editor but
-				might have a bit more of a learning curve.
-			</p>
-		</div>
 
 		<div style="height: 16em"></div>
 	</body>
