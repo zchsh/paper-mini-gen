@@ -19,6 +19,15 @@ body {
 	border-radius: 8px;
 }
 
+#layout-container {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	border: 1px solid #ccc;
+	border-radius: 8px;
+	padding: 1rem;
+}
+
 .raw-image-container {
 	width: 400px;
 	height: 400px;
