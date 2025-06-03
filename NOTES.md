@@ -10,7 +10,10 @@
 - [x] Think through new tool layout and workflow
   - Maybe worth doing in Figma? Sketching on paper, as always, probably a nice place to start
 
-- [ ] Implement designs from Figma
+- [x] Implement download SVG link
+
+- [ ] Implement `Silhouette tweaks` area design from Figma
+- [ ] Implement `Layout tweaks` area design from Figma
 
 ### Later
 

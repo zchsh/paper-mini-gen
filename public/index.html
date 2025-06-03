@@ -312,25 +312,14 @@
 			<!--  -->
 
 			<div id="layout-container"></div>
-			<button
-				onClick="copyTextToClipboard(document.getElementById('layout-container').innerHTML)"
-			>
-				Copy SVG to clipboard
-			</button>
-			<!--  -->
-			<!--  -->
-			<!--  -->
-			<!-- TODO: implement download link. At end of runAll(), update href and download="filename.svg" -->
-			<!--  -->
-			<!--  -->
-			<!--  -->
-			<a
-				id="download-svg-link"
-				href="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iOTIuODAwMDAwMDAwMDAwMDEiIGhlaWdodD0iMzEzLjgiIHZpZXdCb3g9IjI2LjQgMTQuODk5OTk5OTk5OTk5OTk5IDkyLjgwMDAwMDAwMDAwMDAxIDMxMy44Ij48cGF0aCBkPSJNNzYuNCwgMjRMNzcuNiwgMjQuMkw3OS40LCAyNC42TDgwLjQsIDI0LjlMODIuMSwgMjUuN0w4My41LCAyNi42TDg2LjgsIDI5LjJMODcuNiwgMzBMODguMiwgMjkuOEw5MCwgMjkuNUw5Mi4zLCAyOS41TDk0LjEsIDI5LjdMOTUuNiwgMzAuMUw5Ni40LCAzMC40TDk4LjEsIDMxLjNMOTkuNiwgMzIuNEwxMDAuNSwgMzMuM0wxMDEsIDMzLjlMMTAyLjEsIDM1LjRMMTAzLjIsIDM3LjhMMTAzLjcsIDM5LjVMMTA0LjEsIDQxLjRMMTA0LjEsIDQzLjJMMTAzLjgsIDQ1LjFMMTAzLjEsIDQ2LjlMMTAxLjgsIDQ5TDEwMC4yLCA1MC45TDk4LjksIDUyLjJMOTcuNCwgNTMuM0w5NS41LCA1NC4xTDk1LjQsIDU0LjFMOTkuMywgNjkuMUw5OS42LCA3MS42TDk5LjYsIDc0LjZMOTkuNSwgNzYuNEw5OSwgNzguMkw5OC4xLCA3OS45TDk3LCA4MS40TDk2Ljc5OCwgODEuNTg4TDk5LjgsIDgzLjlMMTA1LjQsIDkxLjJMMTA5LCA5OS43TDExMC4yLCAxMDguOUwxMDksIDExOC4xTDEwNS40LCAxMjYuNkw5OS44LCAxMzRMOTIuNCwgMTM5LjZMOTAuNTc5LCAxNDAuMzVMOTIuNCwgMTQxLjFMOTkuOCwgMTQ2LjdMMTA1LjQsIDE1NC4xTDEwOSwgMTYyLjZMMTEwLjIsIDE3MS44TDEwOSwgMTgxTDEwNS40LCAxODkuNUw5OS44LCAxOTYuOEw5Mi40LCAyMDIuNUw5MC42MDQsIDIwMy4yMzlMOTIuNCwgMjA0TDk5LjgsIDIwOS42TDEwNS40LCAyMTYuOUwxMDksIDIyNS41TDExMC4yLCAyMzQuN0wxMDksIDI0My44TDEwNS40LCAyNTIuNEw5OS44LCAyNTkuN0w5Ni44MjYsIDI2MS45NTFMOTcsIDI2Mi4xTDk4LjEsIDI2My42TDk5LCAyNjUuM0w5OS41LCAyNjcuMUw5OS42LCAyNjlMOTkuNiwgMjcxLjlMOTkuMywgMjc0LjVMOTUuNCwgMjg5LjRMOTUuNSwgMjg5LjVMOTcuNCwgMjkwLjNMOTguOSwgMjkxLjRMMTAwLjIsIDI5Mi43TDEwMS44LCAyOTQuNkwxMDMuMSwgMjk2LjdMMTAzLjgsIDI5OC41TDEwNC4xLCAzMDAuM0wxMDQuMSwgMzAyLjJMMTAzLjcsIDMwNEwxMDMuMiwgMzA1LjhMMTAyLjEsIDMwOC4yTDEwMSwgMzA5LjdMMTAwLjUsIDMxMC4zTDk5LjYsIDMxMS4yTDk4LjEsIDMxMi4zTDk2LjQsIDMxMy4xTDk1LjYsIDMxMy40TDk0LjEsIDMxMy45TDkyLjMsIDMxNC4xTDkwLCAzMTQuMUw4OC4yLCAzMTMuOEw4Ny42LCAzMTMuNkw4Ni44LCAzMTQuNEw4My41LCAzMTdMODIuMSwgMzE3LjlMODAuNCwgMzE4LjZMNzkuNCwgMzE5TDc3LjYsIDMxOS40TDc2LjQsIDMxOS42TDc0LjksIDMxOS43TDczLjUsIDMxOS43TDcyLjQsIDMxOS42TDcwLjgsIDMxOS41TDY5LjEsIDMxOS4xTDY3LjQsIDMxOC40TDY1LjMsIDMxNy40TDYzLjUsIDMxNi4yTDYyLjIsIDMxNS4yTDYwLjMsIDMxMy4zTDU5LjMsIDMxMS45TDU4LjIsIDMxMEw1Ny40LCAzMDguNEw1Ni44LCAzMDYuNkw1Ni4zLCAzMDQuN0w1Ni4xLCAzMDMuM0w1NiwgMzAxLjlMNTUuNSwgMzAyTDQ2LjksIDMwMkw0NC45LCAzMDEuOEw0My4xLCAzMDEuM0w0Mi4yLCAzMDAuOUwzOS45LCAyOTkuNkwzOC41LCAyOTguM0wzNy4zLCAyOTYuOEwzNi41LCAyOTUuMkwzNi4xLCAyOTQuM0wzNS42LCAyOTIuNEwzNS40LCAyOTAuNUwzNS40LCAyODVMMzUuNiwgMjgzLjJMMzYuMSwgMjgxLjNMMzYuOSwgMjc5LjZMMzgsIDI3OC4xTDM5LjQsIDI3Ni45TDQwLjksIDI3NS42TDQxLjksIDI3NUw0My42LCAyNzQuMkw0NS40LCAyNzMuNkw0Ny4yLCAyNzMuNUw1NC43LCAyNzMuNUw1NC41LCAyNzIuOEw1NC4zLCAyNzAuOUw1NC4zLCAyNjMuMjI5TDQ5LjcsIDI1OS43TDQ0LCAyNTIuNEw0MC41LCAyNDMuOEwzOS4zLCAyMzQuN0w0MC41LCAyMjUuNUw0NCwgMjE2LjlMNDkuNywgMjA5LjZMNTcsIDIwNEw1OC44MTcsIDIwMy4yMzlMNTcsIDIwMi41TDQ5LjcsIDE5Ni44TDQ0LCAxODkuNUw0MC41LCAxODFMMzkuMywgMTcxLjhMNDAuNSwgMTYyLjZMNDQsIDE1NC4xTDQ5LjcsIDE0Ni43TDU3LCAxNDEuMUw1OC44NDMsIDE0MC4zNUw1NywgMTM5LjZMNDkuNywgMTM0TDQ0LCAxMjYuNkw0MC41LCAxMTguMUwzOS4zLCAxMDguOUw0MC41LCA5OS43TDQ0LCA5MS4yTDQ5LjcsIDgzLjlMNTQuMywgODAuMzA4TDU0LjMsIDcyLjdMNTQuNSwgNzAuOEw1NC43LCA3MC4xTDQ3LjIsIDcwLjFMNDUuNCwgNjkuOUw0My42LCA2OS40TDQxLjksIDY4LjZMNDAuOSwgNjcuOUwzOS40LCA2Ni43TDM4LCA2NS40TDM2LjksIDYzLjlMMzYuMSwgNjIuMkwzNS42LCA2MC40TDM1LjQsIDU4LjZMMzUuNCwgNTMuMUwzNS42LCA1MS4yTDM2LjEsIDQ5LjNMMzYuNSwgNDguNEwzNy4zLCA0Ni43TDM4LjUsIDQ1LjJMMzkuOSwgNDRMNDIuMiwgNDIuN0w0My4xLCA0Mi4zTDQ0LjksIDQxLjhMNDYuOSwgNDEuNkw1NiwgNDEuNkw1Ni4xLCA0MC4yTDU2LjMsIDM4LjlMNTYuOCwgMzdMNTcuNCwgMzUuMkw1OC4yLCAzMy41TDU5LjMsIDMxLjZMNjAuMywgMzAuM0w2Mi4yLCAyOC40TDYzLjUsIDI3LjNMNjUuMywgMjYuMkw2Ny40LCAyNS4xTDY5LjEsIDI0LjVMNzAuOCwgMjQuMUw3Mi40LCAyMy45TDc0LjksIDIzLjlaIiBmaWxsPSJyZ2JhKDI1NSwgMCwgMjU1LCAwLjUpIiBzdHJva2U9InJnYmEoMjU1LCAwLCAyNTUsIDAuNSkiIHN0cm9rZS13aWR0aD0iMC41Ij48L3BhdGg+PC9zdmc+"
-				download="test.svg"
-			>
-				Download SVG
-			</a>
+			<div class="copy-and-download-container">
+				<button
+					onClick="copyTextToClipboard(document.getElementById('layout-container').innerHTML)"
+				>
+					Copy SVG to clipboard
+				</button>
+				<div id="download-link-container"></div>
+			</div>
 		</div>
 
 		<div style="width: 100%">
@@ -354,6 +343,7 @@
 			<div class="processed-image-container">
 				<img id="processed-image" />
 			</div>
+			<div id="trace-svg"></div>
 		</div>
 
 		<p>
@@ -379,84 +369,85 @@
 			/>
 		</p>
 		<p>
-			<button onClick="runAll()">Apply silhouette tweaks</button>
-		</p>
-
-		<!--  -->
-		<!--  -->
-		<!--  -->
-		<h2>TRACE</h2>
-		<!--  -->
-		<!--  -->
-		<!--  -->
-
-		<div id="trace-svg"></div>
-		<h3>Trace tweaks</h3>
-		<p>
 			Omit shapes with an area less than:
-			<input id="pathomit" type="number" min="0" value="30" />
-		</p>
-		<p>
-			<button onClick="runAll()">Apply trace tweaks</button>
+			<input
+				id="pathomit"
+				onchange="runAll()"
+				type="number"
+				min="0"
+				value="30"
+			/>
 		</p>
 
 		<!--  -->
 		<!--  -->
 		<!--  -->
-		<h2>OFFSET</h2>
+		<h2>Layout tweaks</h2>
 		<!--  -->
 		<!--  -->
 		<!--  -->
 
-		<div id="offset-svg"></div>
-		<h3>Offset tweaks</h3>
+		<div style="display: flex; align-items: center">
+			<div id="offset-svg"></div>
+			<div id="arrange-container"></div>
+		</div>
 		<p>
 			Offset amount:
-			<input id="offset" type="number" min="0" max="100" value="30" />
+			<input
+				id="offset"
+				onchange="runAll()"
+				type="number"
+				min="0"
+				max="100"
+				value="30"
+			/>
 		</p>
-		<button onClick="runAll()">Apply offset tweaks</button>
-
-		<!--  -->
-		<!--  -->
-		<!--  -->
-		<h2>ARRANGE</h2>
-		<!--  -->
-		<!--  -->
-		<!--  -->
-
-		<div id="arrange-container"></div>
-		<h3>Arrangement tweaks</h3>
 		<p>
 			Base size in mm (1 inch ~= 25 mm)
-			<input id="baseSizeMm" type="number" min="12" max="50" value="25" />
+			<input
+				id="baseSizeMm"
+				onchange="runAll()"
+				type="number"
+				min="12"
+				max="50"
+				value="25"
+			/>
 		</p>
-
 		<p>
 			Height in mm (1 inch ~= 25 mm)
-			<input id="heightMm" type="number" min="5" max="100" value="35" />
+			<input
+				id="heightMm"
+				onchange="runAll()"
+				type="number"
+				min="5"
+				max="100"
+				value="35"
+			/>
 		</p>
 		<p>
 			X offset (use to center the image over the base)
-			<input id="arrangeOffsetX" type="number" min="-100" max="100" value="0" />
+			<input
+				id="arrangeOffsetX"
+				onchange="runAll()"
+				type="number"
+				min="-100"
+				max="100"
+				value="0"
+			/>
 		</p>
 		<p>
 			Y offset (use to "float" or "ground" the image)
 			<!-- TODO: max should be based on "base size". For now, have done
 			     base size (72) divided by 4 -->
-			<input id="arrangeOffsetY" type="number" min="0" max="18" value="0" />
+			<input
+				id="arrangeOffsetY"
+				onchange="runAll()"
+				type="number"
+				min="0"
+				max="18"
+				value="0"
+			/>
 		</p>
-		<button onClick="runAll()">Apply arrangement tweaks</button>
-
-		<!--  -->
-		<!--  -->
-		<!--  -->
-		<h2>UNION</h2>
-		<!--  -->
-		<!--  -->
-		<!--  -->
-		<div id="union-shapes-debug"></div>
-		<div id="union-arrange-debug"></div>
-		<div id="union-container"></div>
 
 		<div style="height: 16em"></div>
 	</body>

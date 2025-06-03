@@ -134,12 +134,6 @@ async function runAll() {
 	 */
 	const outline_union = applyUnion(polygonsArranged);
 	const polygons_union = [outline_union];
-	// Render the unioned polygons
-	const unionViewBox = getFallbackViewBox(polygons_union, 9);
-	const unionSvgNode = svgNodeFromPolygons(polygons_union, unionViewBox);
-	const unionContainer = document.getElementById("union-container");
-	unionContainer.innerHTML = "";
-	unionContainer.appendChild(unionSvgNode);
 	/**
 	 * Layout the outline union shape with final print elements,
 	 * including the original image, a reverse-side image,
@@ -169,9 +163,16 @@ async function runAll() {
 	const now = new Date();
 	const formattedDate = now.toISOString().replace(/[:.]/g, "-").slice(0, 19);
 	// Set the download link's href to the final SVG data URL
-	const downloadLink = document.getElementById("download-svg-link");
+	const downloadLinkContainer = document.getElementById(
+		"download-link-container"
+	);
+	const downloadLink = document.createElement("a");
 	downloadLink.href = finalSvgDataUrl;
 	downloadLink.download = `${formattedDate}-paper-miniature.svg`;
+	downloadLink.textContent = "Download SVG";
+	// Clear previous download links, add the new ones
+	downloadLinkContainer.innerHTML = "";
+	downloadLinkContainer.appendChild(downloadLink);
 }
 
 async function resetAndRunAll() {
