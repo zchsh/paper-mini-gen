@@ -162,6 +162,16 @@ async function runAll() {
 	const finalContainer = document.getElementById("layout-container");
 	finalContainer.innerHTML = "";
 	finalContainer.appendChild(finalSvgElem);
+	// Grab the final SVG as a string
+	const finalSvgString = new XMLSerializer().serializeToString(finalSvgElem);
+	const finalSvgDataUrl = `data:image/svg+xml;base64,${btoa(finalSvgString)}`;
+	// Get the current date-time in YYYY-MM-DD_HH-MM-SS format
+	const now = new Date();
+	const formattedDate = now.toISOString().replace(/[:.]/g, "-").slice(0, 19);
+	// Set the download link's href to the final SVG data URL
+	const downloadLink = document.getElementById("download-svg-link");
+	downloadLink.href = finalSvgDataUrl;
+	downloadLink.download = `${formattedDate}-paper-miniature.svg`;
 }
 
 async function resetAndRunAll() {
