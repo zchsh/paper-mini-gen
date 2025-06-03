@@ -7,7 +7,7 @@
   - Maybe it should be... scale first, then offset?
   - Cause as is... a "tall" piece of art will get scaled down less, and the offset therefore looks thicker... where a "short" piece of art gets scaled down a lot, and the offset gets scaled down as well, and thus looks thinner
   - This would be a relatively significant refactor, so seems to make sense to clean things up first.
-  - This would also be nice cause setting the "height" before offset seems more intuitive and accurate for height purposes as well
+  - This would also be nice cause setting the "height" before offset seems more intuitive and accurate for height purposes as well. As-is, you can decide on a scale, but then adding or removing offset can vary the size the artwork comes out by a lot (2x the offset amount).
 
 ### Later
 
