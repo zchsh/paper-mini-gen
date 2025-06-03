@@ -13,7 +13,15 @@
 - [x] Implement download SVG link
 
 - [ ] Implement `Silhouette tweaks` area design from Figma
+  - [ ] Add `debounce` function to `onchange` events in `Silhouette tweaks`
+    - <https://www.joshwcomeau.com/snippets/javascript/debounce/> - Josh's stuff has always been great
+  - [ ] Add `showValue` function to `onchange` events in `Silhouette tweaks`
+    - Debounce used for "re-run image processing"... `showValue` should NOT be debounced, should update the displayed value immediately.
 - [ ] Implement `Layout tweaks` area design from Figma
+
+- [ ] Consider "joiner arc" settings
+  - Standing-up part of mini is "joined" to base, currently by half-circle
+  - Could have "arc height" and "arc width" instead, for flexibility
 
 ### Later
 

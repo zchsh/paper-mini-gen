@@ -336,18 +336,18 @@
 		<!--  -->
 
 		<div style="height: 1em"></div>
-		<div style="display: flex; align-items: center">
-			<div class="raw-image-container">
+		<div class="silhouette-preview-container">
+			<div class="image-container-raw">
 				<img id="raw-image" src="/sample-art/sample-char-art-00.jpeg" />
 			</div>
-			<div class="processed-image-container">
+			<div class="image-container-processed">
 				<img id="processed-image" />
 			</div>
-			<div id="trace-svg"></div>
+			<div class="image-container-traced" id="trace-svg"></div>
 		</div>
 
 		<p>
-			Threshold (0-255)
+			Threshold
 			<input
 				id="threshold"
 				type="number"
@@ -358,7 +358,7 @@
 			/>
 		</p>
 		<p>
-			Blur radius
+			Blur
 			<input
 				onchange="runAll()"
 				id="radius"
@@ -369,7 +369,7 @@
 			/>
 		</p>
 		<p>
-			Omit shapes with an area less than:
+			Shape filter
 			<input
 				id="pathomit"
 				onchange="runAll()"

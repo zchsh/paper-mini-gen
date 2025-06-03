@@ -36,28 +36,42 @@ body {
 	justify-content: center;
 }
 
-.raw-image-container {
-	width: 400px;
-	height: 400px;
+/* SILHOUETTE */
+
+.silhouette-preview-container {
+	position: relative;
+	width: 450px;
+	height: 450px;
+	border: 1px solid #ccc;
+	border-radius: 8px;
 }
 
-.raw-image-container img {
+.image-container-raw {
+	width: 160px;
+	height: 160px;
+	position: absolute;
+	top: 8px;
+	left: 8px;
+}
+
+.image-container-raw img {
 	width: 100%;
 	height: 100%;
 	object-fit: contain;
 }
 
-.processed-image-container {
-	width: 450px;
-	height: 450px;
-	display: flex;
-	align-items: center;
-	justify-content: center;
+.image-container-processed {
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	mix-blend-mode: multiply;
+	opacity: 0.6;
 }
 
-.note {
-	font-style: italic;
-	max-width: 30em;
-	margin: 0 auto;
-	text-align: center;
+.image-container-traced {
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
 }
