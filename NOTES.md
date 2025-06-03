@@ -2,38 +2,29 @@
 
 ## Next steps
 
-- [x] Replace example images with NOT random art ripped from the internet
-  - It's been fine and has felt okay during development, but doesn't feel right if I'm going to share this tool at all
-  - Original art might be fun, alternately, look up creative commons or public domain work and attribute it
-  - Steamboat Willie's in the public domain, that'd be fun, and call attention to public domain stuff which i love
-
-- [x] Think through new tool layout and workflow
-  - Maybe worth doing in Figma? Sketching on paper, as always, probably a nice place to start
-
-- [x] Implement download SVG link
-
-- [x] Implement `Silhouette tweaks` area design from Figma
-  - [x] Add `showValue` function to `onchange` events in `Silhouette tweaks`
-    - Debounce used for "re-run image processing"... `showValue` should NOT be debounced, should update the displayed value immediately.
-    - 2025-06-03 - used `oninput` instead, same idea
-  - [x] Add `debounce` function to `onchange` events in `Silhouette tweaks`
-    - <https://www.joshwcomeau.com/snippets/javascript/debounce/> - Josh's stuff has always been great
-  
-- [ ] Implement `Layout tweaks` area design from Figma
-
-- [ ] Consider "joiner arc" settings
-  - Standing-up part of mini is "joined" to base, currently by half-circle
-  - Could have "arc height" and "arc width" instead, for flexibility
-
-### Later
-
-#### Reconsider offset ordering for better consistency
-
 - [ ] Reconsider offset ordering for better consistency
   - Currently I think it's, offset first, scale after?
   - Maybe it should be... scale first, then offset?
   - Cause as is... a "tall" piece of art will get scaled down less, and the offset therefore looks thicker... where a "short" piece of art gets scaled down a lot, and the offset gets scaled down as well, and thus looks thinner
   - This would be a relatively significant refactor, so seems to make sense to clean things up first.
+  - This would also be nice cause setting the "height" before offset seems more intuitive and accurate for height purposes as well
+
+### Later
+
+#### Refine layout tweaks preview
+
+- [ ] Refine `Layout tweaks` preview
+  - Address scroll jank when tweaking values that affect viewBox size...
+  - maybe there's something like `contain` styling that keeps the container a consistent size, and scales down the artwork?
+  - thinking through how things get arranged in this preview area seems like it'd be worth it... check Figma, had sketched some stuff there.
+
+#### Consider joiner arc settings
+
+- [ ] Consider "joiner arc" settings
+  - Standing-up part of mini is "joined" to base, currently by half-circle
+  - Could have "arc height" and "arc width" instead, for flexibility
+  - Some art may be "floating" very high up... special joiner settings for that?
+  - Maybe this is something like... "joiner style"... default is "arc"... and then "joiner height", "joiner width"
 
 #### Explore path smoothing after boolean addition
 

@@ -45,8 +45,14 @@ async function runAll() {
 	// Run all raster related processing
 	const { traceResult, blurPadding, sizeOriginal, scalePreTrace } =
 		await runAllRaster();
+	window.imageMetrics = {
+		sizeOriginal,
+		scalePreTrace,
+		blurPadding,
+		traceResult,
+	};
 	// Run all vector related processing
-	await runAllVector({ traceResult, blurPadding, sizeOriginal, scalePreTrace });
+	await runAllVector();
 }
 
 /**
@@ -103,12 +109,10 @@ async function runAllRaster() {
  *
  *
  */
-async function runAllVector({
-	traceResult,
-	blurPadding,
-	sizeOriginal,
-	scalePreTrace,
-}) {
+async function runAllVector() {
+	const imageMetrics = window.imageMetrics || (await runAllRaster());
+	const { traceResult, blurPadding, sizeOriginal, scalePreTrace } =
+		imageMetrics;
 	/**
 	 * Offset the traced polygons
 	 */
@@ -116,12 +120,7 @@ async function runAllVector({
 	const polygonsOffset = applyOffset(traceResult.polygons, offset);
 	// Render the offset polygons
 	const destNodeOffset = document.getElementById("offset-svg");
-	const viewBoxOffset = [
-		traceResult.viewBox[0] - offset,
-		traceResult.viewBox[1] - offset,
-		traceResult.viewBox[2] + offset * 2,
-		traceResult.viewBox[3] + offset * 2,
-	];
+	const viewBoxOffset = getFallbackViewBox(polygonsOffset, 9);
 	const svgNodeFlattened = svgNodeFromPolygons(polygonsOffset, viewBoxOffset, {
 		showDebug: true,
 	});
@@ -215,6 +214,7 @@ async function resetAndRunAll() {
  * TODO: add handleVectorEffect()
  */
 const handleRasterEffect = debounce(runAll, 250);
+const handleVectorEffect = debounce(runAllVector, 10);
 
 /**
  * GLOBAL FUNCTION ASSIGNMENT
@@ -225,4 +225,5 @@ window.onImageSelection = onImageSelection;
 window.resetAndRunAll = resetAndRunAll;
 window.runAll = runAll;
 window.handleRasterEffect = handleRasterEffect;
+window.handleVectorEffect = handleVectorEffect;
 window.updateImage = updateImage;
