@@ -40,12 +40,21 @@ import { debounce } from "./ui/debounce.js";
  * And for the "arrange" step at least, seems totally fine to do a little
  * extra redundant math WITHIN the step... it'll be wasteful but
  * fast anyways.
- *
- * TODO: all these variables being passed around are a bit of a mess.
- * Would be great to simplify and clean up, I think that'll large
- * come naturally from refactoring each individual function.
  */
 async function runAll() {
+	// Run all raster related processing
+	const { traceResult, blurPadding, sizeOriginal, scalePreTrace } =
+		await runAllRaster();
+	// Run all vector related processing
+	await runAllVector({ traceResult, blurPadding, sizeOriginal, scalePreTrace });
+}
+
+/**
+ * TODO: write description
+ *
+ *
+ */
+async function runAllRaster() {
 	// Load the input image
 	const inputSrc = document.getElementById("raw-image").src;
 	const inputImage = await Jimp.read(inputSrc);
@@ -80,6 +89,26 @@ async function runAll() {
 	const destNodeTrace = document.getElementById("trace-svg");
 	destNodeTrace.innerHTML = "";
 	destNodeTrace.appendChild(svgPolygonsTraced);
+	// Return relevant image metrics
+	return {
+		traceResult,
+		blurPadding,
+		sizeOriginal,
+		scalePreTrace,
+	};
+}
+
+/**
+ * TODO: write description
+ *
+ *
+ */
+async function runAllVector({
+	traceResult,
+	blurPadding,
+	sizeOriginal,
+	scalePreTrace,
+}) {
 	/**
 	 * Offset the traced polygons
 	 */
