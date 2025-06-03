@@ -24,6 +24,7 @@ import { onImageSelection } from "./ui/on-image-selection.js";
 import { updateImage } from "./upload/update-image.js";
 import { scaleToTargetHeight } from "./layout/scale-to-target-height.js";
 import { getFallbackViewBox } from "./render/get-fallback-viewbox.js";
+import { debounce } from "./ui/debounce.js";
 
 /**
  * TODO: refactor so runAll() can start from specific step.
@@ -181,10 +182,18 @@ async function resetAndRunAll() {
 }
 
 /**
+ * TODO: split runAll() into runAllRaster() and runAllVector()
+ * TODO: add handleVectorEffect()
+ */
+const handleRasterEffect = debounce(runAll, 250);
+
+/**
  * GLOBAL FUNCTION ASSIGNMENT
  */
 window.copyTextToClipboard = copyTextToClipboard;
+window.debounce = debounce;
 window.onImageSelection = onImageSelection;
 window.resetAndRunAll = resetAndRunAll;
 window.runAll = runAll;
+window.handleRasterEffect = handleRasterEffect;
 window.updateImage = updateImage;

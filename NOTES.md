@@ -12,11 +12,13 @@
 
 - [x] Implement download SVG link
 
-- [ ] Implement `Silhouette tweaks` area design from Figma
-  - [ ] Add `debounce` function to `onchange` events in `Silhouette tweaks`
-    - <https://www.joshwcomeau.com/snippets/javascript/debounce/> - Josh's stuff has always been great
-  - [ ] Add `showValue` function to `onchange` events in `Silhouette tweaks`
+- [x] Implement `Silhouette tweaks` area design from Figma
+  - [x] Add `showValue` function to `onchange` events in `Silhouette tweaks`
     - Debounce used for "re-run image processing"... `showValue` should NOT be debounced, should update the displayed value immediately.
+    - 2025-06-03 - used `oninput` instead, same idea
+  - [x] Add `debounce` function to `onchange` events in `Silhouette tweaks`
+    - <https://www.joshwcomeau.com/snippets/javascript/debounce/> - Josh's stuff has always been great
+  
 - [ ] Implement `Layout tweaks` area design from Figma
 
 - [ ] Consider "joiner arc" settings

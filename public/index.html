@@ -33,7 +33,7 @@
 		heightMm: 30,
 		radius: 2,
 		arrangeOffsetX: -5
-	}, runAll)"
+	}, handleRasterEffect)"
 	>
 		<div class="page-container">
 			<h1>Paper Miniature Generator</h1>
@@ -276,7 +276,7 @@
 				radius: 2,
 				arrangeOffsetX: -5,
 				offset: 15
-			}, runAll)"
+			}, handleRasterEffect)"
 				>
 					test-figure.jpeg
 				</button>
@@ -287,7 +287,7 @@
 				threshold: 220,
 				arrangeOffsetX: 0,
 				offset: 30
-			}, runAll)"
+			}, handleRasterEffect)"
 				>
 					chess-piece.png
 				</button>
@@ -297,7 +297,7 @@
 				radius: 2,
 				threshold: 220,
 				arrangeOffsetX: 0,
-				offset: 30 }, runAll)"
+				offset: 30 }, handleRasterEffect)"
 				>
 					greek-doll.jpeg
 				</button>
@@ -320,64 +320,90 @@
 				</button>
 				<div id="download-link-container"></div>
 			</div>
+
+			<!--  -->
+			<!--  -->
+			<!--  -->
+			<h2>Silhouette Tweaks</h2>
+			<!--  -->
+			<!--  -->
+			<!--  -->
+
+			<div class="silhouette-preview-container">
+				<div class="image-container-raw">
+					<img id="raw-image" src="/sample-art/sample-char-art-00.jpeg" />
+				</div>
+				<div class="image-container-processed">
+					<img id="processed-image" />
+				</div>
+				<div class="image-container-traced" id="trace-svg"></div>
+			</div>
+
+			<div class="input-containers">
+				<div class="input-container">
+					<span>Threshold</span>
+					<input
+						id="threshold-slider"
+						max="255"
+						min="0"
+						oninput="document.getElementById('threshold').value = this.value; handleRasterEffect()"
+						type="range"
+						value="200"
+					/>
+					<input
+						id="threshold"
+						max="255"
+						min="0"
+						oninput="document.getElementById('threshold-slider').value = this.value; handleRasterEffect()"
+						type="number"
+						value="200"
+					/>
+				</div>
+				<div class="input-container">
+					<span>Blur</span>
+					<input
+						id="radius-slider"
+						max="16"
+						min="1"
+						oninput="document.getElementById('radius').value = this.value; handleRasterEffect()"
+						type="range"
+						value="2"
+					/>
+					<input
+						id="radius"
+						max="16"
+						min="1"
+						oninput="document.getElementById('radius-slider').value = this.value; handleRasterEffect()"
+						type="number"
+						value="2"
+					/>
+				</div>
+				<div class="input-container">
+					<span>Shape filter</span>
+					<input
+						id="pathomit-slider"
+						min="0"
+						max="100"
+						oninput="document.getElementById('pathomit').value = this.value; handleRasterEffect()"
+						type="range"
+						value="30"
+					/>
+					<input
+						id="pathomit"
+						oninput="document.getElementById('pathomit-slider').value = this.value; handleRasterEffect()"
+						type="number"
+						min="0"
+						value="30"
+						max="100"
+					/>
+				</div>
+			</div>
 		</div>
 
 		<div style="width: 100%">
 			<hr />
 			<hr />
 		</div>
-
-		<!--  -->
-		<!--  -->
-		<!--  -->
-		<h2>Silhouette Tweaks</h2>
-		<!--  -->
-		<!--  -->
-		<!--  -->
-
-		<div style="height: 1em"></div>
-		<div class="silhouette-preview-container">
-			<div class="image-container-raw">
-				<img id="raw-image" src="/sample-art/sample-char-art-00.jpeg" />
-			</div>
-			<div class="image-container-processed">
-				<img id="processed-image" />
-			</div>
-			<div class="image-container-traced" id="trace-svg"></div>
-		</div>
-
-		<p>
-			Threshold
-			<input
-				id="threshold"
-				type="number"
-				min="0"
-				max="255"
-				value="200"
-				onchange="runAll()"
-			/>
-		</p>
-		<p>
-			Blur
-			<input
-				onchange="runAll()"
-				id="radius"
-				type="number"
-				min="1"
-				max="30"
-				value="2"
-			/>
-		</p>
-		<p>
-			Shape filter
-			<input
-				id="pathomit"
-				onchange="runAll()"
-				type="number"
-				min="0"
-				value="30"
-			/>
-		</p>
 
 		<!--  -->
 		<!--  -->
@@ -395,7 +421,7 @@
 			Offset amount:
 			<input
 				id="offset"
-				onchange="runAll()"
+				onchange="handleRasterEffect()"
 				type="number"
 				min="0"
 				max="100"
@@ -406,7 +432,7 @@
 			Base size in mm (1 inch ~= 25 mm)
 			<input
 				id="baseSizeMm"
-				onchange="runAll()"
+				onchange="handleRasterEffect()"
 				type="number"
 				min="12"
 				max="50"
@@ -417,7 +443,7 @@
 			Height in mm (1 inch ~= 25 mm)
 			<input
 				id="heightMm"
-				onchange="runAll()"
+				onchange="handleRasterEffect()"
 				type="number"
 				min="5"
 				max="100"
@@ -428,7 +454,7 @@
 			X offset (use to center the image over the base)
 			<input
 				id="arrangeOffsetX"
-				onchange="runAll()"
+				onchange="handleRasterEffect()"
 				type="number"
 				min="-100"
 				max="100"
@@ -441,7 +467,7 @@
 			     base size (72) divided by 4 -->
 			<input
 				id="arrangeOffsetY"
-				onchange="runAll()"
+				onchange="handleRasterEffect()"
 				type="number"
 				min="0"
 				max="18"
