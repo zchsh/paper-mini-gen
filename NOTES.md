@@ -2,20 +2,6 @@
 
 ## Next steps
 
-- [x] Reconsider offset ordering for better consistency
-  - Currently I think it's, offset first, scale after?
-  - Maybe it should be... scale first, then offset?
-  - Cause as is... a "tall" piece of art will get scaled down less, and the offset therefore looks thicker... where a "short" piece of art gets scaled down a lot, and the offset gets scaled down as well, and thus looks thinner
-  - This would be a relatively significant refactor, so seems to make sense to clean things up first.
-  - This would also be nice cause setting the "height" before offset seems more intuitive and accurate for height purposes as well. As-is, you can decide on a scale, but then adding or removing offset can vary the size the artwork comes out by a lot (2x the offset amount).
-  - 2025-06-03 at 21:58 - re-ordered, seems to be working well! definitely feels more intuitive.
-
-- [x] Refine `Layout tweaks` preview
-  - Address scroll jank when tweaking values that affect viewBox size...
-  - maybe there's something like `contain` styling that keeps the container a consistent size, and scales down the artwork?
-  - thinking through how things get arranged in this preview area seems like it'd be worth it... check Figma, had sketched some stuff there.
-  - 2025-06-03 at 21:55 - removed it altogether, simpler to use final product as preview
-
 - [ ] SVG size efficiency
   - Image data gets embedded twice, I think? Is there way to make a kind of "definition" of the image, and then have "instances" for the separate front and reflected back images (top and bottom images in code comment speak)?
   - Current metric - `test-figure.jpeg` is 6 kB, resulting SVG with current defaults is 25 kB. Double-embedding the image data feels like the first thing to try... Could try manually in a text editor first, if you want.
