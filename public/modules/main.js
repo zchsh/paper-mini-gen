@@ -43,16 +43,10 @@ import { debounce } from "./ui/debounce.js";
  */
 async function runAll() {
 	// Run all raster related processing
-	const { traceResult, blurPadding, sizeOriginal, scalePreTrace } =
-		await runAllRaster();
-	window.imageMetrics = {
-		sizeOriginal,
-		scalePreTrace,
-		blurPadding,
-		traceResult,
-	};
+	const imageMetrics = await runAllRaster();
+	window.imageMetrics = imageMetrics;
 	// Run all vector related processing
-	await runAllVector();
+	await runAllVector(imageMetrics);
 }
 
 /**
@@ -95,12 +89,21 @@ async function runAllRaster() {
 	const destNodeTrace = document.getElementById("trace-svg");
 	destNodeTrace.innerHTML = "";
 	destNodeTrace.appendChild(svgPolygonsTraced);
+	// Grab the image as a data URL
+	const imageElem = document.getElementById("raw-image");
+	const imgData = {
+		dataUrl: await toDataUrl(imageElem.getAttribute("src")),
+		height: imageElem.naturalHeight,
+		width: imageElem.naturalWidth,
+	};
+
 	// Return relevant image metrics
 	return {
 		traceResult,
 		blurPadding,
 		sizeOriginal,
 		scalePreTrace,
+		imgData,
 	};
 }
 
@@ -109,31 +112,24 @@ async function runAllRaster() {
  *
  *
  */
-async function runAllVector() {
-	const imageMetrics = window.imageMetrics || (await runAllRaster());
-	const { traceResult, blurPadding, sizeOriginal, scalePreTrace } =
+async function runAllVector(imageMetricsArg) {
+	const imageMetrics =
+		imageMetricsArg || window.imageMetrics || (await runAllRaster());
+	const { traceResult, blurPadding, sizeOriginal, scalePreTrace, imgData } =
 		imageMetrics;
-	/**
-	 * Offset the traced polygons
-	 */
-	const offset = getInputAsInt("offset");
-	const polygonsOffset = applyOffset(traceResult.polygons, offset);
-	// Render the offset polygons
-	const destNodeOffset = document.getElementById("offset-svg");
-	const viewBoxOffset = getFallbackViewBox(polygonsOffset, 9);
-	const svgNodeFlattened = svgNodeFromPolygons(polygonsOffset, viewBoxOffset, {
-		showDebug: true,
-	});
-	destNodeOffset.innerHTML = "";
-	destNodeOffset.appendChild(svgNodeFlattened);
 	/**
 	 * Scale the polygons to a target height
 	 */
 	const heightInputMm = getInputAsInt("heightMm");
 	const [polygonsScaled, scalePostTrace] = scaleToTargetHeight(
-		polygonsOffset,
+		traceResult.polygons,
 		heightInputMm
 	);
+	/**
+	 * Offset the traced polygons
+	 */
+	const offset = getInputAsInt("offset");
+	const polygonsOffset = applyOffset(polygonsScaled, offset);
 	/**
 	 * Arrange the offset trace and base shapes for a union operation.
 	 * This union shape will be the cut-out outline for the paper miniature.
@@ -141,23 +137,11 @@ async function runAllVector() {
 	const baseSizeMm = getInputAsInt("baseSizeMm");
 	const arrangeOffsetX = getInputAsInt("arrangeOffsetX");
 	const arrangeOffsetY = getInputAsInt("arrangeOffsetY");
-	const [polygonsArranged, baseData] = arrangeForUnion(polygonsScaled, {
+	const [polygonsArranged, baseData] = arrangeForUnion(polygonsOffset, {
 		baseSizeMm,
 		arrangeOffsetX,
 		arrangeOffsetY,
 	});
-	/**
-	 * Render the shapes arranged for a union
-	 */
-	const arrangeContainer = document.getElementById("arrange-container");
-	const viewBoxArrangePadding = 9; // 1/8 inch
-	const viewBoxArrange = getFallbackViewBox(
-		polygonsArranged,
-		viewBoxArrangePadding
-	);
-	const svgNodeArranged = svgNodeFromPolygons(polygonsArranged, viewBoxArrange);
-	arrangeContainer.innerHTML = "";
-	arrangeContainer.appendChild(svgNodeArranged);
 	/**
 	 * Apply union to the arranged polygons
 	 */
@@ -168,12 +152,6 @@ async function runAllVector() {
 	 * including the original image, a reverse-side image,
 	 * the outline union shape, and fold lines.
 	 */
-	const imageElem = document.getElementById("raw-image");
-	const imgData = {
-		dataUrl: await toDataUrl(imageElem.getAttribute("src")),
-		height: imageElem.naturalHeight,
-		width: imageElem.naturalWidth,
-	};
 	const finalSvgElem = await applyLayout(polygons_union, imgData, {
 		blurPadding,
 		scalePreTrace,
@@ -185,6 +163,11 @@ async function runAllVector() {
 	const finalContainer = document.getElementById("layout-container");
 	finalContainer.innerHTML = "";
 	finalContainer.appendChild(finalSvgElem);
+	/**
+	 * TODO: all the stuff below could be debounced,
+	 * doesn't need to happen on every single change,
+	 * could happen MUCH less frequently (eg 4 times per second).
+	 */
 	// Grab the final SVG as a string
 	const finalSvgString = new XMLSerializer().serializeToString(finalSvgElem);
 	const finalSvgDataUrl = `data:image/svg+xml;base64,${btoa(finalSvgString)}`;
@@ -209,11 +192,9 @@ async function resetAndRunAll() {
 	await runAll();
 }
 
-/**
- * TODO: split runAll() into runAllRaster() and runAllVector()
- * TODO: add handleVectorEffect()
- */
+// Raster processing is a bit slow, we debounce to try not to waste resources
 const handleRasterEffect = debounce(runAll, 250);
+// Vector processing is pretty fast, it can happen more often
 const handleVectorEffect = debounce(runAllVector, 10);
 
 /**

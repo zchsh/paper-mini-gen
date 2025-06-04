@@ -30,7 +30,7 @@
 	</head>
 	<body
 		onload="updateImage('/sample-art/test-figure.jpeg', {
-		heightMm: 30,
+		heightMm: 27,
 		radius: 2,
 		arrangeOffsetX: -5
 	}, handleRasterEffect)"
@@ -272,10 +272,10 @@
 			<p>
 				<button
 					onclick="updateImage('/sample-art/test-figure.jpeg', {
-				heightMm: 30,
-				radius: 2,
-				arrangeOffsetX: -5,
-				offset: 15
+		heightMm: 27,
+		radius: 2,
+		arrangeOffsetX: -5,
+		offset: 10
 			}, handleRasterEffect)"
 				>
 					test-figure.jpeg
@@ -286,7 +286,7 @@
 				radius: 2,
 				threshold: 220,
 				arrangeOffsetX: 0,
-				offset: 30
+				offset: 10
 			}, handleRasterEffect)"
 				>
 					chess-piece.png
@@ -297,7 +297,7 @@
 				radius: 2,
 				threshold: 220,
 				arrangeOffsetX: 0,
-				offset: 30 }, handleRasterEffect)"
+				offset: 10 }, handleRasterEffect)"
 				>
 					greek-doll.jpeg
 				</button>
@@ -321,10 +321,114 @@
 				<div id="download-link-container"></div>
 			</div>
 
+			<div class="input-containers">
+				<div class="input-container">
+					<span>Outline</span>
+					<input
+						id="offset-slider"
+						oninput="document.getElementById('offset').value = this.value; handleVectorEffect()"
+						type="range"
+						min="0"
+						max="100"
+						value="10"
+					/>
+					<input
+						id="offset"
+						oninput="document.getElementById('offset-slider').value = this.value; handleVectorEffect()"
+						type="number"
+						min="0"
+						max="100"
+						value="10"
+					/>
+				</div>
+
+				<div class="input-container">
+					<span>Height</span>
+					<input
+						id="heightMm-slider"
+						oninput="document.getElementById('heightMm').value = this.value; handleVectorEffect()"
+						type="range"
+						min="5"
+						max="100"
+						value="35"
+					/>
+					<input
+						id="heightMm"
+						oninput="document.getElementById('heightMm-slider').value = this.value; handleVectorEffect()"
+						type="number"
+						min="5"
+						max="100"
+						value="35"
+					/>
+					<span>mm</span>
+				</div>
+
+				<div class="input-container">
+					<span>Base size</span>
+					<input
+						id="baseSizeMm-slider"
+						oninput="document.getElementById('baseSizeMm').value = this.value; handleVectorEffect()"
+						type="range"
+						min="12"
+						max="50"
+						value="25"
+					/>
+					<input
+						id="baseSizeMm"
+						oninput="document.getElementById('baseSizeMm-slider').value = this.value; handleVectorEffect()"
+						type="number"
+						min="12"
+						max="50"
+						value="25"
+					/>
+					<span>mm</span>
+				</div>
+
+				<div class="input-container">
+					<span>Center</span>
+					<input
+						id="arrangeOffsetX-slider"
+						oninput="document.getElementById('arrangeOffsetX').value = this.value; handleVectorEffect()"
+						type="range"
+						min="-50"
+						max="50"
+						value="0"
+					/>
+					<input
+						id="arrangeOffsetX"
+						oninput="document.getElementById('arrangeOffsetX-slider').value = this.value; handleVectorEffect()"
+						type="number"
+						min="-50"
+						max="50"
+						value="0"
+					/>
+				</div>
+
+				<div class="input-container">
+					<span>Float</span>
+					<input
+						id="arrangeOffsetY-slider"
+						oninput="document.getElementById('arrangeOffsetY').value = this.value; handleVectorEffect()"
+						type="range"
+						min="-20"
+						max="80"
+						value="0"
+					/>
+					<input
+						id="arrangeOffsetY"
+						oninput="document.getElementById('arrangeOffsetY-slider').value = this.value; handleVectorEffect()"
+						type="number"
+						min="-20"
+						max="80"
+						value="0"
+					/>
+				</div>
+			</div>
+
 			<!--  -->
 			<!--  -->
 			<!--  -->
-			<h2>Silhouette Tweaks</h2>
+			<h2>Silhouette tweaks</h2>
 			<!--  -->
 			<!--  -->
 			<!--  -->
@@ -398,127 +502,6 @@
 					/>
 				</div>
 			</div>
-
-			<!--  -->
-			<!--  -->
-			<!--  -->
-			<h2>Layout tweaks</h2>
-			<!--  -->
-			<!--  -->
-			<!--  -->
-
-			<!-- TODO: figure out CSS setup that keeps results previews at consistent size -->
-			<!-- eg, by scaling to parent container... currently lots of jank cause i'm not doing that -->
-			<!-- have a stubbed version of this, but it's not very refined -->
-
-			<div class="layout-tweaks-container">
-				<div id="offset-svg"></div>
-				<div id="arrange-container"></div>
-			</div>
-			<div class="input-containers">
-				<div class="input-container">
-					<span>Outline</span>
-					<input
-						id="offset-slider"
-						oninput="document.getElementById('offset').value = this.value; handleVectorEffect()"
-						type="range"
-						min="0"
-						max="100"
-						value="30"
-					/>
-					<input
-						id="offset"
-						oninput="document.getElementById('offset-slider').value = this.value; handleVectorEffect()"
-						type="number"
-						min="0"
-						max="100"
-						value="30"
-					/>
-				</div>
-
-				<div class="input-container">
-					<span>Base</span>
-					<input
-						id="baseSizeMm-slider"
-						oninput="document.getElementById('baseSizeMm').value = this.value; handleVectorEffect()"
-						type="range"
-						min="12"
-						max="50"
-						value="25"
-					/>
-					<input
-						id="baseSizeMm"
-						oninput="document.getElementById('baseSizeMm-slider').value = this.value; handleVectorEffect()"
-						type="number"
-						min="12"
-						max="50"
-						value="25"
-					/>
-					<span>mm</span>
-				</div>
-
-				<div class="input-container">
-					<span>Height</span>
-					<input
-						id="heightMm-slider"
-						oninput="document.getElementById('heightMm').value = this.value; handleVectorEffect()"
-						type="range"
-						min="5"
-						max="100"
-						value="35"
-					/>
-					<input
-						id="heightMm"
-						oninput="document.getElementById('heightMm-slider').value = this.value; handleVectorEffect()"
-						type="number"
-						min="5"
-						max="100"
-						value="35"
-					/>
-					<span>mm</span>
-				</div>
-
-				<div class="input-container">
-					<span>Center</span>
-					<input
-						id="arrangeOffsetX-slider"
-						oninput="document.getElementById('arrangeOffsetX').value = this.value; handleVectorEffect()"
-						type="range"
-						min="-50"
-						max="50"
-						value="0"
-					/>
-					<input
-						id="arrangeOffsetX"
-						oninput="document.getElementById('arrangeOffsetX-slider').value = this.value; handleVectorEffect()"
-						type="number"
-						min="-50"
-						max="50"
-						value="0"
-					/>
-				</div>
-
-				<div class="input-container">
-					<span>Float</span>
-					<input
-						id="arrangeOffsetY-slider"
-						oninput="document.getElementById('arrangeOffsetY').value = this.value; handleVectorEffect()"
-						type="range"
-						min="-20"
-						max="80"
-						value="0"
-					/>
-					<input
-						id="arrangeOffsetY"
-						oninput="document.getElementById('arrangeOffsetY-slider').value = this.value; handleVectorEffect()"
-						type="number"
-						min="-20"
-						max="80"
-						value="0"
-					/>
-				</div>
-			</div>
-		</div>
 
 		<div style="height: 16em"></div>
 	</body>

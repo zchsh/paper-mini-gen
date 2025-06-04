@@ -2,29 +2,39 @@
 
 ## Next steps
 
-- [ ] Reconsider offset ordering for better consistency
+- [x] Reconsider offset ordering for better consistency
   - Currently I think it's, offset first, scale after?
   - Maybe it should be... scale first, then offset?
   - Cause as is... a "tall" piece of art will get scaled down less, and the offset therefore looks thicker... where a "short" piece of art gets scaled down a lot, and the offset gets scaled down as well, and thus looks thinner
   - This would be a relatively significant refactor, so seems to make sense to clean things up first.
   - This would also be nice cause setting the "height" before offset seems more intuitive and accurate for height purposes as well. As-is, you can decide on a scale, but then adding or removing offset can vary the size the artwork comes out by a lot (2x the offset amount).
+  - 2025-06-03 at 21:58 - re-ordered, seems to be working well! definitely feels more intuitive.
 
-### Later
-
-#### Refine layout tweaks preview
-
-- [ ] Refine `Layout tweaks` preview
+- [x] Refine `Layout tweaks` preview
   - Address scroll jank when tweaking values that affect viewBox size...
   - maybe there's something like `contain` styling that keeps the container a consistent size, and scales down the artwork?
   - thinking through how things get arranged in this preview area seems like it'd be worth it... check Figma, had sketched some stuff there.
+  - 2025-06-03 at 21:55 - removed it altogether, simpler to use final product as preview
 
-#### Consider joiner arc settings
+- [ ] SVG size efficiency
+  - Image data gets embedded twice, I think? Is there way to make a kind of "definition" of the image, and then have "instances" for the separate front and reflected back images (top and bottom images in code comment speak)?
+  - Current metric - `test-figure.jpeg` is 6 kB, resulting SVG with current defaults is 25 kB. Double-embedding the image data feels like the first thing to try... Could try manually in a text editor first, if you want.
 
-- [ ] Consider "joiner arc" settings
-  - Standing-up part of mini is "joined" to base, currently by half-circle
-  - Could have "arc height" and "arc width" instead, for flexibility
-  - Some art may be "floating" very high up... special joiner settings for that?
-  - Maybe this is something like... "joiner style"... default is "arc"... and then "joiner height", "joiner width"
+- [ ] Clean up `main.js`
+  - Have split out a lot of different functionality... but the main file still feels kind of messy
+
+- [ ] Styling refinement
+  - Currently feels mostly functional... but styling feels like it could use some work!
+
+### Later
+
+#### Separate arrangement tool
+
+- [ ] Not everyone knows how to work with SVGs. Bit of a pain. Consider arrangement of "results" on page...
+  - maybe let them be dragged around, even rotated?
+  - nah... seems to make more sense to have this as a separate tool
+  - character mini generator should render to `.svg`, or to `.jpeg` or `.png`. The exported asset can then be placed and duplicated in other programs (eg Figma). If I happen to want to create an HTML-based standalone program that lets you arrange imported `.svg`, `.png`, and `.jpeg` files on a page, that might be cool. But, can be completely separate from the "paper minis" generator.
+  - probably makes sense as a separate project
 
 #### Explore path smoothing after boolean addition
 
@@ -40,13 +50,13 @@
   - 2025-05-10 at 10:27 - there's a Figma plugin for this that might be worth trying: <https://www.figma.com/community/plugin/809139536998662893/simplify>. Might make sense to set up "Copy SVG" at every step for debug purposes... then you can test the smoothing process in Figma, see if it works, and if it does and the plugin is licensed appropriately, swipe the code and integrate it here.
   - 2025-05-13 at 09:41 - <https://mourner.github.io/simplify-js/> looks perfect
 
-#### Separate arrangement tool
+#### Consider joiner arc settings
 
-- [ ] Not everyone knows how to work with SVGs. Bit of a pain. Consider arrangement of "results" on page...
-  - maybe let them be dragged around, even rotated?
-  - nah... seems to make more sense to have this as a separate tool
-  - character mini generator should render to `.svg`, or to `.jpeg` or `.png`. The exported asset can then be placed and duplicated in other programs (eg Figma). If I happen to want to create an HTML-based standalone program that lets you arrange imported `.svg`, `.png`, and `.jpeg` files on a page, that might be cool. But, can be completely separate from the "paper minis" generator.
-  - probably makes sense as a separate project
+- [ ] Consider "joiner arc" settings
+  - Standing-up part of mini is "joined" to base, currently by half-circle
+  - Could have "arc height" and "arc width" instead, for flexibility
+  - Some art may be "floating" very high up... special joiner settings for that?
+  - Maybe this is something like... "joiner style"... default is "arc"... and then "joiner height", "joiner width"
 
 #### Support "backside" images
 
@@ -60,6 +70,13 @@
 - Could there be an option to remove these interior voids? Option to remove them completely could make sense.
 - Another way to implement this option, more manual maybe a separate thing, would be manual removal of specific shapes, eg by clicking on them and having them change colour
 - Possible first cut option... a given polygon is made up of many REGIONS. Group the regions of a given polygon based on whether they overlap - any overlapping regions should be placed in a single group. Determining overlap might be done with a "minowski diff"? <https://sourceforge.net/p/jsclipper/wiki/documentation/#clipperlibclipperminkowskidiff>. In longer form, running an intersection of the two regions, and then determining whether the intersection has a surface area greater than zero might be another option. Once you have a group of overlapping regions, then determine the surface area of each region, with <https://sourceforge.net/p/jsclipper/wiki/documentation/#clipperlibjsareaofpolygon>. Finally, sort by surface area, and keep only the region with the largest surface area.
+
+#### Image resizing performance
+
+- [ ] Image resize performance
+  - Image resize should only need to happen once, on upload
+  - Currently happens every time a raster-related setting is changed
+  - Incidentally... maybe resized image would be efficient to embed into the SVG? Could potentially debounce the actual image data resizing, while immediately updating the display image size.
 
 #### Consider alternate approach to centering traced shapes
 
