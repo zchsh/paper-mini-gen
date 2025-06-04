@@ -5,6 +5,7 @@
 - [ ] SVG size efficiency
   - Image data gets embedded twice, I think? Is there way to make a kind of "definition" of the image, and then have "instances" for the separate front and reflected back images (top and bottom images in code comment speak)?
   - Current metric - `test-figure.jpeg` is 6 kB, resulting SVG with current defaults is 25 kB. Double-embedding the image data feels like the first thing to try... Could try manually in a text editor first, if you want.
+  - 2025-06-04 - manually edited the default `test-figure.jpeg` setup, got size down from 25 kB to 12 kB. Next step is to build the same kinds of "edits" into the SVG creation process, in `apply-layout.js`. Which could probably be renamed to `layout-final-svg.js` or something.
 
 - [ ] Clean up `main.js`
   - Have split out a lot of different functionality... but the main file still feels kind of messy
