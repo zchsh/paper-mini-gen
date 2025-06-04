@@ -12,6 +12,11 @@
 - [ ] Styling refinement
   - Currently feels mostly functional... but styling feels like it could use some work!
 
+- [ ] Add mountain fold lines where bases intersect
+  - Currently only have valley folds marked, where character art meets the base
+  - Would be helpful to mark mountain folds as well...
+  - Dot-dash line vs dashed line for mountain folds vs valley folds, using `stroke-dasharray`
+
 ### Later
 
 #### Separate arrangement tool
