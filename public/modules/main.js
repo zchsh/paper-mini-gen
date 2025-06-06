@@ -18,6 +18,7 @@ import { applyOffset } from "./vector-processing/apply-offset.js";
 import { arrangeForUnion } from "./layout/arrange-for-union.js";
 import { applyUnion } from "./vector-processing/clipperjs-wrappers/apply-union.js";
 import { applyLayout } from "./layout/apply-layout.js";
+import { layoutFinalSvg } from "./layout/layout-final-svg.js";
 import { toDataUrl } from "./render/to-data-url.js";
 // GLOBAL STUFF
 import { onImageSelection } from "./ui/on-image-selection.js";
@@ -152,7 +153,8 @@ async function runAllVector(imageMetricsArg) {
 	 * including the original image, a reverse-side image,
 	 * the outline union shape, and fold lines.
 	 */
-	const finalSvgElem = await applyLayout(polygons_union, imgData, {
+	// const finalSvgElem = await applyLayout(polygons_union, imgData, {
+	const finalSvgElem = await layoutFinalSvg(polygons_union, imgData, {
 		blurPadding,
 		scalePreTrace,
 		scalePostTrace,
