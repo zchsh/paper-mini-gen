@@ -10,6 +10,14 @@
 
 ### Later
 
+#### Separate arrangement tool
+
+- [ ] Not everyone knows how to work with SVGs. Bit of a pain. Consider arrangement of "results" on page...
+  - maybe let them be dragged around, even rotated?
+  - nah... seems to make more sense to have this as a separate tool
+  - character mini generator should render to `.svg`, or to `.jpeg` or `.png`. The exported asset can then be placed and duplicated in other programs (eg Figma). If I happen to want to create an HTML-based standalone program that lets you arrange imported `.svg`, `.png`, and `.jpeg` files on a page, that might be cool. But, can be completely separate from the "paper minis" generator.
+  - probably makes sense as a separate project
+
 #### Explore path smoothing after boolean addition
 
 - [ ] Explore path smoothing after boolean addition
@@ -23,14 +31,6 @@
   - 2025-04-13 at 18:05 - stubbedin `demo-smooth-to-polyline`
   - 2025-05-10 at 10:27 - there's a Figma plugin for this that might be worth trying: <https://www.figma.com/community/plugin/809139536998662893/simplify>. Might make sense to set up "Copy SVG" at every step for debug purposes... then you can test the smoothing process in Figma, see if it works, and if it does and the plugin is licensed appropriately, swipe the code and integrate it here.
   - 2025-05-13 at 09:41 - <https://mourner.github.io/simplify-js/> looks perfect
-
-#### Separate arrangement tool
-
-- [ ] Not everyone knows how to work with SVGs. Bit of a pain. Consider arrangement of "results" on page...
-  - maybe let them be dragged around, even rotated?
-  - nah... seems to make more sense to have this as a separate tool
-  - character mini generator should render to `.svg`, or to `.jpeg` or `.png`. The exported asset can then be placed and duplicated in other programs (eg Figma). If I happen to want to create an HTML-based standalone program that lets you arrange imported `.svg`, `.png`, and `.jpeg` files on a page, that might be cool. But, can be completely separate from the "paper minis" generator.
-  - probably makes sense as a separate project
 
 #### Consider joiner arc settings
 
