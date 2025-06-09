@@ -5,7 +5,7 @@
 - [x] Clean up `main.js`
   - Have split out a lot of different functionality... but the main file still feels kind of messy
 
-- [ ] Revisit "float" and "center" units
+- [x] Revisit "float" and "center" units
   - Currently a concrete unit, pixels I think
   - Could maybe be percentage of the figure?
   - For example, "center" would be percentage of the figure's width (plus offset * 2 I think?). No matter what the width of the figure, at -100%, the figure will no longer be connected to the base... so we know this is the FARTHEST we would want to offset.

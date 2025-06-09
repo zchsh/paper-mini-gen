@@ -9,5 +9,15 @@
  * @returns {number}
  */
 export function getInputAsInt(inputId) {
-	return parseInt(document.getElementById(inputId).value);
+	const elem = document.getElementById(inputId);
+	if (!elem || !elem.value) {
+		throw new Error(
+			`Input element with ID "${inputId}" not found or has no value.`
+		);
+	}
+	const rawValue = parseInt(elem.value);
+	if (isNaN(rawValue)) {
+		return 0;
+	}
+	return rawValue;
 }

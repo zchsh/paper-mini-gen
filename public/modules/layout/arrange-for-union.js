@@ -3,9 +3,6 @@ import { translatePolygons } from "../vector-processing/translate-polygons.js";
 import { visitPoints } from "../vector-processing/visit-points.js";
 import { createCircularPolygon } from "../vector-processing/create-circular-polygon.js";
 
-const PIXELS_PER_INCH = 72;
-const MM_PER_INCH = 25.4;
-
 /**
  * Given a set of polygons, representing the traced shape of art for a paper
  * miniature, as well as settings for the base size and arrangement tweaks,
@@ -23,10 +20,8 @@ const MM_PER_INCH = 25.4;
  */
 export function arrangeForUnion(
 	polygons,
-	{ baseSizeMm, arrangeOffsetX, arrangeOffsetY }
+	{ baseSize, arrangeOffsetX, arrangeOffsetY }
 ) {
-	// Determine the base size in pixels
-	const baseSize = baseSizeMm * (PIXELS_PER_INCH / MM_PER_INCH);
 	// Determine the base overlap, based on the base size
 	const baseOverlap = Math.ceil(baseSize / 10);
 	/**

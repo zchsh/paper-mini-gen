@@ -11,6 +11,10 @@ import { scaleToTargetHeight } from "../layout/scale-to-target-height.js";
 import { getCachedResult } from "../util/cache-result.js";
 // RASTER processing, which is a pre-requisite and MIGHT have to be run
 import { runRasterProcessing } from "../raster-processing/run-raster-processing.js";
+import { getBoundingPoints } from "./get-bounding-points.js";
+
+const PIXELS_PER_INCH = 72;
+const MM_PER_INCH = 25.4;
 
 /**
  * Runs vector processing on a set of traced polygons, to produce
@@ -55,21 +59,31 @@ export async function runVectorProcessing(imageMetricsArg) {
 	 */
 	const offset = getInputAsInt("offset");
 	const polygonsOffset = applyOffset(polygonsScaled, offset);
+	// Get the bounding points of the offset polygons
+	const allPoints = polygonsOffset.map((p) => p.regions.flat()).flat();
+	const boundingPoints = getBoundingPoints(allPoints);
 	/**
 	 * Arrange the offset trace and base shapes for a union operation.
 	 * This union shape will be the cut-out outline for the paper miniature.
 	 */
 	const baseSizeMm = getInputAsInt("baseSizeMm");
-	/**
-	 * TODO: treat arrangeOffsetX as a percent of the width of the traced polygons
-	 */
-	const arrangeOffsetX = getInputAsInt("arrangeOffsetX");
-	/**
-	 * TODO: treat arrangeOffsetY as a percent of the height of the traced polygons
-	 */
-	const arrangeOffsetY = getInputAsInt("arrangeOffsetY");
+	const baseSize = baseSizeMm * (PIXELS_PER_INCH / MM_PER_INCH);
+	// Ww treat the arrangeOffsetX as a percent, so we do some math to get pixels
+	const boundingWidth = boundingPoints.maxX - boundingPoints.minX;
+	const maxAbsoluteOffsetX = boundingWidth / 2 + baseSize / 2;
+	const arrangeOffsetXPercent = getInputAsInt("arrangeOffsetX");
+	const arrangeOffsetX = (arrangeOffsetXPercent / 100.0) * maxAbsoluteOffsetX;
+	// We treat the arrangeOffsetY as a percent, so again, math to get pixels
+	const boundingHeight = boundingPoints.maxY - boundingPoints.minY;
+	const maxPositiveOffsetY = baseSize / 2; // Stay connected to the base
+	const maxNegativeOffsetY = boundingHeight - offset; // Show some of the image
+	const arrangeOffsetYPercent = getInputAsInt("arrangeOffsetY");
+	const arrangeOffsetY =
+		arrangeOffsetYPercent > 0
+			? (arrangeOffsetYPercent / 100.0) * maxPositiveOffsetY
+			: (arrangeOffsetYPercent / 100.0) * maxNegativeOffsetY;
 	const [polygonsArranged, baseData] = arrangeForUnion(polygonsOffset, {
-		baseSizeMm,
+		baseSize,
 		arrangeOffsetX,
 		arrangeOffsetY,
 	});

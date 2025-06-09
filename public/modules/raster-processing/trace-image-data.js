@@ -21,7 +21,7 @@ import ImageTracer from "./imagetracejs-remixes/imagetracer_v1.2.6_module.js";
  * @param {JimpImage} pathomit
  * @returns {Promise<{
  *  polygons: { regions: [number, number][][] }[],
- * 	viewBox: [number, number, number, number],
+ * 	viewBox: [number, number, number, number]
  * }>}
  */
 export async function traceImageData(jimpImage, pathomit) {
