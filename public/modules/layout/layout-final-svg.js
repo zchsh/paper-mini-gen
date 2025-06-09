@@ -79,11 +79,10 @@ export async function layoutFinalSvg(
 	 * which will be visible behind the image.
 	 */
 	const outlineBackground = createSvgElem("g");
-	for (const [idx, pathString] of outlinePathStrings.entries()) {
+	for (const [idx, _pathString] of outlinePathStrings.entries()) {
 		outlineBackground.append(
 			createSvgElem("use", {
 				fill: "white",
-				d: pathString,
 				href: `#${getOutlinePathId(idx)}`,
 			})
 		);
@@ -93,7 +92,7 @@ export async function layoutFinalSvg(
 	 * Use the outline shape for a gray cutting line
 	 */
 	const outlineCutLine = createSvgElem("g");
-	for (const [idx, pathString] of outlinePathStrings.entries()) {
+	for (const [idx, _pathString] of outlinePathStrings.entries()) {
 		outlineCutLine.append(
 			createSvgElem("use", {
 				"fill-rule": "nonzero",
@@ -103,7 +102,6 @@ export async function layoutFinalSvg(
 				"stroke-linecap": "round",
 				"stroke-linejoin": "round",
 				"stroke-miterlimit": 10,
-				d: pathString,
 				href: `#${getOutlinePathId(idx)}`,
 			})
 		);
@@ -117,10 +115,9 @@ export async function layoutFinalSvg(
 	const outlineClipPathId = "unionClipPath";
 	const outlineClipPath = createSvgElem("clipPath", { id: outlineClipPathId });
 	outlineClipPath.append(
-		...outlinePathStrings.map((pathString, idx) => {
+		...outlinePathStrings.map((_pathString, idx) => {
 			return createSvgElem("use", {
 				fill: "white",
-				d: pathString,
 				href: `#${getOutlinePathId(idx)}`,
 			});
 		})
@@ -128,22 +125,35 @@ export async function layoutFinalSvg(
 	/**
 	 * Set up data for the original image.
 	 *
-	 * TODO: actually implement this part.
-	 * For now, using the previous approach of duplicate elements.
+	 * Note that the image element sets the scale as well, as width and height
+	 * attributes have no effect on <use /> elements in our use case here.
+	 *
+	 * For reference:
+	 * https://developer.mozilla.org/en-US/docs/Web/SVG/Reference/Element/use
 	 */
+	const imgScaleFinal = scalePreTrace * scalePostTrace;
+	const imageDataElemId = "imageData";
+	const imageDataGroup = createSvgElem("g", {
+		visibility: "hidden",
+	});
+	const imageDataElem = createSvgElem("image", {
+		id: imageDataElemId,
+		"xlink:href": imgData.dataUrl,
+		width: imgData.width * imgScaleFinal,
+		height: imgData.height * imgScaleFinal,
+	});
+	imageDataGroup.appendChild(imageDataElem);
 	/**
 	 * Position the top image.
 	 *
 	 * We do some finicky positioning here to ensure the position of
 	 * the top image matches the position of the outline shape.
 	 */
-	const imgScaleFinal = scalePreTrace * scalePostTrace;
+
 	const scaledPadding = blurPadding * scalePostTrace;
 	const imgTopPosn = { x: scaledPadding, y: scaledPadding };
-	const svgImageTop = createSvgElem("image", {
-		"xlink:href": imgData.dataUrl,
-		width: imgData.width * imgScaleFinal,
-		height: imgData.height * imgScaleFinal,
+	const svgImageTop = createSvgElem("use", {
+		href: `#${imageDataElemId}`,
 		x: imgTopPosn.x,
 		y: imgTopPosn.y,
 	});
@@ -196,14 +206,21 @@ export async function layoutFinalSvg(
 	 * https://developer.mozilla.org/en-US/docs/Web/SVG/Reference/Attribute/transform-origin
 	 */
 	const imgBottomReflectionTranslate = -1 * (imgBottomY * 2 + imgHeightFinal);
-	const svgImageBottom = createSvgElem("image", {
-		"xlink:href": imgData.dataUrl,
-		width: imgData.width * imgScaleFinal,
-		height: imgData.height * imgScaleFinal,
-		x: imgTopPosn.x,
-		y: imgBottomY,
+	/**
+	 * Create a group for the bottom image, we apply transforms here
+	 * since we can't apply transforms to <use /> elements.
+	 */
+	const svgImageBottom = createSvgElem("g", {
 		transform: `scale(1, -1) translate(0, ${imgBottomReflectionTranslate})`,
 	});
+	// Add the bottom image with a <use /> element
+	svgImageBottom.appendChild(
+		createSvgElem("use", {
+			href: `#${imageDataElemId}`,
+			x: imgTopPosn.x,
+			y: imgBottomY,
+		})
+	);
 	/**
 	 * Build a group for the "top" and "bottom" images. This group includes
 	 * a reference to the outline clip path we created earlier.
@@ -237,6 +254,7 @@ export async function layoutFinalSvg(
 	 * Build the final SVG node
 	 */
 	svgNode.appendChild(outlineDataGroup);
+	svgNode.appendChild(imageDataGroup);
 	svgNode.appendChild(outlineClipPath);
 	svgNode.append(outlineBackground);
 	svgGroupImages.appendChild(svgImageTop);

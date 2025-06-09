@@ -2,10 +2,11 @@
 
 ## Next steps
 
-- [ ] SVG size efficiency
+- [x] SVG size efficiency
   - Image data gets embedded twice, I think? Is there way to make a kind of "definition" of the image, and then have "instances" for the separate front and reflected back images (top and bottom images in code comment speak)?
   - Current metric - `test-figure.jpeg` is 6 kB, resulting SVG with current defaults is 25 kB. Double-embedding the image data feels like the first thing to try... Could try manually in a text editor first, if you want.
   - 2025-06-04 - manually edited the default `test-figure.jpeg` setup, got size down from 25 kB to 12 kB. Next step is to build the same kinds of "edits" into the SVG creation process, in `apply-layout.js`. Which could probably be renamed to `layout-final-svg.js` or something. Might make sense to start that as a separate file, and rebuild from whatever's in `apply-layout.js`.
+  - 2025-06-09 - set up `<use />` elements for the outline path and the image data, which were the heaviest parts of the resulting SVG file. SVG size is down to 12 kB, as expected. Also ran the results through <https://validator.w3.org/>, and they seem fine.
 
 - [ ] Add mountain fold lines where bases intersect
   - Currently only have valley folds marked, where character art meets the base

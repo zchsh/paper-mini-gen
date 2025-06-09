@@ -16,9 +16,7 @@
   <!-- Images -->
   <g clip-path="url(#unionClipPath)">
     <!-- Image top -->
-    <g id="image-top" >
-      <use href="#image-data" x="3.265511811023622" y="3.265511811023622" />
-    </g>
+    <use href="#image-data" x="3.265511811023622" y="3.265511811023622" />
     <!-- Image bottom -->
     <g transform="scale(1, -1) translate(0, -598.6217322834646)">
       <use href="#image-data" x="3.265511811023622" y="221.75496062992124" />
