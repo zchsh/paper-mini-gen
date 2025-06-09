@@ -251,6 +251,11 @@ export async function layoutFinalSvg(
 		...dottedLineStyle,
 	});
 	/**
+	 * TODO:
+	 * TODO: add mountain fold lines where bases intersect
+	 * TODO:
+	 */
+	/**
 	 * Build the final SVG node
 	 */
 	svgNode.appendChild(outlineDataGroup);
