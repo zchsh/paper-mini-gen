@@ -8,10 +8,12 @@
   - 2025-06-04 - manually edited the default `test-figure.jpeg` setup, got size down from 25 kB to 12 kB. Next step is to build the same kinds of "edits" into the SVG creation process, in `apply-layout.js`. Which could probably be renamed to `layout-final-svg.js` or something. Might make sense to start that as a separate file, and rebuild from whatever's in `apply-layout.js`.
   - 2025-06-09 - set up `<use />` elements for the outline path and the image data, which were the heaviest parts of the resulting SVG file. SVG size is down to 12 kB, as expected. Also ran the results through <https://validator.w3.org/>, and they seem fine.
 
-- [ ] Add mountain fold lines where bases intersect
+- [x] Add mountain fold lines where bases intersect
   - Currently only have valley folds marked, where character art meets the base
   - Would be helpful to mark mountain folds as well...
   - Dot-dash line vs dashed line for mountain folds vs valley folds, using `stroke-dasharray`
+  - Position them slightly "below" where the paper will naturally fold from the cut-out shape... this way, they won't end up on the top of the piece. Or... maybe there should be an option to hide / show these lines?
+  - 2025-06-09 at 09:32 - added mountain fold lines. Had an alternate approach that'd have the lines outside the shape, so they're much less likely to make the base look messy... but seems fine to have the lines, they're so light anyways. Could maybe add an option to "hide fold lines" later, if it really feels necessary.
 
 - [ ] Clean up `main.js`
   - Have split out a lot of different functionality... but the main file still feels kind of messy

@@ -231,30 +231,88 @@ export async function layoutFinalSvg(
 	/**
 	 * Add some dotted lines to the SVG, indicating where to fold the paper
 	 */
-	const dottedLineStyle = {
+	// Get the X center of the bases
+	const baseCentreX = baseData.centers[0][0];
+	const baseRadius = baseData.size / 2;
+	// Valley folds
+	const valleyFoldStyle = {
 		stroke: OUTLINE_COLOR,
 		"stroke-width": 0.5,
-		"stroke-dasharray": "2, 2",
+		"stroke-dasharray": "2 2",
 	};
-	const dottedLineTop = createSvgElem("line", {
-		x1: baseData.centers[0][0] - baseData.size / 2,
+	const valleyFoldTop = createSvgElem("line", {
+		x1: baseCentreX - baseRadius,
 		y1: baseData.centers[0][1],
-		x2: baseData.centers[0][0] + baseData.size / 2,
+		x2: baseCentreX + baseRadius,
 		y2: baseData.centers[0][1],
-		...dottedLineStyle,
+		...valleyFoldStyle,
 	});
-	const dottedLineBottom = createSvgElem("line", {
-		x1: baseData.centers[2][0] - baseData.size / 2,
+	const valleyFoldBottom = createSvgElem("line", {
+		x1: baseCentreX - baseRadius,
 		y1: baseData.centers[2][1],
-		x2: baseData.centers[2][0] + baseData.size / 2,
+		x2: baseCentreX + baseRadius,
 		y2: baseData.centers[2][1],
-		...dottedLineStyle,
+		...valleyFoldStyle,
+	});
+	// Mountain folds
+	const mountainFoldStyle = {
+		stroke: OUTLINE_COLOR,
+		"stroke-width": 0.5,
+		"stroke-dasharray": "1 2 4 2",
+	};
+	// Get the chord length of the circle when positioned at the fold axis
+	const distanceToCenter = baseRadius - baseData.overlap / 2.0;
+	const halfChordLength = Math.sqrt(
+		Math.pow(baseRadius, 2) - Math.pow(distanceToCenter, 2)
+	);
+	const mountainFoldTop = createSvgElem("line", {
+		x1: baseCentreX - halfChordLength,
+		y1: baseData.centers[1][1] - distanceToCenter + 0.5,
+		x2: baseCentreX + halfChordLength,
+		y2: baseData.centers[1][1] - distanceToCenter + 0.5,
+		...mountainFoldStyle,
 	});
 	/**
-	 * TODO:
-	 * TODO: add mountain fold lines where bases intersect
-	 * TODO:
+	 * Alternate fold lines on either side of the shape
 	 */
+	// const mountainFoldTopLeft = createSvgElem("line", {
+	// 	x1: baseCentreX - baseRadius,
+	// 	y1: baseData.centers[1][1] - distanceToCenter + 0.5,
+	// 	x2: baseCentreX - halfChordLength,
+	// 	y2: baseData.centers[1][1] - distanceToCenter + 0.5,
+	// 	...mountainFoldStyle,
+	// });
+	// const mountainFoldTopRight = createSvgElem("line", {
+	// 	x1: baseCentreX + halfChordLength,
+	// 	y1: baseData.centers[1][1] - distanceToCenter + 0.5,
+	// 	x2: baseCentreX + baseRadius,
+	// 	y2: baseData.centers[1][1] - distanceToCenter + 0.5,
+	// 	...mountainFoldStyle,
+	// });
+	const mountainFoldBottom = createSvgElem("line", {
+		x1: baseCentreX - halfChordLength,
+		y1: baseData.centers[1][1] + distanceToCenter - 0.5,
+		x2: baseCentreX + halfChordLength,
+		y2: baseData.centers[1][1] + distanceToCenter - 0.5,
+		...mountainFoldStyle,
+	});
+	/**
+	 * Alternate fold lines on either side of the shape
+	 */
+	// const mountainFoldBottomLeft = createSvgElem("line", {
+	// 	x1: baseCentreX - baseRadius,
+	// 	y1: baseData.centers[1][1] + distanceToCenter - 0.5,
+	// 	x2: baseCentreX - halfChordLength,
+	// 	y2: baseData.centers[1][1] + distanceToCenter - 0.5,
+	// 	...mountainFoldStyle,
+	// });
+	// const mountainFoldBottomRight = createSvgElem("line", {
+	// 	x1: baseCentreX + halfChordLength,
+	// 	y1: baseData.centers[1][1] + distanceToCenter - 0.5,
+	// 	x2: baseCentreX + baseRadius,
+	// 	y2: baseData.centers[1][1] + distanceToCenter - 0.5,
+	// 	...mountainFoldStyle,
+	// });
 	/**
 	 * Build the final SVG node
 	 */
@@ -266,8 +324,14 @@ export async function layoutFinalSvg(
 	svgGroupImages.appendChild(svgImageBottom);
 	svgNode.appendChild(svgGroupImages);
 	svgNode.append(outlineCutLine);
-	svgNode.appendChild(dottedLineTop);
-	svgNode.appendChild(dottedLineBottom);
+	svgNode.appendChild(valleyFoldTop);
+	svgNode.appendChild(valleyFoldBottom);
+	svgNode.appendChild(mountainFoldTop);
+	svgNode.appendChild(mountainFoldBottom);
+	// svgNode.appendChild(mountainFoldTopLeft);
+	// svgNode.appendChild(mountainFoldTopRight);
+	// svgNode.appendChild(mountainFoldBottomLeft);
+	// svgNode.appendChild(mountainFoldBottomRight);
 	// Return the final SVG node
 	return svgNode;
 }
