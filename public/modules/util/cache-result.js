@@ -1,4 +1,5 @@
 /**
+ * TODO: write description
  *
  * @param {string} key
  * @returns
@@ -9,6 +10,7 @@ export function getCachedResult(key) {
 }
 
 /**
+ * TODO: write description
  *
  * @param {string} key
  * @param {unknown} value
