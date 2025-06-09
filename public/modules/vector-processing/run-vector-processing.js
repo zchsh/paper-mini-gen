@@ -60,7 +60,13 @@ export async function runVectorProcessing(imageMetricsArg) {
 	 * This union shape will be the cut-out outline for the paper miniature.
 	 */
 	const baseSizeMm = getInputAsInt("baseSizeMm");
+	/**
+	 * TODO: treat arrangeOffsetX as a percent of the width of the traced polygons
+	 */
 	const arrangeOffsetX = getInputAsInt("arrangeOffsetX");
+	/**
+	 * TODO: treat arrangeOffsetY as a percent of the height of the traced polygons
+	 */
 	const arrangeOffsetY = getInputAsInt("arrangeOffsetY");
 	const [polygonsArranged, baseData] = arrangeForUnion(polygonsOffset, {
 		baseSizeMm,
