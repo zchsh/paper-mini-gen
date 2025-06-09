@@ -2,17 +2,11 @@
 
 ## Next steps
 
-- [x] Clean up `main.js`
-  - Have split out a lot of different functionality... but the main file still feels kind of messy
-
-- [x] Revisit "float" and "center" units
-  - Currently a concrete unit, pixels I think
-  - Could maybe be percentage of the figure?
-  - For example, "center" would be percentage of the figure's width (plus offset * 2 I think?). No matter what the width of the figure, at -100%, the figure will no longer be connected to the base... so we know this is the FARTHEST we would want to offset.
-  - Similarly, "float" would be a percentage of the figure's height (plus offset * 2). Again, no matter what the height, at +100%, the figure will no longer be connected to the base, so we know that's a very reasonable limit.
-
 - [ ] Styling refinement
   - Currently feels mostly functional... but styling feels like it could use some work!
+  - [ ] Show `Download SVG` link always, but have it disabled when not ready to download (initially)
+  - [ ] Have `Copy SVG to Clipboard` disabled when not ready to download (initially)
+  - [ ] Link out to articles about AI tooling... have some saved somewhere.
 
 ### Later
 
@@ -47,6 +41,7 @@
   - Could have "arc height" and "arc width" instead, for flexibility
   - Some art may be "floating" very high up... special joiner settings for that?
   - Maybe this is something like... "joiner style"... default is "arc"... and then "joiner height", "joiner width"
+  - Note: keep in mind implications to `arrangeOffsetY` when changing this setting. Should work nicely, worth testing out!
 
 #### Support "backside" images
 
