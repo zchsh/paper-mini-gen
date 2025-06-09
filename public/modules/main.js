@@ -17,7 +17,6 @@ import { applyOffset } from "./vector-processing/apply-offset.js";
 // ARRANGE
 import { arrangeForUnion } from "./layout/arrange-for-union.js";
 import { applyUnion } from "./vector-processing/clipperjs-wrappers/apply-union.js";
-import { applyLayout } from "./layout/apply-layout.js";
 import { layoutFinalSvg } from "./layout/layout-final-svg.js";
 import { toDataUrl } from "./render/to-data-url.js";
 // GLOBAL STUFF
