@@ -2,19 +2,6 @@
 
 ## Next steps
 
-- [x] SVG size efficiency
-  - Image data gets embedded twice, I think? Is there way to make a kind of "definition" of the image, and then have "instances" for the separate front and reflected back images (top and bottom images in code comment speak)?
-  - Current metric - `test-figure.jpeg` is 6 kB, resulting SVG with current defaults is 25 kB. Double-embedding the image data feels like the first thing to try... Could try manually in a text editor first, if you want.
-  - 2025-06-04 - manually edited the default `test-figure.jpeg` setup, got size down from 25 kB to 12 kB. Next step is to build the same kinds of "edits" into the SVG creation process, in `apply-layout.js`. Which could probably be renamed to `layout-final-svg.js` or something. Might make sense to start that as a separate file, and rebuild from whatever's in `apply-layout.js`.
-  - 2025-06-09 - set up `<use />` elements for the outline path and the image data, which were the heaviest parts of the resulting SVG file. SVG size is down to 12 kB, as expected. Also ran the results through <https://validator.w3.org/>, and they seem fine.
-
-- [x] Add mountain fold lines where bases intersect
-  - Currently only have valley folds marked, where character art meets the base
-  - Would be helpful to mark mountain folds as well...
-  - Dot-dash line vs dashed line for mountain folds vs valley folds, using `stroke-dasharray`
-  - Position them slightly "below" where the paper will naturally fold from the cut-out shape... this way, they won't end up on the top of the piece. Or... maybe there should be an option to hide / show these lines?
-  - 2025-06-09 at 09:32 - added mountain fold lines. Had an alternate approach that'd have the lines outside the shape, so they're much less likely to make the base look messy... but seems fine to have the lines, they're so light anyways. Could maybe add an option to "hide fold lines" later, if it really feels necessary.
-
 - [ ] Clean up `main.js`
   - Have split out a lot of different functionality... but the main file still feels kind of messy
 
@@ -22,14 +9,6 @@
   - Currently feels mostly functional... but styling feels like it could use some work!
 
 ### Later
-
-#### Separate arrangement tool
-
-- [ ] Not everyone knows how to work with SVGs. Bit of a pain. Consider arrangement of "results" on page...
-  - maybe let them be dragged around, even rotated?
-  - nah... seems to make more sense to have this as a separate tool
-  - character mini generator should render to `.svg`, or to `.jpeg` or `.png`. The exported asset can then be placed and duplicated in other programs (eg Figma). If I happen to want to create an HTML-based standalone program that lets you arrange imported `.svg`, `.png`, and `.jpeg` files on a page, that might be cool. But, can be completely separate from the "paper minis" generator.
-  - probably makes sense as a separate project
 
 #### Explore path smoothing after boolean addition
 
@@ -44,6 +23,14 @@
   - 2025-04-13 at 18:05 - stubbedin `demo-smooth-to-polyline`
   - 2025-05-10 at 10:27 - there's a Figma plugin for this that might be worth trying: <https://www.figma.com/community/plugin/809139536998662893/simplify>. Might make sense to set up "Copy SVG" at every step for debug purposes... then you can test the smoothing process in Figma, see if it works, and if it does and the plugin is licensed appropriately, swipe the code and integrate it here.
   - 2025-05-13 at 09:41 - <https://mourner.github.io/simplify-js/> looks perfect
+
+#### Separate arrangement tool
+
+- [ ] Not everyone knows how to work with SVGs. Bit of a pain. Consider arrangement of "results" on page...
+  - maybe let them be dragged around, even rotated?
+  - nah... seems to make more sense to have this as a separate tool
+  - character mini generator should render to `.svg`, or to `.jpeg` or `.png`. The exported asset can then be placed and duplicated in other programs (eg Figma). If I happen to want to create an HTML-based standalone program that lets you arrange imported `.svg`, `.png`, and `.jpeg` files on a page, that might be cool. But, can be completely separate from the "paper minis" generator.
+  - probably makes sense as a separate project
 
 #### Consider joiner arc settings
 
