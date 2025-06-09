@@ -16,7 +16,8 @@
   - maybe let them be dragged around, even rotated?
   - nah... seems to make more sense to have this as a separate tool
   - character mini generator should render to `.svg`, or to `.jpeg` or `.png`. The exported asset can then be placed and duplicated in other programs (eg Figma). If I happen to want to create an HTML-based standalone program that lets you arrange imported `.svg`, `.png`, and `.jpeg` files on a page, that might be cool. But, can be completely separate from the "paper minis" generator.
-  - probably makes sense as a separate project
+  - probably makes sense as a separate project...
+  - 2025-06-09 at 09:38 - maybe this doesn't need to be a fully separate project? if aim is to make it a nicely packaged, browser-only thing... maybe you could start by building it within this project?
 
 #### Explore path smoothing after boolean addition
 
