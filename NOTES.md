@@ -2,10 +2,15 @@
 
 ## Next steps
 
+- [ ] Implement drag-and-drop area
+  - <https://css-tricks.com/drag-and-drop-file-uploading/>
+  - <https://developer.mozilla.org/en-US/docs/Web/API/HTML_Drag_and_Drop_API/File_drag_and_drop>
+
 - [ ] Styling refinement
   - Currently feels mostly functional... but styling feels like it could use some work!
-  - [ ] Show `Download SVG` link always, but have it disabled when not ready to download (initially)
-  - [ ] Have `Copy SVG to Clipboard` disabled when not ready to download (initially)
+  - [x] Show `Download SVG` link always, but have it disabled when not ready to download (initially)
+  - [x] Have `Copy SVG to Clipboard` disabled when not ready to download (initially)
+  - [ ] Look back at Figma work to get a sense of what to style
   - [ ] Link out to articles about AI tooling... have some saved somewhere.
 
 ### Later

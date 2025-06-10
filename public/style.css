@@ -1,10 +1,26 @@
+/* TYPOGRAPHY */
+
+html,
+body {
+	/* System font stacks swiped from https://systemfontstack.com/ */
+	--font-family-sans: -apple-system, BlinkMacSystemFont, avenir next, avenir,
+		segoe ui, helvetica neue, Cantarell, Ubuntu, roboto, noto, helvetica, arial,
+		sans-serif;
+	--font-family-serif: Iowan Old Style, Apple Garamond, Baskerville,
+		Times New Roman, Droid Serif, Times, Source Serif Pro, serif,
+		Apple Color Emoji, Segoe UI Emoji, Segoe UI Symbol;
+	--font-family-monospace: Menlo, Consolas, Monaco, Liberation Mono,
+		Lucida Console, monospace;
+	font-family: var(--font-family-serif);
+}
+
 /* GLOBAL */
 
 * {
 	box-sizing: border-box;
 }
 
-/* ... */
+/* TODO: sort stuff below, into sections near bottom of file */
 
 body {
 	display: flex;
@@ -25,31 +41,6 @@ body {
 	background: #efefef;
 	padding: 1rem;
 	border-radius: 8px;
-}
-
-#layout-container {
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	width: 100%;
-	height: 450px;
-	position: relative;
-	border: 1px solid #ccc;
-	border-radius: 8px;
-	padding: 1rem;
-}
-
-#layout-container svg {
-	width: 100%;
-	height: auto;
-}
-
-.copy-and-download-container {
-	display: flex;
-	gap: 1rem;
-	padding: 0.5rem 0;
-	align-items: center;
-	justify-content: center;
 }
 
 /* SILHOUETTE */
@@ -144,3 +135,87 @@ body {
 	border: 1px solid magenta;
 	transform: scale(0.75, 0.75);
 }
+
+/*
+ * Shared styles
+ */
+
+/* TODO */
+
+/*
+ * Page container
+ */
+
+/* TODO */
+
+/*
+ * Header
+ */
+
+/* TODO */
+
+/*
+ * FAQ
+ */
+
+details summary {
+	cursor: pointer;
+}
+
+details summary:hover {
+	color: dodgerblue;
+}
+
+/* TODO */
+
+/*
+ * Character art
+ */
+
+/* TODO */
+
+/*
+ * Paper miniature
+ */
+
+#layout-container {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	width: 100%;
+	height: 450px;
+	position: relative;
+	border: 1px solid #ccc;
+	border-radius: 8px;
+	padding: 1rem;
+}
+
+#layout-container svg {
+	width: 100%;
+	height: auto;
+}
+
+.copy-and-download-container {
+	display: flex;
+	gap: 1rem;
+	padding: 0.5rem 0;
+	align-items: center;
+	justify-content: center;
+}
+
+#copy-svg-button {
+	cursor: pointer;
+}
+
+#download-svg-link.disabled {
+	opacity: 0.5;
+	pointer-events: none;
+}
+
+/* TODO */
+
+/*
+ * Silhouette tweaks
+ */
+
+/* TODO */

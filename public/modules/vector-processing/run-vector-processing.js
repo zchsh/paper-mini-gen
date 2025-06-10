@@ -120,14 +120,12 @@ export async function runVectorProcessing(imageMetricsArg) {
 	const now = new Date();
 	const formattedDate = now.toISOString().replace(/[:.]/g, "-").slice(0, 19);
 	// Set the download link's href to the final SVG data URL
-	const downloadLinkContainer = document.getElementById(
-		"download-link-container"
-	);
-	const downloadLink = document.createElement("a");
+	const downloadLink = document.getElementById("download-svg-link");
 	downloadLink.href = finalSvgDataUrl;
+	downloadLink.classList.remove("disabled");
 	downloadLink.download = `${formattedDate}-paper-miniature.svg`;
 	downloadLink.textContent = "Download SVG";
-	// Clear previous download links, add the new ones
-	downloadLinkContainer.innerHTML = "";
-	downloadLinkContainer.appendChild(downloadLink);
+	// Remove the disabled attribute from the copy button
+	const copyButton = document.getElementById("copy-svg-button");
+	copyButton.disabled = false;
 }

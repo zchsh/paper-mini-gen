@@ -12,6 +12,8 @@
 		<!-- main module -->
 		<script type="module" src="./modules/main.js"></script>
 		<!-- CSS -->
+		<!-- TODO: add reset LATER... once you have styling set up -->
+		<!-- <link rel="stylesheet" href="./reset.css" /> -->
 		<link rel="stylesheet" href="./style.css" />
 		<!-- NOTES -->
 		<script>
@@ -260,6 +262,7 @@
 			<p>Upload a file...</p>
 			<!-- TODO: make this into a nice big dropzone somehow? -->
 			<!-- https://developer.mozilla.org/en-US/docs/Web/API/HTML_Drag_and_Drop_API/File_drag_and_drop -->
+			<!-- https://css-tricks.com/drag-and-drop-file-uploading/ -->
 			<div class="file-input-container">
 				<input
 					type="file"
@@ -312,13 +315,16 @@
 			<!--  -->
 
 			<div id="layout-container"></div>
+
 			<div class="copy-and-download-container">
 				<button
+					id="copy-svg-button"
+					disabled
 					onClick="copyTextToClipboard(document.getElementById('layout-container').innerHTML)"
 				>
 					Copy SVG to clipboard
 				</button>
-				<div id="download-link-container"></div>
+				<a id="download-svg-link" class="disabled" href="#">Download SVG</a>
 			</div>
 
 			<div class="input-containers">
@@ -435,7 +441,7 @@
 
 			<div class="silhouette-preview-container">
 				<div class="image-container-raw">
-					<img id="raw-image" src="/sample-art/sample-char-art-00.jpeg" />
+					<img id="raw-image" src="/sample-art/test-figure.jpeg" />
 				</div>
 				<div class="image-container-processed">
 					<img id="processed-image" />
@@ -503,6 +509,7 @@
 				</div>
 			</div>
 
-		<div style="height: 16em"></div>
+			<div style="height: 16em"></div>
+		</div>
 	</body>
 </html>
