@@ -10,7 +10,7 @@
  */
 export function getInputAsInt(inputId) {
 	const elem = document.getElementById(inputId);
-	if (!elem || !elem.value) {
+	if (!elem || typeof elem.value === "undefined") {
 		throw new Error(
 			`Input element with ID "${inputId}" not found or has no value.`
 		);

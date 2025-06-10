@@ -2,16 +2,17 @@
 
 ## Next steps
 
-- [ ] Implement drag-and-drop area
+- [x] Implement drag-and-drop area
   - <https://css-tricks.com/drag-and-drop-file-uploading/>
   - <https://developer.mozilla.org/en-US/docs/Web/API/HTML_Drag_and_Drop_API/File_drag_and_drop>
+  - Ended up styling `input` to occupy a larger area cause it was easier, added drag events for additional feedback
 
-- [ ] Styling refinement
+- [x] Styling refinement
   - Currently feels mostly functional... but styling feels like it could use some work!
   - [x] Show `Download SVG` link always, but have it disabled when not ready to download (initially)
   - [x] Have `Copy SVG to Clipboard` disabled when not ready to download (initially)
-  - [ ] Look back at Figma work to get a sense of what to style
-  - [ ] Link out to articles about AI tooling... have some saved somewhere.
+  - [x] Look back at Figma work to get a sense of what to style
+  - [x] Link out to stuff about AI tooling... have some saved somewhere (linked to CBC understood instead)
 
 ### Later
 

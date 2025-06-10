@@ -1,7 +1,8 @@
-/* TYPOGRAPHY */
+/*
+ * Typography
+ */
 
-html,
-body {
+:root {
 	/* System font stacks swiped from https://systemfontstack.com/ */
 	--font-family-sans: -apple-system, BlinkMacSystemFont, avenir next, avenir,
 		segoe ui, helvetica neue, Cantarell, Ubuntu, roboto, noto, helvetica, arial,
@@ -11,16 +12,88 @@ body {
 		Apple Color Emoji, Segoe UI Emoji, Segoe UI Symbol;
 	--font-family-monospace: Menlo, Consolas, Monaco, Liberation Mono,
 		Lucida Console, monospace;
-	font-family: var(--font-family-serif);
 }
 
-/* GLOBAL */
+/*
+ * Color
+ */
+
+:root {
+	--color-active: #007aff;
+	--color-visited: #9000ff;
+	--color-border: #cccccc;
+	--color-text-display: #000000;
+	--color-text-body: #333333;
+}
+
+/*
+ * Global
+ */
 
 * {
 	box-sizing: border-box;
 }
 
-/* TODO: sort stuff below, into sections near bottom of file */
+body,
+html {
+	font-family: var(--font-family-serif);
+	color: var(--color-text-body);
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+	color: var(--color-text-display);
+}
+
+p {
+	line-height: 1.5;
+}
+
+a {
+	color: var(--color-active);
+}
+
+a:visited {
+	color: var(--color-visited);
+}
+
+/*
+ * Input styles
+ */
+
+.input-containers {
+	display: flex;
+	flex-direction: column;
+	width: 100%;
+	padding-top: 0.5rem;
+}
+
+.input-container {
+	width: 100%;
+	padding: 0.5rem;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 0.25rem 0.5rem;
+}
+
+.input-container input[type="range"] {
+	flex-shrink: 1;
+	flex-grow: 1;
+	width: 0;
+}
+
+.input-container span {
+	flex-shrink: 0;
+}
+
+/*
+ * Page container
+ */
 
 body {
 	display: flex;
@@ -34,22 +107,93 @@ body {
 	padding: 1rem;
 }
 
+/*
+ * FAQ
+ */
+
+details > :last-child {
+	padding-bottom: 12px;
+}
+
+details summary {
+	padding-top: 6px;
+	padding-bottom: 6px;
+	cursor: pointer;
+}
+
+details summary:hover {
+	color: var(--color-active);
+}
+
+/*
+ * Character art
+ */
+
 .file-input-container {
 	display: flex;
 	flex-direction: column;
-	align-items: center;
-	background: #efefef;
-	padding: 1rem;
-	border-radius: 8px;
 }
 
-/* SILHOUETTE */
+#image-input {
+	width: 100%;
+	height: 100%;
+	padding: 1rem;
+	border-radius: 8px;
+	background: #efefef;
+	cursor: pointer;
+}
+
+#image-input.drag-active {
+	outline: 2px solid var(--color-active);
+}
+
+/*
+ * Paper miniature
+ */
+
+#layout-container {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	width: 100%;
+	height: 450px;
+	position: relative;
+	border: 1px solid var(--color-border);
+	border-radius: 8px;
+	padding: 1rem;
+}
+
+#layout-container svg {
+	width: 100%;
+	height: auto;
+}
+
+.copy-and-download-container {
+	display: flex;
+	gap: 1rem;
+	padding: 0.5rem 0;
+	align-items: center;
+	justify-content: center;
+}
+
+#copy-svg-button {
+	cursor: pointer;
+}
+
+#download-svg-link.disabled {
+	opacity: 0.5;
+	pointer-events: none;
+}
+
+/*
+ * Silhouette tweaks
+ */
 
 .silhouette-preview-container {
 	position: relative;
 	width: 100%;
 	height: 450px;
-	border: 1px solid #ccc;
+	border: 1px solid var(--color-border);
 	border-radius: 8px;
 }
 
@@ -82,140 +226,3 @@ body {
 	left: 50%;
 	transform: translate(-50%, -50%);
 }
-
-/* INPUTS */
-
-.input-containers {
-	display: flex;
-	flex-direction: column;
-	width: 100%;
-	padding-top: 0.5rem;
-}
-
-.input-container {
-	width: 100%;
-	padding: 0.5rem;
-	display: flex;
-	align-items: center;
-	justify-content: space-between;
-	gap: 0.25rem 0.5rem;
-}
-
-.input-container input[type="range"] {
-	flex-shrink: 1;
-	flex-grow: 1;
-	width: 0;
-}
-
-.input-container span {
-	flex-shrink: 0;
-}
-
-/* LAYOUT TWEAKS */
-
-.layout-tweaks-container {
-	display: flex;
-	align-items: center;
-	width: 100%;
-	height: 450px;
-	overflow: hidden;
-	border: 1px solid #ccc;
-	border-radius: 8px;
-	position: relative;
-}
-
-#offset-svg {
-	position: absolute;
-	border: 1px solid magenta;
-	transform: scale(0.5, 0.5);
-}
-
-#arrange-container {
-	position: absolute;
-	border: 1px solid magenta;
-	transform: scale(0.75, 0.75);
-}
-
-/*
- * Shared styles
- */
-
-/* TODO */
-
-/*
- * Page container
- */
-
-/* TODO */
-
-/*
- * Header
- */
-
-/* TODO */
-
-/*
- * FAQ
- */
-
-details summary {
-	cursor: pointer;
-}
-
-details summary:hover {
-	color: dodgerblue;
-}
-
-/* TODO */
-
-/*
- * Character art
- */
-
-/* TODO */
-
-/*
- * Paper miniature
- */
-
-#layout-container {
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	width: 100%;
-	height: 450px;
-	position: relative;
-	border: 1px solid #ccc;
-	border-radius: 8px;
-	padding: 1rem;
-}
-
-#layout-container svg {
-	width: 100%;
-	height: auto;
-}
-
-.copy-and-download-container {
-	display: flex;
-	gap: 1rem;
-	padding: 0.5rem 0;
-	align-items: center;
-	justify-content: center;
-}
-
-#copy-svg-button {
-	cursor: pointer;
-}
-
-#download-svg-link.disabled {
-	opacity: 0.5;
-	pointer-events: none;
-}
-
-/* TODO */
-
-/*
- * Silhouette tweaks
- */
-
-/* TODO */

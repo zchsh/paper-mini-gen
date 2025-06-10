@@ -11,6 +11,21 @@
 		<script src="./modules/global/pathseg-polyfill.js"></script>
 		<!-- main module -->
 		<script type="module" src="./modules/main.js"></script>
+		<script>
+			/**
+			 * Add event listeners to add a `drag-active` class to `#image-input`
+			 * when a file is dragged over it.
+			 */
+			function initImageInput() {
+				const imageInputElem = document.getElementById("image-input");
+				imageInputElem.addEventListener("dragenter", () => {
+					imageInputElem.classList.add("drag-active");
+				});
+				imageInputElem.addEventListener("dragleave", () => {
+					imageInputElem.classList.remove("drag-active");
+				});
+			}
+		</script>
 		<!-- CSS -->
 		<!-- TODO: add reset LATER... once you have styling set up -->
 		<!-- <link rel="stylesheet" href="./reset.css" /> -->
@@ -31,7 +46,7 @@
 		</script>
 	</head>
 	<body
-		onload="updateImage('/sample-art/test-figure.jpeg', {
+		onload="initImageInput(); updateImage('/sample-art/test-figure.jpeg', {
 		heightMm: 27,
 		radius: 2,
 		arrangeOffsetX: -5
@@ -55,15 +70,15 @@
 			<details>
 				<summary>What are paper miniatures?</summary>
 				<p>
-					Miniature figurines have a long history in games and storytelling.
-					Think of chess pieces and ceramic dolls, hand puppets and marionettes.
-					By bringing a physical item into existence, we can hold a small part
-					of the story we're telling in our hands.
+					<em>Miniature figurines</em> have a long history in games and
+					storytelling. Think of chess pieces and ceramic dolls, hand puppets
+					and marionettes. By bringing a physical item into existence, we can
+					hold a small part of the story we're telling in our hands.
 				</p>
 				<p>
-					Paper miniatures are an easy way to make those little physical
-					representations of the characters and creatures in our stories.
-					They're commonly associated with
+					<em>Paper miniatures</em> are an easy way to make those little
+					physical representations of the characters and creatures in our
+					stories. They're commonly associated with
 					<a href="https://en.wikipedia.org/wiki/Tabletop_role-playing_game"
 						>tabletop role-playing games</a
 					>, like
@@ -74,8 +89,7 @@
 				<p>
 					You can use paper miniatures however you like. You could make your own
 					paper chess set, prototype a new board game, or print some little
-					characters from whatever book you're reading as a bedtime story. Have
-					fun!
+					characters from whatever book you're reading as a bedtime story.
 				</p>
 			</details>
 			<details>
@@ -87,10 +101,13 @@
 				</p>
 				<p>
 					<a href="https://www.figma.com/">Figma</a> is likely the easiest
-					option if you're new to vector editing tools.
-					<a href="https://inkscape.org/">Inkscape</a> is another option, it's a
-					free and open-source vector graphics editor but might have a bit more
-					of a learning curve.
+					option if you're new to vector editing tools, although it's been
+					increasingly hard to avoid subscription payments since Adobe acquired
+					it.
+				</p>
+				<p>
+					<a href="https://inkscape.org/">Inkscape</a> is another option, it's
+					free and open-source, but might have a bit more of a learning curve.
 				</p>
 			</details>
 
@@ -98,13 +115,16 @@
 				<summary>How do I assemble a paper mini?</summary>
 				<p>You'll need scissors and a glue stick.</p>
 				<p>
-					First cut along the solid lines. you don’t have to be super exact, a
-					little variation is fine. Then fold along the dotted lines.
+					First cut along the solid lines. You don’t have to be exact unless you
+					want to, making precise cuts takes practice. Then fold along the
+					dotted lines. Valley fold are marked with dotted lines, and mountain
+					folds are marked with dash-dot lines.
 				</p>
 				<p>
 					Once you’re done each individual fold, fold everything into place to
-					see how your paper miniature will look. Finally, glue along the entire
-					back of the print to permanently assemble your miniature.
+					see how your paper miniature will look. To permanently assemble your
+					miniature, unfold it, add glue to the entire back of the print, and
+					then fold it back together and press things together.
 				</p>
 			</details>
 
@@ -115,9 +135,9 @@
 					well. JPEG and PNG are likely best.
 				</p>
 				<p>
-					Images should have a plain white background. This is helpful for
-					tracing, and also prints nicely. If you need a way to remove a
-					background,
+					Images should have a plain white or transparent background. This is
+					helpful for tracing, and also prints nicely. If you need a way to
+					remove a background,
 					<a href="https://www.remove.bg/">https://www.remove.bg/</a> works
 					well, the small image sizes you get for free are fine for miniature
 					sized printing.
@@ -133,7 +153,7 @@
 					can be refreshing because it's just one giant ad for Adobe.
 				</p>
 				<p>
-					If your image isn’t working as expected, you can try to tweak the
+					If your image isn’t working as expected, you can try tweaking the
 					silhouette related settings to see if that helps.
 				</p>
 			</details>
@@ -141,25 +161,30 @@
 			<details>
 				<summary>Should I use AI-generated images?</summary>
 				<p>
-					Using generative algorithms to create character artwork is a shortcut.
-					I think it's important to consider what you’re cutting out, and the
-					nature of the tools you’re using.
+					Using generative algorithms to create artwork is a shortcut. I think
+					it's important to consider what you’re cutting out, and the nature of
+					the tools you’re using.
 				</p>
 				<p>
-					By their nature, generative algorithms are derivative of existing
-					images. To train these algorithms, AI companies download and process,
-					without permission, the creative work of many generations of
-					hard-working artists. I think it's critically important to acknowledge
-					the lifetimes of human labour that underpin these tools. The companies
-					that build and sell these tools did not create the words and images
-					that power them. These companies seem happy to compromise the
-					livelihoods of the same people to whom they owe their existence, all
-					in the name of profit and financial progress.
+					By their nature, generative algorithms are based on existing images.
+					To train these algorithms, AI companies download and process, without
+					permission and without providing compensation, the creative work of
+					many generations of hard-working artists. I think it's critically
+					important to acknowledge the lifetimes of human labour that underpin
+					these tools. The companies that build and sell these tools did not
+					create the words and images that power them. These companies seem
+					happy to compromise the livelihoods of the same people to whom they
+					owe their existence, all in the name of profit and financial progress.
 				</p>
 				<p>
-					When you use generative algorithms, you are cutting out the artist.
-					And this is just one issue of many related to generative algorithms.
-					It’s up to you to source and create images responsibly.
+					When you use generative algorithms, you are cutting out the artist. It
+					may be that some judge at some point in the future rules that this
+					falls under fair use, but legality is not morality, and laws in the
+					digital space have
+					<a
+						href="https://www.cbc.ca/listen/cbc-podcasts/1353-the-naked-emperor/episode/16142603-introducing-understood-who-broke-the-internet"
+						>a history of industry corruption</a
+					>. It’s up to you to source and create images responsibly.
 				</p>
 				<p>
 					You may be cutting something else out too. The value proposition of
@@ -178,9 +203,9 @@
 					tools in the first place.
 				</p>
 				<p>
-					If you focus on a playful and forgiving creative process, your joy
-					will be baked into whatever you make, even if it doesn’t have as much
-					lipstick as what gets spit out of an image generator.
+					If you focus on a playful and forgiving creative process, you can bake
+					your good feelings into whatever you make, even if it doesn’t have as
+					much lipstick as what gets spit out of an image generator.
 				</p>
 			</details>
 
@@ -190,17 +215,17 @@
 					If you've gotten something out of the many hours of work that went
 					into this tool, you can
 					<a href="https://buymeacoffee.com/zchsh">say thanks with money</a>.
-					It'll help me buy food and pay for shelter.
+					It'll help me buy food and pay rent.
 				</p>
 				<p>
 					If you'd like to contribute code or feedback, you can do that on
-					GitHub at
+					GitHub, at
 					<a href="https://github.com/zchsh/paper-mini-gen"
 						>zchsh/paper-mini-gen</a
 					>.
 				</p>
 				<p>
-					The spirit of this project is to make a tool that's open source,
+					The spirit of this project is to make a tool that's free, open source,
 					account-less, does one thing really well, and uses file formats that
 					are highly interoperable, so that you can use it in combination with
 					other tools. It's an attempt at taking a
@@ -210,7 +235,7 @@
 					to writing code for the web.
 				</p>
 				<p>
-					If you like writing code, I'd love to hear your thoughts or
+					If you like writing code, I'd love to hear your thoughts, or
 					collaborate on tools with a similar philosophy. You can reach me at
 					<a href="mailto:hi@zch.sh">hi@zch.sh</a>.
 				</p>
@@ -259,10 +284,7 @@
 			<!--  -->
 			<!--  -->
 
-			<p>Upload a file...</p>
-			<!-- TODO: make this into a nice big dropzone somehow? -->
-			<!-- https://developer.mozilla.org/en-US/docs/Web/API/HTML_Drag_and_Drop_API/File_drag_and_drop -->
-			<!-- https://css-tricks.com/drag-and-drop-file-uploading/ -->
+			<p>Upload a file:</p>
 			<div class="file-input-container">
 				<input
 					type="file"
