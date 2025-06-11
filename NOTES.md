@@ -31,6 +31,11 @@ Not everyone knows how to work with SVGs. Bit of a pain. Consider arrangement of
 
 ### Later
 
+#### Dark mode
+
+- Why not, would be nice I think, I just found myself wanting it
+- Nice to establish a pattern for these types of lil projects early
+
 #### Explore path smoothing after boolean addition
 
 - [ ] Explore path smoothing after boolean addition
