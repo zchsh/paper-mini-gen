@@ -14,7 +14,7 @@
   - [x] Look back at Figma work to get a sense of what to style
   - [x] Link out to stuff about AI tooling... have some saved somewhere (linked to CBC understood instead)
 
-- [ ] Run some cross-browser testing
+- [x] Run some cross-browser testing
   - Mostly just wanna see what the styles look like
 
 ### Later
