@@ -2,32 +2,34 @@
 
 ## Next steps
 
-- [x] Implement drag-and-drop area
-  - <https://css-tricks.com/drag-and-drop-file-uploading/>
-  - <https://developer.mozilla.org/en-US/docs/Web/API/HTML_Drag_and_Drop_API/File_drag_and_drop>
-  - Ended up styling `input` to occupy a larger area cause it was easier, added drag events for additional feedback
+### Separate arrangement tool
 
-- [x] Styling refinement
-  - Currently feels mostly functional... but styling feels like it could use some work!
-  - [x] Show `Download SVG` link always, but have it disabled when not ready to download (initially)
-  - [x] Have `Copy SVG to Clipboard` disabled when not ready to download (initially)
-  - [x] Look back at Figma work to get a sense of what to style
-  - [x] Link out to stuff about AI tooling... have some saved somewhere (linked to CBC understood instead)
+Not everyone knows how to work with SVGs. Bit of a pain. Consider arrangement of "results" on page...
 
-- [x] Run some cross-browser testing
-  - Mostly just wanna see what the styles look like
+- maybe let them be dragged around, even rotated?
+- nah... seems to make more sense to have this as a separate tool
+- character mini generator should render to `.svg`, or to `.jpeg` or `.png`. The exported asset can then be placed and duplicated in other programs (eg Figma). If I happen to want to create an HTML-based standalone program that lets you arrange imported `.svg`, `.png`, and `.jpeg` files on a page, that might be cool. But, can be completely separate from the "paper minis" generator.
+- probably makes sense as a separate project...
+- 2025-06-09 at 09:38 - maybe this doesn't need to be a fully separate project? if aim is to make it a nicely packaged, browser-only thing... maybe you could start by building it within this project?
+- Core functionality: import SVG (drag-drop, or paste from clipboard). arrange SVGs on page. adjust page size. print to PDF (use browser).
+
+- [x] Stub in a rough prototype of how printing will work
+  - [x] New page exists
+  - [x] New page can print border to 8.5 by 11 page
+  - Stubbed in `/demo/print-letter-page`
+- [x] Stub in navigable view
+  - Gonna lean on browser zoom and scroll for now
+  - More purpose-built document navigation can come later... maybe even have artboards? Mark them for printing? `@page` directive in CSS might make that feasible, even if pages are different sizes? Something to dive into _later_.
+  - Stubbed in `/demo/print-letter-page`, works for now
+- [ ] Stub in static position SVG, see how it prints
+- [ ] Stub in moveable SVG, see how it prints
+- [ ] Stub in paste-from-clipboard to add a static SVG to the page
+- [ ] Stub in paste-from-clipboard to add a moveable SVG to the page
+- [ ] Stub in drag-and-drop to add a static SVG to the page
+- [ ] Stub in drag-and-drop to add a moveable SVG to the page
+- [ ] Sketch out how an arrangement tool would work
 
 ### Later
-
-#### Separate arrangement tool
-
-- [ ] Not everyone knows how to work with SVGs. Bit of a pain. Consider arrangement of "results" on page...
-  - maybe let them be dragged around, even rotated?
-  - nah... seems to make more sense to have this as a separate tool
-  - character mini generator should render to `.svg`, or to `.jpeg` or `.png`. The exported asset can then be placed and duplicated in other programs (eg Figma). If I happen to want to create an HTML-based standalone program that lets you arrange imported `.svg`, `.png`, and `.jpeg` files on a page, that might be cool. But, can be completely separate from the "paper minis" generator.
-  - probably makes sense as a separate project...
-  - 2025-06-09 at 09:38 - maybe this doesn't need to be a fully separate project? if aim is to make it a nicely packaged, browser-only thing... maybe you could start by building it within this project?
-  - Core functionality: import SVG (drag-drop, or paste from clipboard). arrange SVGs on page. adjust page size. print to PDF (use browser).
 
 #### Explore path smoothing after boolean addition
 
