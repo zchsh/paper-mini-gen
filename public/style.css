@@ -19,11 +19,31 @@
  */
 
 :root {
+	--color-background: #ffffff;
+	--color-background-muted: #efefef;
+	--color-image-background: #ffffff;
 	--color-active: #007aff;
 	--color-visited: #9000ff;
 	--color-border: #cccccc;
 	--color-text-display: #000000;
 	--color-text-body: #333333;
+}
+
+/**
+ * Dark mode
+ */
+
+@media (prefers-color-scheme: dark) {
+	:root {
+		--color-background: #121212;
+		--color-background-muted: #1e1e1e;
+		--color-image-background: #ffffff; /* Image backgrounds won't change */
+		--color-active: #3791ff;
+		--color-visited: #cd76f8;
+		--color-border: #666666;
+		--color-text-display: #ffffff;
+		--color-text-body: #dddddd;
+	}
 }
 
 /*
@@ -38,6 +58,7 @@ body,
 html {
 	font-family: var(--font-family-serif);
 	color: var(--color-text-body);
+	background: var(--color-background);
 }
 
 h1,
@@ -139,7 +160,7 @@ details summary:hover {
 	height: 100%;
 	padding: 1rem;
 	border-radius: 8px;
-	background: #efefef;
+	background: var(--color-background-muted);
 	cursor: pointer;
 }
 
@@ -161,6 +182,7 @@ details summary:hover {
 	border: 1px solid var(--color-border);
 	border-radius: 8px;
 	padding: 1rem;
+	background: var(--color-image-background);
 }
 
 #layout-container svg {
@@ -195,6 +217,7 @@ details summary:hover {
 	height: 400px;
 	border: 1px solid var(--color-border);
 	border-radius: 8px;
+	background: var(--color-image-background);
 }
 
 .image-container-raw {

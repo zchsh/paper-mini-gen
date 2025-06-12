@@ -2,6 +2,11 @@
 
 ## Next steps
 
+- [x] Implement dark mode
+  - Why not, would be nice I think, I just found myself wanting it
+  - Nice to establish a pattern for these types of lil projects early
+  - 2025-06-12 at 10:29 - got this done in a very basic way
+
 ### Separate arrangement tool
 
 Not everyone knows how to work with SVGs. Bit of a pain. Consider arrangement of "results" on page...
@@ -30,11 +35,6 @@ Not everyone knows how to work with SVGs. Bit of a pain. Consider arrangement of
 - [ ] Sketch out how an arrangement tool would work
 
 ### Later
-
-#### Dark mode
-
-- Why not, would be nice I think, I just found myself wanting it
-- Nice to establish a pattern for these types of lil projects early
 
 #### Explore path smoothing after boolean addition
 
