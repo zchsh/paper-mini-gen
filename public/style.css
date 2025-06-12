@@ -35,8 +35,8 @@
 
 @media (prefers-color-scheme: dark) {
 	:root {
-		--color-background: #121212;
-		--color-background-muted: #1e1e1e;
+		--color-background: #1f1f1f;
+		--color-background-muted: #333333;
 		--color-image-background: #ffffff; /* Image backgrounds won't change */
 		--color-active: #3791ff;
 		--color-visited: #cd76f8;
