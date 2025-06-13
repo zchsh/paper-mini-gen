@@ -31,6 +31,9 @@ Not everyone knows how to work with SVGs. Bit of a pain. Consider arrangement of
   - Gonna lean on browser zoom and scroll for now
   - More purpose-built document navigation can come later... maybe even have artboards? Mark them for printing? `@page` directive in CSS might make that feasible, even if pages are different sizes? Something to dive into _later_.
   - Stubbed in `/demo/print-letter-page`, works for now
+- [ ] Look into using <https://spencer.place/creation/playhtml>
+  - Great option, but it's also real-time-multiplayer which I don't need (via <https://www.partykit.io/>)
+  - Started digging some stuff outta this, maybe look into <https://github.com/react-grid-layout/react-draggable> to init "drag" events (handle both touch and mouse)?
 - [ ] Stub in static position SVG, see how it prints
 - [ ] Stub in moveable SVG, see how it prints
 - [ ] Stub in paste-from-clipboard to add a static SVG to the page
