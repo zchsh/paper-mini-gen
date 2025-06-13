@@ -2,15 +2,12 @@
 
 ## Next steps
 
+### Implement dark mode
+
 - [x] Implement dark mode
   - Why not, would be nice I think, I just found myself wanting it
   - Nice to establish a pattern for these types of lil projects early
   - 2025-06-12 at 10:29 - got this done in a very basic way
-
-### Publish to a more permanent domain home
-
-- Maybe `zch.sh/paper-miniature-generator`
-- Could rename the repository to match
 
 ### Separate arrangement tool
 
@@ -36,18 +33,39 @@ Not everyone knows how to work with SVGs. Bit of a pain. Consider arrangement of
   - Started digging some stuff outta this, maybe look into <https://github.com/react-grid-layout/react-draggable> to init "drag" events (handle both touch and mouse)?
   - 2025-06-13 at 08:53 - have this _kind of_ working, it's janky and I need to learn more about event listeners, but it feels workable enough to move on for now to other hurdles
 
-- [ ] Stub in paste-from-clipboard to add an SVG to the page
-- [ ] Stub in drag-and-drop to add an SVG to the page
-
-- [ ] Investigate why Firefox doesn't seem to print images embedded in an SVG
+- [x] Investigate why Firefox doesn't seem to print images embedded in an SVG
   - Images are shown in the print preview... but upon saving to PDF, the images aren't there
   - Happens with the raw SVG files as well
   - Doesn't happen in Chrome, Chrome seems to print to PDF fine, with images included.
   - Is this related to how I've formatted the SVG? Or is it a deeper issue in FireFox? Feels worth investigating...
   - Alternately, maybe the answer is "just use Chrome"? That sucks though.
   - Have repro case of relative simple SVG file with embedded image... maybe try with something even simpler, exported from Figma? If the simplest use cases aren't working, then it's probably more of a Firefox problem.
+  - 2025-06-13 at 09:43 - pretty sure this is a bit of a bug in Firefox... [clipPath](https://developer.mozilla.org/en-US/docs/Web/SVG/Reference/Element/clipPath) should be able to contain `<use>` elements... but in my case at lease, they don't seem to print correctly.
+  - 2025-06-13 at 09:53 - have a minimal repro... maybe worth filing a bug report? Seems petty and tiny, but maybe fixing all the petty and tiny things adds up to a more usable browser.
+  - 2025-06-13 at 10:15 - filed a bug report - <https://bugzilla.mozilla.org/show_bug.cgi?id=1972006>
+
+- [ ] Revisit `layout-final-svg.js` to work around Firefox issue
+  - Copy approach in `2025-06-13-firefox-print-to-pdf-test-svg-09-sample-output-working-with-defs.svg`
+  - Reference `path` should be declared within the `clipPath`, and can then be referenced later
+
+- [ ] Stub in paste-from-clipboard to add an SVG to the page
+- [ ] Stub in drag-and-drop to add an SVG to the page
+- [ ] Implement basic z-index layering
+  - The last element you touched should have the highest z-index
+  - To avoid going to infinite z-indices, maybe this means having to touch every `can-move` element's z-index at once... might be more performant to avoid z-index completely, and re-append the last touched element to the DOM, so it's the last child and therefore highest in z-index due to ordering.
+
+- [ ] Add notes on print quirks
+  - Printing from certain browsers can be annoying.
+  - Chrome seems to have the most considered approach.
+  - Firefox seems to work pretty well, though I've run into some nitpicky bugs when printing SVGs.
+  - Safari can be frustrating. The print preview sometimes doesn't match the printed document.
 
 ### Later
+
+#### Publish to a more permanent domain home
+
+- Maybe `zch.sh/paper-miniature-generator`
+- Could rename the repository to match
 
 #### Explore path smoothing after boolean addition
 
