@@ -1,6 +1,7 @@
 const LOCAL_DATA = {
 	startMouseX: 0,
 	startMouseY: 0,
+	element: null,
 };
 
 function setLocalData(data) {
@@ -20,57 +21,58 @@ function getClientCoordinates(e) {
 
 function onDragStart(e) {
 	const { clientX, clientY } = getClientCoordinates(e);
-	console.log("Drag started at:", clientX, clientY);
+	const element = e.target.closest(".can-move");
 	setLocalData({
 		startMouseX: clientX,
 		startMouseY: clientY,
+		element,
 	});
 }
 
-function onDrag(e, data, element) {
+function onDrag(e) {
+	const element = LOCAL_DATA.element;
+	if (!element || !element.classList.contains("can-move")) {
+		return;
+	}
 	const { clientX, clientY } = getClientCoordinates(e);
 	const { top, left, bottom, right } = element.getBoundingClientRect();
-	if (
+	const willBeOutOfBounds =
 		(right > window.outerWidth && clientX > LOCAL_DATA.startMouseX) ||
 		(bottom > window.innerHeight && clientY > LOCAL_DATA.startMouseY) ||
 		(left < 0 && clientX < LOCAL_DATA.startMouseX) ||
-		(top < 0 && clientY < LOCAL_DATA.startMouseY)
-	)
+		(top < 0 && clientY < LOCAL_DATA.startMouseY);
+	if (willBeOutOfBounds) {
 		return;
+	}
+	// Get the current position of the element, based on the transform property
+	const transform = element.style.transform || "translate(0px, 0px)";
+	const match = transform.match(/translate\(([-\d.]+)px,\s*([-\d.]+)px\)/);
+	let data = { x: 0, y: 0 };
+	if (match) {
+		data.x = parseFloat(match[1]);
+		data.y = parseFloat(match[2]);
+	}
+	// Calculate the new position based on the mouse movement
 	const newX = data.x + clientX - LOCAL_DATA.startMouseX;
 	const newY = data.y + clientY - LOCAL_DATA.startMouseY;
-	console.log("Dragging to:", newX, newY);
-
 	element.style.transform = `translate(${newX}px, ${newY}px)`;
 	setLocalData({ startMouseX: clientX, startMouseY: clientY });
 }
 
 document.addEventListener("DOMContentLoaded", () => {
 	const canMoveElems = document.querySelectorAll(".can-move");
-
-	canMoveElems.forEach((element) => {
-		let data = { x: 0, y: 0 };
+	for (const element of canMoveElems) {
+		element.addEventListener("dragstart", (e) => {
+			e.preventDefault(); // Prevent default drag behavior
+		});
 
 		element.addEventListener("mousedown", (e) => {
 			onDragStart(e);
-			element.addEventListener("mousemove", (e) => {
-				onDrag(e, data, element);
-			});
+			document.addEventListener("mousemove", onDrag);
 		});
 
 		element.addEventListener("mouseup", () => {
-			element.removeEventListener("mousemove", onDrag);
+			document.removeEventListener("mousemove", onDrag);
 		});
-
-		element.addEventListener("touchstart", (e) => {
-			onDragStart(e);
-			element.addEventListener("touchmove", (e) => {
-				onDrag(e, data, element);
-			});
-		});
-
-		element.addEventListener("touchend", () => {
-			element.removeEventListener("touchmove", onDrag);
-		});
-	});
+	}
 });

@@ -31,11 +31,16 @@ Not everyone knows how to work with SVGs. Bit of a pain. Consider arrangement of
   - Gonna lean on browser zoom and scroll for now
   - More purpose-built document navigation can come later... maybe even have artboards? Mark them for printing? `@page` directive in CSS might make that feasible, even if pages are different sizes? Something to dive into _later_.
   - Stubbed in `/demo/print-letter-page`, works for now
-- [ ] Look into using <https://spencer.place/creation/playhtml>
+- [x] Look into using <https://spencer.place/creation/playhtml>
   - Great option, but it's also real-time-multiplayer which I don't need (via <https://www.partykit.io/>)
   - Started digging some stuff outta this, maybe look into <https://github.com/react-grid-layout/react-draggable> to init "drag" events (handle both touch and mouse)?
-- [ ] Stub in static position SVG, see how it prints
-- [ ] Stub in moveable SVG, see how it prints
+  - 2025-06-13 at 08:53 - have this _kind of_ working, it's janky and I need to learn more about event listeners, but it feels workable enough to move on for now to other hurdles
+- [ ] FireFox doesn't seem to print images embedded in an SVG
+  - Images are shown in the print preview... but upon saving to PDF, the images aren't there
+  - Happens with the raw SVG files as well
+  - Doesn't happen in Chrome, Chrome seems to print to PDF fine, with images included.
+  - Is this related to how I've formatted the SVG? Or is it a deeper issue in FireFox? Feels worth investigating...
+  - Alternately, maybe the answer is "just use Chrome"? That sucks though.
 - [ ] Stub in paste-from-clipboard to add a static SVG to the page
 - [ ] Stub in paste-from-clipboard to add a moveable SVG to the page
 - [ ] Stub in drag-and-drop to add a static SVG to the page
