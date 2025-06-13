@@ -7,20 +7,39 @@
   viewBox="0 0 100 100"
 >
   <defs>
+    
+    <!-- Line below doesn't fully work, read on as to why -->
+    <!-- <circle id="myCircle" cx="40" cy="35" r="35" /> -->
+
     <clipPath id="myClip">
+
+      <!-- Line below doesn't fully work, read on as to why -->
+      <!-- <use href="#myCircle" /> -->
+
+      <!-- 🐛 Including a <use /> referencing #myCircle within this clipPath,
+      as commented out above, doesn't seem to work properly.
+      
+      It seems to result in the red heart not showing up at all when printing
+      to PDF. This approach still works in the browser, and even displays
+      correctly in the print dialog, but once the PDF is exported the red heart
+      is gone. Chrome and Safari both seem to handle this correctly.
+
+      Filed a bug with Firefox:
+      https://bugzilla.mozilla.org/show_bug.cgi?id=1972006
+      
+      As a workaround, #myCircle can be declared within the clipPath, and
+      re-used outside of the clipPath. This achieves the same result as being
+      able to declare #myCircle outside the clipPath... but it feels a lot
+      less intuitive, and if you wanted to re-use the definition within 
+      multiple clipPaths then you can-->
+
       <circle id="myCircle" cx="40" cy="35" r="35" />
     </clipPath>
   </defs>
-  <!-- The original black heart, for reference -->
-  <path
-    id="heart"
-    d="M10,30 A20,20,0,0,1,50,30 A20,20,0,0,1,90,30 Q90,60,50,90 Q10,60,10,30 Z"
-  />
-  <!--
-    Only the portion of the red heart
-    inside the clip circle is visible.
-  -->
-  <use clip-path="url(#myClip)" href="#heart" fill="red" />
-  <!-- Can reference the circle again, if you want -->
+  <!-- Black heart, also acts as shape reference for the red heart -->
+  <path id="heart" d="M10,30 A20,20,0,0,1,50,30 A20,20,0,0,1,90,30 Q90,60,50,90 Q10,60,10,30 Z" />
+  <!-- Red heart, clip it using the clipPath with the circle shape -->
+  <use href="#heart" fill="red" clip-path="url(#myClip)"  />
+  <!-- Can reference the circle shape again -->
   <use href="#myCircle" x="0" y="0" fill="none" stroke="magenta" stroke-width="4" />
 </svg>
