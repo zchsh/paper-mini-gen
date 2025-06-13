@@ -7,6 +7,11 @@
   - Nice to establish a pattern for these types of lil projects early
   - 2025-06-12 at 10:29 - got this done in a very basic way
 
+### Publish to a more permanent domain home
+
+- Maybe `zch.sh/paper-miniature-generator`
+- Could rename the repository to match
+
 ### Separate arrangement tool
 
 Not everyone knows how to work with SVGs. Bit of a pain. Consider arrangement of "results" on page...
