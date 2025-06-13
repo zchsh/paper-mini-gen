@@ -35,17 +35,17 @@ Not everyone knows how to work with SVGs. Bit of a pain. Consider arrangement of
   - Great option, but it's also real-time-multiplayer which I don't need (via <https://www.partykit.io/>)
   - Started digging some stuff outta this, maybe look into <https://github.com/react-grid-layout/react-draggable> to init "drag" events (handle both touch and mouse)?
   - 2025-06-13 at 08:53 - have this _kind of_ working, it's janky and I need to learn more about event listeners, but it feels workable enough to move on for now to other hurdles
-- [ ] FireFox doesn't seem to print images embedded in an SVG
+
+- [ ] Stub in paste-from-clipboard to add an SVG to the page
+- [ ] Stub in drag-and-drop to add an SVG to the page
+
+- [ ] Investigate why Firefox doesn't seem to print images embedded in an SVG
   - Images are shown in the print preview... but upon saving to PDF, the images aren't there
   - Happens with the raw SVG files as well
   - Doesn't happen in Chrome, Chrome seems to print to PDF fine, with images included.
   - Is this related to how I've formatted the SVG? Or is it a deeper issue in FireFox? Feels worth investigating...
   - Alternately, maybe the answer is "just use Chrome"? That sucks though.
-- [ ] Stub in paste-from-clipboard to add a static SVG to the page
-- [ ] Stub in paste-from-clipboard to add a moveable SVG to the page
-- [ ] Stub in drag-and-drop to add a static SVG to the page
-- [ ] Stub in drag-and-drop to add a moveable SVG to the page
-- [ ] Sketch out how an arrangement tool would work
+  - Have repro case of relative simple SVG file with embedded image... maybe try with something even simpler, exported from Figma? If the simplest use cases aren't working, then it's probably more of a Firefox problem.
 
 ### Later
 
