@@ -9,7 +9,7 @@
   - Nice to establish a pattern for these types of lil projects early
   - 2025-06-12 at 10:29 - got this done in a very basic way
 
-### Separate arrangement tool
+### Prototype arrange-and-print tool
 
 Not everyone knows how to work with SVGs. Bit of a pain. Consider arrangement of "results" on page...
 
@@ -47,42 +47,40 @@ Not everyone knows how to work with SVGs. Bit of a pain. Consider arrangement of
 - [x] Revisit `layout-final-svg.js` to work around Firefox issue
   - Copy approach in `2025-06-13-firefox-print-to-pdf-test-svg-09-sample-output-working-with-defs.svg`
   - Reference `path` should be declared within the `clipPath`, and can then be referenced later
-
 - [x] In `layout-final-svg`, use `href` instead of `xlink:href`, latter is deprecated
-
 - [x] Stub in paste-from-clipboard to add an SVG to the page
 
-- [ ] Refine document structure to allow SVG export
-  - Currently one big HTML document, with many SVG documents within it.
-  - Currently solution is to add `uuid` values to ids within each SVG document... this works fine for now because I have control over the SVG source... but for this "print and arrange SVGs" tool to be really useful, maybe it shouldn't rely on that property?
-  - Alternate solution... when an `<svg />` document is pasted, grab the _contents_ of the SVG, and paste those into the DOM, within an existing `<svg />` paste target.
-  - Main reason to do this: allows `Export SVG` functionality, which would be really nice.
-  - Hurdle: may want to automatically modify the incoming SVG contents to add a `uuid` to any `id` values, and any `#<id>` references to those original values? Maybe this should be a toggle-able option... as in my case, it feels like it might be ideal to instead _match_ any incoming definitions by their `id`, and thereby keep SVG (and PDF) file size really trim, but actually re-using definitions across any duplicate paste elements.
-  - Note: this will change event listeners significantly, I think? Or maybe wrapping incoming contents in a `<g />` group, and applying the same kind of `transform: translate` approach to the group makes sense?
-  - Related note: scope here is `paste and repositioning smaller incoming SVGs within a page-sized SVG document`, and that page-sized SVG document can then be printed using browser print.
+### Basic arrangement tool
 
-- [ ] Stub in showing bounding box on "selection" of an individual element
-- [ ] Stub in "delete" option on individual pasted elements
+Prototype started at `/demo/paste-and-print-letter-page-svg`.
+
+- [ ] Stub in display of bounding box on click-to-select of an individual element
+  - Clicking outside any element should de-select any currently selected element
+- [ ] Stub in "delete" option on individually selected element
+  - Maybe it's a little action button at the top left of the bounding box?
+  - Only show when selected
 - [ ] Stub in drag-and-drop to add an SVG to the page
-
-- [ ] Zoom and pan document, in container
-  - By default, click and drag should select
-  - So... shift-click to pan? Seems to be pretty standard
-- [ ] Initial auto-zoom to fit document in viewport
+  - Drag-and-drop area above page, I think?
 
 - [ ] Implement basic z-index layering
   - The last element you touched should have the highest z-index
   - To avoid going to infinite z-indices, maybe this means having to touch every `can-move` element's z-index at once... might be more performant to avoid z-index completely, and re-append the last touched element to the DOM, so it's the last child and therefore highest in z-index due to ordering.
 
-- [ ] Select multiple items
-- [ ] Delete multiple items
-- [ ] Export to SVG
-
 - [ ] Add on-page docs-ish notes about print quirks
+  - This tool is likely easiest to use on a larger screen, such as a tablet or laptop
   - Printing from certain browsers can be annoying.
   - Chrome seems to have the most considered approach.
   - Firefox seems to work pretty well, though I've run into some nitpicky bugs when printing SVGs.
   - Safari can be frustrating. The print preview sometimes doesn't match the printed document.
+
+- [ ] Implement page size adjustment
+  - In theory could rely on browser print... in practice, nice to have a preview
+  - Number inputs for width and height
+- [ ] Implement page size presets
+  - Probably more useful than custom units
+- [ ] Implement page size units
+  - Start with `inches` most likely, cause that's how paper works where I am...
+  - Add `mm` probably, that's it really
 
 ### Later
 
@@ -126,6 +124,41 @@ Not everyone knows how to work with SVGs. Bit of a pain. Consider arrangement of
 - Could there be an option to remove these interior voids? Option to remove them completely could make sense.
 - Another way to implement this option, more manual maybe a separate thing, would be manual removal of specific shapes, eg by clicking on them and having them change colour
 - Possible first cut option... a given polygon is made up of many REGIONS. Group the regions of a given polygon based on whether they overlap - any overlapping regions should be placed in a single group. Determining overlap might be done with a "minowski diff"? <https://sourceforge.net/p/jsclipper/wiki/documentation/#clipperlibclipperminkowskidiff>. In longer form, running an intersection of the two regions, and then determining whether the intersection has a surface area greater than zero might be another option. Once you have a group of overlapping regions, then determine the surface area of each region, with <https://sourceforge.net/p/jsclipper/wiki/documentation/#clipperlibjsareaofpolygon>. Finally, sort by surface area, and keep only the region with the largest surface area.
+
+#### Arrange-and-print tool enhancements
+
+At times this feels a little close to "re-implementing a completely basic version of Figma"... but hey, why not I guess.
+
+- [ ] Refine document structure to allow SVG export
+  - Currently one big HTML document, with many SVG documents within it.
+  - Currently solution is to add `uuid` values to ids within each SVG document... this works fine for now because I have control over the SVG source... but for this "print and arrange SVGs" tool to be really useful, maybe it shouldn't rely on that property?
+  - Alternate solution... when an `<svg />` document is pasted, grab the _contents_ of the SVG, and paste those into the DOM, within an existing `<svg />` paste target.
+  - Main reason to do this: allows `Export SVG` functionality, which would be really nice.
+  - Hurdle: may want to automatically modify the incoming SVG contents to add a `uuid` to any `id` values, and any `#<id>` references to those original values? Maybe this should be a toggle-able option... as in my case, it feels like it might be ideal to instead _match_ any incoming definitions by their `id`, and thereby keep SVG (and PDF) file size really trim, but actually re-using definitions across any duplicate paste elements.
+  - Note: this will change event listeners significantly, I think? Or maybe wrapping incoming contents in a `<g />` group, and applying the same kind of `transform: translate` approach to the group makes sense?
+  - Related note: scope here is `paste and repositioning smaller incoming SVGs within a page-sized SVG document`, and that page-sized SVG document can then be printed using browser print.
+
+- [ ] Zoom and pan document, in "canvas" container
+  - In this little program, fixed to single artboard (control size later though), and toolset is _vastly_ simplified (select only, plus document navigation)
+  - Move elements - click and drag, starting ON a selectable object
+  - Select - click and drag, starting OFF any selectable object
+    - Shift-click, or shift-click-drag, to invert selection
+  - Zoom - command-scroll. Zoom about current pointer position
+    - `transform: scale` I think?
+  - Pan - separate "tool"? In Figma, it's `H` for hand.
+    - Pan shorcut could be clicking down scroll wheel and moving (as in Figma)
+    - Command + click-and-drag might work. Or "alt". Choose a default, allow user to customize `Pan modifier`?
+    - Either way... basic "toolbar", either "select" (pointer icon) or "pan" (hand icon)?
+    - `transform: translate` on the broader canvas, I think?
+- [ ] Size "canvas" container to same width and height as viewport
+  - Activate "canvas" container to interact (eg click), this brings it into scroll view, input captured, scrolling navigates canvas (shift-scroll scrolls horizontally)
+  - `Esc` or activate escape button within "canvas" container to leave, input no longer captured, scrolling scrolls page
+- [ ] Initial auto-zoom to fit document in viewport
+  - Maybe this is where case for instructions "outside" the "canvas" makes sense? Otherwise this could scale text to tiny proportions.
+
+- [ ] Select multiple items
+- [ ] Delete multiple items
+- [ ] Export to SVG
 
 #### Image resizing performance
 
