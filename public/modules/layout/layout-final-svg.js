@@ -72,6 +72,9 @@ export async function layoutFinalSvg(
 	 * we'll also be setting up the <path /> definition for the outline
 	 * within the `clipPath`. We'll re-use this path definition
 	 * for the background and cutting line.
+	 *
+	 * Bug:
+	 * https://bugzilla.mozilla.org/show_bug.cgi?id=1972006
 	 */
 	const outlineClipPathId = "unionClipPath";
 	const outlineClipPath = createSvgElem("clipPath", { id: outlineClipPathId });
@@ -92,7 +95,7 @@ export async function layoutFinalSvg(
 	const imageDataElemId = "imageData";
 	const imageDataElem = createSvgElem("image", {
 		id: imageDataElemId,
-		"xlink:href": imgData.dataUrl,
+		href: imgData.dataUrl,
 		width: imgData.width * imgScaleFinal,
 		height: imgData.height * imgScaleFinal,
 	});

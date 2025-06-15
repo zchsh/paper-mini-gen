@@ -48,7 +48,7 @@ Not everyone knows how to work with SVGs. Bit of a pain. Consider arrangement of
   - Copy approach in `2025-06-13-firefox-print-to-pdf-test-svg-09-sample-output-working-with-defs.svg`
   - Reference `path` should be declared within the `clipPath`, and can then be referenced later
 
-- [ ] In `layout-final-svg`, use `href` instead of `xlink:href`, latter is deprecated
+- [x] In `layout-final-svg`, use `href` instead of `xlink:href`, latter is deprecated
 
 - [ ] Stub in paste-from-clipboard to add an SVG to the page
 - [ ] Stub in drag-and-drop to add an SVG to the page
