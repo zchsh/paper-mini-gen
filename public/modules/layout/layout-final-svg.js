@@ -46,6 +46,7 @@ export async function layoutFinalSvg(
 		9
 	);
 	const svgNode = createSvgElem("svg", {
+		xmlns: "http://www.w3.org/2000/svg",
 		width: svgWidth,
 		height: svgHeight,
 		viewBox: `${minX} ${minY} ${svgWidth} ${svgHeight}`,
