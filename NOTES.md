@@ -44,9 +44,11 @@ Not everyone knows how to work with SVGs. Bit of a pain. Consider arrangement of
   - 2025-06-13 at 09:53 - have a minimal repro... maybe worth filing a bug report? Seems petty and tiny, but maybe fixing all the petty and tiny things adds up to a more usable browser.
   - 2025-06-13 at 10:15 - filed a bug report - <https://bugzilla.mozilla.org/show_bug.cgi?id=1972006>
 
-- [ ] Revisit `layout-final-svg.js` to work around Firefox issue
+- [x] Revisit `layout-final-svg.js` to work around Firefox issue
   - Copy approach in `2025-06-13-firefox-print-to-pdf-test-svg-09-sample-output-working-with-defs.svg`
   - Reference `path` should be declared within the `clipPath`, and can then be referenced later
+
+- [ ] In `layout-final-svg`, use `href` instead of `xlink:href`, latter is deprecated
 
 - [ ] Stub in paste-from-clipboard to add an SVG to the page
 - [ ] Stub in drag-and-drop to add an SVG to the page

@@ -51,105 +51,85 @@ export async function layoutFinalSvg(
 		viewBox: `${minX} ${minY} ${svgWidth} ${svgHeight}`,
 	});
 	/**
-	 * Set up data for shapes based on the cut-out outline
+	 * Set up a <defs> element, to hold elements we can re-use later.
+	 */
+	const defsElem = createSvgElem("defs");
+	/**
+	 * Set up data for shapes for the cut-out outline
 	 */
 	// Convert the outline polygons to path data strings
-	const outlinePathStrings = outlinePolygons.map((polygon) => {
-		return pathDataStringFromRegions(polygon.regions);
+	const outlinePathEntries = outlinePolygons.map((polygon, idx) => {
+		return {
+			id: `outlineData_${idx.toString().padStart(3, "0")}`,
+			pathString: pathDataStringFromRegions(polygon.regions),
+		};
 	});
-	// Set up outline <path /> elements we can reference with <use /> elements.
-	// We'll also hide this group, so that the base referenced <path />
-	// doesn't appear in the final SVG.
-	const getOutlinePathId = (idx) =>
-		`outlineData_${idx.toString().padStart(3, "0")}`;
-	const outlineDataGroup = createSvgElem("g", {
-		visibility: "hidden",
-	});
-	for (const [idx, pathString] of outlinePathStrings.entries()) {
-		outlineDataGroup.append(
-			createSvgElem("path", {
-				id: getOutlinePathId(idx),
-				"fill-rule": "nonzero",
-				d: pathString,
-			})
-		);
-	}
 	/**
-	 * Use the outline shape for a white background,
-	 * which will be visible behind the image.
-	 */
-	const outlineBackground = createSvgElem("g");
-	for (const [idx, _pathString] of outlinePathStrings.entries()) {
-		outlineBackground.append(
-			createSvgElem("use", {
-				fill: "white",
-				href: `#${getOutlinePathId(idx)}`,
-			})
-		);
-	}
-
-	/**
-	 * Use the outline shape for a gray cutting line
-	 */
-	const outlineCutLine = createSvgElem("g");
-	for (const [idx, _pathString] of outlinePathStrings.entries()) {
-		outlineCutLine.append(
-			createSvgElem("use", {
-				"fill-rule": "nonzero",
-				fill: "none",
-				stroke: OUTLINE_COLOR,
-				"stroke-width": 0.5,
-				"stroke-linecap": "round",
-				"stroke-linejoin": "round",
-				"stroke-miterlimit": 10,
-				href: `#${getOutlinePathId(idx)}`,
-			})
-		);
-	}
-	/**
-	 * Use the outline shape for a clipping path.
+	 * Set up a clipping path definition, tracing the outline of the
+	 * shape to cut out, to keep images from bleeding outside the shape.
 	 *
-	 * We'll place the original image artwork within this clip path,
-	 * which will prevent the image from bleeding outside the outline shape.
+	 * Note that due to a bug in how Firefox handles SVGs during print,
+	 * we'll also be setting up the <path /> definition for the outline
+	 * within the `clipPath`. We'll re-use this path definition
+	 * for the background and cutting line.
 	 */
 	const outlineClipPathId = "unionClipPath";
 	const outlineClipPath = createSvgElem("clipPath", { id: outlineClipPathId });
-	outlineClipPath.append(
-		...outlinePathStrings.map((_pathString, idx) => {
-			return createSvgElem("use", {
-				fill: "white",
-				href: `#${getOutlinePathId(idx)}`,
-			});
-		})
-	);
+	for (const { id, pathString } of outlinePathEntries) {
+		outlineClipPath.append(createSvgElem("path", { id, d: pathString }));
+	}
+	defsElem.append(outlineClipPath);
 	/**
 	 * Set up data for the original image.
 	 *
 	 * Note that the image element sets the scale as well, as width and height
 	 * attributes have no effect on <use /> elements in our use case here.
 	 *
-	 * For reference:
+	 * Reference:
 	 * https://developer.mozilla.org/en-US/docs/Web/SVG/Reference/Element/use
 	 */
 	const imgScaleFinal = scalePreTrace * scalePostTrace;
 	const imageDataElemId = "imageData";
-	const imageDataGroup = createSvgElem("g", {
-		visibility: "hidden",
-	});
 	const imageDataElem = createSvgElem("image", {
 		id: imageDataElemId,
 		"xlink:href": imgData.dataUrl,
 		width: imgData.width * imgScaleFinal,
 		height: imgData.height * imgScaleFinal,
 	});
-	imageDataGroup.appendChild(imageDataElem);
+	defsElem.append(imageDataElem);
+	/**
+	 * Use the outline shape for a white background,
+	 * which will be visible behind the image.
+	 */
+	const outlineBackground = createSvgElem("g");
+	for (const { id } of outlinePathEntries) {
+		outlineBackground.append(
+			createSvgElem("use", { href: `#${id}`, fill: "white" })
+		);
+	}
+	/**
+	 * Use the outline shape for a gray cutting line
+	 */
+	const outlineCutLine = createSvgElem("g");
+	for (const { id } of outlinePathEntries) {
+		outlineCutLine.append(
+			createSvgElem("use", {
+				href: `#${id}`,
+				fill: "none",
+				stroke: OUTLINE_COLOR,
+				"stroke-width": 0.5,
+				"stroke-linecap": "round",
+				"stroke-linejoin": "round",
+				"stroke-miterlimit": 10,
+			})
+		);
+	}
 	/**
 	 * Position the top image.
 	 *
 	 * We do some finicky positioning here to ensure the position of
 	 * the top image matches the position of the outline shape.
 	 */
-
 	const scaledPadding = blurPadding * scalePostTrace;
 	const imgTopPosn = { x: scaledPadding, y: scaledPadding };
 	const svgImageTop = createSvgElem("use", {
@@ -214,7 +194,7 @@ export async function layoutFinalSvg(
 		transform: `scale(1, -1) translate(0, ${imgBottomReflectionTranslate})`,
 	});
 	// Add the bottom image with a <use /> element
-	svgImageBottom.appendChild(
+	svgImageBottom.append(
 		createSvgElem("use", {
 			href: `#${imageDataElemId}`,
 			x: imgTopPosn.x,
@@ -225,7 +205,7 @@ export async function layoutFinalSvg(
 	 * Build a group for the "top" and "bottom" images. This group includes
 	 * a reference to the outline clip path we created earlier.
 	 */
-	const svgGroupImages = createSvgElem("g", {
+	const imagesClipGroup = createSvgElem("g", {
 		"clip-path": `url(#${outlineClipPathId})`,
 	});
 	/**
@@ -316,22 +296,20 @@ export async function layoutFinalSvg(
 	/**
 	 * Build the final SVG node
 	 */
-	svgNode.appendChild(outlineDataGroup);
-	svgNode.appendChild(imageDataGroup);
-	svgNode.appendChild(outlineClipPath);
+	svgNode.append(defsElem);
 	svgNode.append(outlineBackground);
-	svgGroupImages.appendChild(svgImageTop);
-	svgGroupImages.appendChild(svgImageBottom);
-	svgNode.appendChild(svgGroupImages);
+	imagesClipGroup.append(svgImageTop);
+	imagesClipGroup.append(svgImageBottom);
+	svgNode.append(imagesClipGroup);
 	svgNode.append(outlineCutLine);
-	svgNode.appendChild(valleyFoldTop);
-	svgNode.appendChild(valleyFoldBottom);
-	svgNode.appendChild(mountainFoldTop);
-	svgNode.appendChild(mountainFoldBottom);
-	// svgNode.appendChild(mountainFoldTopLeft);
-	// svgNode.appendChild(mountainFoldTopRight);
-	// svgNode.appendChild(mountainFoldBottomLeft);
-	// svgNode.appendChild(mountainFoldBottomRight);
+	svgNode.append(valleyFoldTop);
+	svgNode.append(valleyFoldBottom);
+	svgNode.append(mountainFoldTop);
+	svgNode.append(mountainFoldBottom);
+	// svgNode.append(mountainFoldTopLeft);
+	// svgNode.append(mountainFoldTopRight);
+	// svgNode.append(mountainFoldBottomLeft);
+	// svgNode.append(mountainFoldBottomRight);
 	// Return the final SVG node
 	return svgNode;
 }
