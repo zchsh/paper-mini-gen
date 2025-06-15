@@ -2,54 +2,6 @@
 
 ## Next steps
 
-### Implement dark mode
-
-- [x] Implement dark mode
-  - Why not, would be nice I think, I just found myself wanting it
-  - Nice to establish a pattern for these types of lil projects early
-  - 2025-06-12 at 10:29 - got this done in a very basic way
-
-### Prototype arrange-and-print tool
-
-Not everyone knows how to work with SVGs. Bit of a pain. Consider arrangement of "results" on page...
-
-- maybe let them be dragged around, even rotated?
-- nah... seems to make more sense to have this as a separate tool
-- character mini generator should render to `.svg`, or to `.jpeg` or `.png`. The exported asset can then be placed and duplicated in other programs (eg Figma). If I happen to want to create an HTML-based standalone program that lets you arrange imported `.svg`, `.png`, and `.jpeg` files on a page, that might be cool. But, can be completely separate from the "paper minis" generator.
-- probably makes sense as a separate project...
-- 2025-06-09 at 09:38 - maybe this doesn't need to be a fully separate project? if aim is to make it a nicely packaged, browser-only thing... maybe you could start by building it within this project?
-- Core functionality: import SVG (drag-drop, or paste from clipboard). arrange SVGs on page. adjust page size. print to PDF (use browser).
-
-- [x] Stub in a rough prototype of how printing will work
-  - [x] New page exists
-  - [x] New page can print border to 8.5 by 11 page
-  - Stubbed in `/demo/print-letter-page`
-- [x] Stub in navigable view
-  - Gonna lean on browser zoom and scroll for now
-  - More purpose-built document navigation can come later... maybe even have artboards? Mark them for printing? `@page` directive in CSS might make that feasible, even if pages are different sizes? Something to dive into _later_.
-  - Stubbed in `/demo/print-letter-page`, works for now
-- [x] Look into using <https://spencer.place/creation/playhtml>
-  - Great option, but it's also real-time-multiplayer which I don't need (via <https://www.partykit.io/>)
-  - Started digging some stuff outta this, maybe look into <https://github.com/react-grid-layout/react-draggable> to init "drag" events (handle both touch and mouse)?
-  - 2025-06-13 at 08:53 - have this _kind of_ working, it's janky and I need to learn more about event listeners, but it feels workable enough to move on for now to other hurdles
-
-- [x] Investigate why Firefox doesn't seem to print images embedded in an SVG
-  - Images are shown in the print preview... but upon saving to PDF, the images aren't there
-  - Happens with the raw SVG files as well
-  - Doesn't happen in Chrome, Chrome seems to print to PDF fine, with images included.
-  - Is this related to how I've formatted the SVG? Or is it a deeper issue in FireFox? Feels worth investigating...
-  - Alternately, maybe the answer is "just use Chrome"? That sucks though.
-  - Have repro case of relative simple SVG file with embedded image... maybe try with something even simpler, exported from Figma? If the simplest use cases aren't working, then it's probably more of a Firefox problem.
-  - 2025-06-13 at 09:43 - pretty sure this is a bit of a bug in Firefox... [clipPath](https://developer.mozilla.org/en-US/docs/Web/SVG/Reference/Element/clipPath) should be able to contain `<use>` elements... but in my case at lease, they don't seem to print correctly.
-  - 2025-06-13 at 09:53 - have a minimal repro... maybe worth filing a bug report? Seems petty and tiny, but maybe fixing all the petty and tiny things adds up to a more usable browser.
-  - 2025-06-13 at 10:15 - filed a bug report - <https://bugzilla.mozilla.org/show_bug.cgi?id=1972006>
-
-- [x] Revisit `layout-final-svg.js` to work around Firefox issue
-  - Copy approach in `2025-06-13-firefox-print-to-pdf-test-svg-09-sample-output-working-with-defs.svg`
-  - Reference `path` should be declared within the `clipPath`, and can then be referenced later
-- [x] In `layout-final-svg`, use `href` instead of `xlink:href`, latter is deprecated
-- [x] Stub in paste-from-clipboard to add an SVG to the page
-
 ### Basic arrangement tool
 
 Prototype started at `/demo/paste-and-print-letter-page-svg`.
