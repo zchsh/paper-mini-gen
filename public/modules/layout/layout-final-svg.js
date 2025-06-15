@@ -38,6 +38,10 @@ export async function layoutFinalSvg(
 	{ blurPadding, scalePreTrace, scalePostTrace, sizeOriginal, baseData }
 ) {
 	/**
+	 * Grab a UUID for this document. This way,
+	 */
+	const uuid = crypto.randomUUID();
+	/**
 	 * Set up the parent SVG container
 	 */
 	// Add 9 pixels of padding to the viewBox, so borders don't bleed out
@@ -61,7 +65,7 @@ export async function layoutFinalSvg(
 	// Convert the outline polygons to path data strings
 	const outlinePathEntries = outlinePolygons.map((polygon, idx) => {
 		return {
-			id: `outlineData_${idx.toString().padStart(3, "0")}`,
+			id: `outlineData_${idx.toString().padStart(3, "0")}_${uuid}`,
 			pathString: pathDataStringFromRegions(polygon.regions),
 		};
 	});
@@ -77,7 +81,7 @@ export async function layoutFinalSvg(
 	 * Bug:
 	 * https://bugzilla.mozilla.org/show_bug.cgi?id=1972006
 	 */
-	const outlineClipPathId = "unionClipPath";
+	const outlineClipPathId = `unionClipPath_${uuid}`;
 	const outlineClipPath = createSvgElem("clipPath", { id: outlineClipPathId });
 	for (const { id, pathString } of outlinePathEntries) {
 		outlineClipPath.append(createSvgElem("path", { id, d: pathString }));
@@ -93,7 +97,7 @@ export async function layoutFinalSvg(
 	 * https://developer.mozilla.org/en-US/docs/Web/SVG/Reference/Element/use
 	 */
 	const imgScaleFinal = scalePreTrace * scalePostTrace;
-	const imageDataElemId = "imageData";
+	const imageDataElemId = `imageData_${uuid}`;
 	const imageDataElem = createSvgElem("image", {
 		id: imageDataElemId,
 		href: imgData.dataUrl,

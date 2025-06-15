@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Print Letter Page</title>
+		<script
+			type="text/javascript"
+			src="/demo/paste-and-print-letter-page-svg/main.js"
+		></script>
+		<link
+			rel="stylesheet"
+			href="/demo/paste-and-print-letter-page-svg/style.css"
+		/>
+	</head>
+	<body>
+		<div class="page-container">
+			<div class="noprint instructions-container">
+				<h1>Demo - Paste & print SVGs on a letter page</h1>
+				<p>
+					Paste SVGs into the page, reposition them, then print the page. Most
+					browsers will let you save a PDF document from the print dialog, which
+					you can then print later.
+				</p>
+				<button id="paste-button">Paste from clipboard</button>
+				<button onclick="window.print()">Print</button>
+				<br />
+				<br />
+				<hr style="color: magenta" />
+				<div style="font-style: italic; color: magenta">
+					<p>
+						This is a very rough work in progress! There are a bunch of basic
+						things that aren't implemented yet:
+					</p>
+					<ul>
+						<li>Select a single item</li>
+						<li>Delete selected item</li>
+						<li>Drag-and-drop SVG files</li>
+						<li>Zoom and pan document, in container</li>
+						<li>Initial auto-zoom to fit document in viewport</li>
+						<li>Z-index ordering based on recent selection</li>
+						<li>Select multiple items</li>
+						<li>Delete multiple items</li>
+						<li>Export to SVG</li>
+					</ul>
+				</div>
+
+				<br />
+			</div>
+			<div class="letter-page">
+				<div class="letter-page-contents">
+					<div id="paste-target"></div>
+				</div>
+			</div>
+		</div>
+	</body>
+</html>

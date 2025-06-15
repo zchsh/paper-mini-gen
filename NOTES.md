@@ -50,13 +50,35 @@ Not everyone knows how to work with SVGs. Bit of a pain. Consider arrangement of
 
 - [x] In `layout-final-svg`, use `href` instead of `xlink:href`, latter is deprecated
 
-- [ ] Stub in paste-from-clipboard to add an SVG to the page
+- [x] Stub in paste-from-clipboard to add an SVG to the page
+
+- [ ] Refine document structure to allow SVG export
+  - Currently one big HTML document, with many SVG documents within it.
+  - Currently solution is to add `uuid` values to ids within each SVG document... this works fine for now because I have control over the SVG source... but for this "print and arrange SVGs" tool to be really useful, maybe it shouldn't rely on that property?
+  - Alternate solution... when an `<svg />` document is pasted, grab the _contents_ of the SVG, and paste those into the DOM, within an existing `<svg />` paste target.
+  - Main reason to do this: allows `Export SVG` functionality, which would be really nice.
+  - Hurdle: may want to automatically modify the incoming SVG contents to add a `uuid` to any `id` values, and any `#<id>` references to those original values? Maybe this should be a toggle-able option... as in my case, it feels like it might be ideal to instead _match_ any incoming definitions by their `id`, and thereby keep SVG (and PDF) file size really trim, but actually re-using definitions across any duplicate paste elements.
+  - Note: this will change event listeners significantly, I think? Or maybe wrapping incoming contents in a `<g />` group, and applying the same kind of `transform: translate` approach to the group makes sense?
+  - Related note: scope here is `paste and repositioning smaller incoming SVGs within a page-sized SVG document`, and that page-sized SVG document can then be printed using browser print.
+
+- [ ] Stub in showing bounding box on "selection" of an individual element
+- [ ] Stub in "delete" option on individual pasted elements
 - [ ] Stub in drag-and-drop to add an SVG to the page
+
+- [ ] Zoom and pan document, in container
+  - By default, click and drag should select
+  - So... shift-click to pan? Seems to be pretty standard
+- [ ] Initial auto-zoom to fit document in viewport
+
 - [ ] Implement basic z-index layering
   - The last element you touched should have the highest z-index
   - To avoid going to infinite z-indices, maybe this means having to touch every `can-move` element's z-index at once... might be more performant to avoid z-index completely, and re-append the last touched element to the DOM, so it's the last child and therefore highest in z-index due to ordering.
 
-- [ ] Add notes on print quirks
+- [ ] Select multiple items
+- [ ] Delete multiple items
+- [ ] Export to SVG
+
+- [ ] Add on-page docs-ish notes about print quirks
   - Printing from certain browsers can be annoying.
   - Chrome seems to have the most considered approach.
   - Firefox seems to work pretty well, though I've run into some nitpicky bugs when printing SVGs.
