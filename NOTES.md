@@ -6,9 +6,9 @@
 
 Prototype started at `/demo/paste-and-print-letter-page-svg`.
 
-- [ ] Stub in display of bounding box on click-to-select of an individual element
+- [x] Stub in display of bounding box on click-to-select of an individual element
   - Clicking outside any element should de-select any currently selected element
-- [ ] Stub in "delete" option on individually selected element
+- [x] Stub in "delete" option on individually selected element
   - Maybe it's a little action button at the top left of the bounding box?
   - Only show when selected
 - [ ] Stub in drag-and-drop to add an SVG to the page
