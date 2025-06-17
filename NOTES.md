@@ -11,7 +11,7 @@ Prototype started at `/demo/paste-and-print-letter-page-svg`.
 - [x] Stub in "delete" option on individually selected element
   - Maybe it's a little action button at the top left of the bounding box?
   - Only show when selected
-- [ ] Stub in drag-and-drop to add an SVG to the page
+- [x] Stub in drag-and-drop to add an SVG to the page
   - Drag-and-drop area above page, I think?
 
 - [ ] Implement basic z-index layering

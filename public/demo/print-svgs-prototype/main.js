@@ -154,6 +154,40 @@ function listenForPaste() {
 			}
 		});
 }
+
+/**
+ * IMAGE DRAG AND DROP
+ */
+
+/**
+ * Add event listeners to add a `drag-active` class to `.file-input`
+ * when a file is dragged over it.
+ */
+function initFileInputs() {
+	const fileInputElems = document.querySelectorAll(".file-input");
+	for (const fileInputElem of fileInputElems) {
+		fileInputElem.addEventListener("dragover", (e) => {
+			fileInputElem.classList.add("drag-active");
+		});
+		fileInputElem.addEventListener("dragleave", () => {
+			fileInputElem.classList.remove("drag-active");
+		});
+		fileInputElem.addEventListener("change", () => {
+			if (fileInputElem.files && fileInputElem.files[0]) {
+				var reader = new FileReader();
+				reader.onload = function (e) {
+					const base64Data = e.target.result;
+					const fileString = atob(base64Data.split(",")[1]);
+					handlePasteEvent(fileString);
+					fileInputElem.value = "";
+					fileInputElem.classList.remove("drag-active");
+				};
+				reader.readAsDataURL(fileInputElem.files[0]);
+			}
+		});
+	}
+}
+
 /**
  * ONLOAD INITIALIZATION
  */
@@ -172,4 +206,6 @@ document.addEventListener("DOMContentLoaded", () => {
 	});
 	// Listen for paste events
 	listenForPaste();
+	// Initialize file inputs for drag and drop
+	initFileInputs();
 });
