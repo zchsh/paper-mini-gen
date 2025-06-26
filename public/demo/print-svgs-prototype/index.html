@@ -31,23 +31,29 @@
 
 				<button id="paste-button">Paste from clipboard</button>
 				<button onclick="window.print()">Print</button>
-				<br />
-				<br />
-				<hr style="color: magenta" />
-				<div style="font-style: italic">
-					<p style="color: magenta">
-						This is a very rough work in progress! There are a bunch of basic
-						things that aren't implemented yet:
-					</p>
+				<h2>FAQ</h2>
+				<p>
+					I made this tool to work with a
+					<a href="https://paper-mini.zch.sh/">Paper miniature generator</a>
+					tool that outputs SVGs.
+				</p>
+				<details>
+					<summary>Caveats and shortcomings</summary>
+					This tool is far from perfect. Please keep in mind the following
+					caveats:
 					<ul>
-						<li>✅ Select a single item</li>
-						<li>✅ Delete selected item</li>
-						<li style="color: magenta">Drag-and-drop SVG files</li>
-						<li style="color: magenta">
-							Z-index ordering based on recent selection
+						<li>
+							If you're pasting different SVGs, you might see strange shapes and
+							images where they shouldn't be. This is a bit technical, but
+							pasted SVGs all share the same parent document, so any
+							<code>&lt;defs /&gt;</code> or other elements with the same
+							<code>id</code> will cause conflicts. There's a fix for this, but
+							so far I've been too lazy to implement it... please email me at
+							<a href="mailto:hi@zch.sh">hi@zch.sh</a> if you run into it, then
+							I'll know it's worth the effort.
 						</li>
 					</ul>
-				</div>
+				</details>
 
 				<br />
 			</div>

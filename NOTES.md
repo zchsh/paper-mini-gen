@@ -14,9 +14,13 @@ Prototype started at `/demo/paste-and-print-letter-page-svg`.
 - [x] Stub in drag-and-drop to add an SVG to the page
   - Drag-and-drop area above page, I think?
 
-- [ ] Implement basic z-index layering
+- [x] Implement basic z-index layering
   - The last element you touched should have the highest z-index
   - To avoid going to infinite z-indices, maybe this means having to touch every `can-move` element's z-index at once... might be more performant to avoid z-index completely, and re-append the last touched element to the DOM, so it's the last child and therefore highest in z-index due to ordering.
+  - 2025-06-26 - implemented this in a really basic way
+
+- [ ] Move `print-svgs-prototype` to separate project
+  - Separate domain probably makes sense too
 
 - [ ] Add on-page docs-ish notes about print quirks
   - This tool is likely easiest to use on a larger screen, such as a tablet or laptop
@@ -28,8 +32,10 @@ Prototype started at `/demo/paste-and-print-letter-page-svg`.
 - [ ] Implement page size adjustment
   - In theory could rely on browser print... in practice, nice to have a preview
   - Number inputs for width and height
+
 - [ ] Implement page size presets
   - Probably more useful than custom units
+
 - [ ] Implement page size units
   - Start with `inches` most likely, cause that's how paper works where I am...
   - Add `mm` probably, that's it really
@@ -38,7 +44,7 @@ Prototype started at `/demo/paste-and-print-letter-page-svg`.
 
 #### Publish to a more permanent domain home
 
-- Maybe `zch.sh/paper-miniature-generator`
+- Maybe `paper-mini.zch.sh`
 - Could rename the repository to match
 
 #### Explore path smoothing after boolean addition

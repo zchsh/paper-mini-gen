@@ -61,6 +61,12 @@ function onDrag(e) {
 	const newY = data.y + clientY - LOCAL_DATA.startMouseY;
 	element.style.transform = `translate(${newX}px, ${newY}px)`;
 	setLocalData({ startMouseX: clientX, startMouseY: clientY });
+	/**
+	 * Move the element to the end of its parentso it's at the "top" of the z-axis
+	 * Note that `appendChild` shouldn't duplicate the element, for details see:
+	 * https://developer.mozilla.org/en-US/docs/Web/API/Node/appendChild#description
+	 */
+	element.parentElement.appendChild(element);
 }
 
 function preventDefault(e) {
