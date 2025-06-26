@@ -48,14 +48,21 @@ export function arrangeForUnion(
 	/**
 	 * Create circular polygons for each base
 	 */
+	const circleVertexCount = 36;
 	const circleBase = {
-		regions: [createCircularPolygon(baseSize / 2, 24, baseCenters[0])],
+		regions: [
+			createCircularPolygon(baseSize / 2, circleVertexCount, baseCenters[0]),
+		],
 	};
 	const circleBaseTop = {
-		regions: [createCircularPolygon(baseSize / 2, 24, baseCenters[1])],
+		regions: [
+			createCircularPolygon(baseSize / 2, circleVertexCount, baseCenters[1]),
+		],
 	};
 	const circleBaseBottom = {
-		regions: [createCircularPolygon(baseSize / 2, 24, baseCenters[2])],
+		regions: [
+			createCircularPolygon(baseSize / 2, circleVertexCount, baseCenters[2]),
+		],
 	};
 	/**
 	 * Add a reflected duplicate of the traced polygons for the reverse side

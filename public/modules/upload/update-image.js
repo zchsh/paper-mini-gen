@@ -3,14 +3,14 @@ export function updateImage(
 	settings = {},
 	callback = async () => null
 ) {
+	// Update settings
+	for (const [key, value] of Object.entries(settings)) {
+		document.getElementById(key).value = value;
+	}
+	// Add listener to the image element
 	const rawImageElement = document.getElementById("raw-image");
 	rawImageElement.src = newImageSrc;
 	rawImageElement.onload = async () => {
-		// Update settings
-		// console.log({ settings });
-		for (const [key, value] of Object.entries(settings)) {
-			document.getElementById(key).value = value;
-		}
 		await callback();
 	};
 }
