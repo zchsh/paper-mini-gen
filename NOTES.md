@@ -5,7 +5,7 @@
 - [x] Update so on upload, values reset properly
   - Currently, "center" is always -5, subtle and hard to catch, due to settings reset in `onload`
 
-- [ ] Update so downloaded SVG has similar filename to uploaded image
+- [x] Update so downloaded SVG has similar filename to uploaded image
   - First need to see if I can get uploaded image name...
 
 ### Later

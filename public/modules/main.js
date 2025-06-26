@@ -16,16 +16,17 @@ import { runVectorProcessing } from "./vector-processing/run-vector-processing.j
  * then run vector processing, which generates the final SVG layout
  * for the paper miniature.
  */
-async function runAll() {
+async function runAll(inputSrc, inputBasename) {
+	inputSrc = inputSrc || document.getElementById("raw-image").src;
 	// Run all raster related processing
-	const imageMetrics = await runRasterProcessing();
+	const imageMetrics = await runRasterProcessing(inputSrc, inputBasename);
 	// Run all vector related processing
 	await runVectorProcessing(imageMetrics);
 }
 
-async function resetAndRunAll() {
+async function resetAndRunAll(inputSrc, inputBasename) {
 	resetSettings();
-	await runAll();
+	await runAll(inputSrc, inputBasename);
 }
 
 // Raster processing is a bit slow, we debounce to try not to waste resources

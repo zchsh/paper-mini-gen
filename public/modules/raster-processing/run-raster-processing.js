@@ -32,9 +32,9 @@ import { setCachedResult } from "../util/cache-result.js";
  * - An element with id "trace-svg" is present,
  *   which will be used to render the traced polygons as an SVG.
  */
-export async function runRasterProcessing() {
+export async function runRasterProcessing(inputSrc, inputBasename) {
 	// Load the input image
-	const inputSrc = document.getElementById("raw-image").src;
+	// const inputSrc = document.getElementById("raw-image").src;
 	const inputImage = await Jimp.read(inputSrc);
 	// Get settings for the silhouette
 	const threshold = getInputAsInt("threshold");
@@ -82,6 +82,12 @@ export async function runRasterProcessing() {
 		scalePreTrace,
 		imgData,
 	};
+	if (inputBasename) {
+		imageMetrics.imageBasename = inputBasename;
+	} else if (window.results?.imageMetrics) {
+		// If we have a previous imageMetrics, use its basename
+		imageMetrics.imageBasename = window.results?.imageMetrics.imageBasename;
+	}
 	// Store the raster related processing results on the window object
 	setCachedResult("imageMetrics", imageMetrics);
 	// Return relevant image metrics

@@ -44,8 +44,14 @@ export async function runVectorProcessing(imageMetricsArg) {
 		imageMetricsArg ||
 		getCachedResult("imageMetrics") ||
 		(await runRasterProcessing());
-	const { traceResult, blurPadding, sizeOriginal, scalePreTrace, imgData } =
-		imageMetrics;
+	const {
+		imageBasename,
+		traceResult,
+		blurPadding,
+		sizeOriginal,
+		scalePreTrace,
+		imgData,
+	} = imageMetrics;
 	/**
 	 * Scale the polygons to a target height
 	 */
@@ -123,7 +129,12 @@ export async function runVectorProcessing(imageMetricsArg) {
 	const downloadLink = document.getElementById("download-svg-link");
 	downloadLink.href = finalSvgDataUrl;
 	downloadLink.classList.remove("disabled");
-	downloadLink.download = `${formattedDate}-paper-miniature.svg`;
+	// Grab the filename from the input image, use a formatted date as fallback
+	let svgFileBasename = formattedDate;
+	if (typeof imageBasename === "string" && imageBasename !== "") {
+		svgFileBasename = imageBasename;
+	}
+	downloadLink.download = `${svgFileBasename}.svg`;
 	downloadLink.textContent = "Download SVG";
 	// Remove the disabled attribute from the copy button
 	const copyButton = document.getElementById("copy-svg-button");

@@ -4,7 +4,8 @@ export function onImageSelection(inputElem, imgElemId, callback = () => null) {
 		reader.onload = function (e) {
 			const imgElem = document.getElementById(imgElemId);
 			imgElem.setAttribute("src", e.target.result);
-			callback();
+			const basename = inputElem.files[0].name.replace(/\.[^/.]+$/, "");
+			callback(e.target.result, basename);
 		};
 		reader.readAsDataURL(inputElem.files[0]);
 	}
