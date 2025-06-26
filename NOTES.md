@@ -2,50 +2,7 @@
 
 ## Next steps
 
-### Basic arrangement tool
-
-Prototype started at `/demo/paste-and-print-letter-page-svg`.
-
-- [x] Stub in display of bounding box on click-to-select of an individual element
-  - Clicking outside any element should de-select any currently selected element
-- [x] Stub in "delete" option on individually selected element
-  - Maybe it's a little action button at the top left of the bounding box?
-  - Only show when selected
-- [x] Stub in drag-and-drop to add an SVG to the page
-  - Drag-and-drop area above page, I think?
-
-- [x] Implement basic z-index layering
-  - The last element you touched should have the highest z-index
-  - To avoid going to infinite z-indices, maybe this means having to touch every `can-move` element's z-index at once... might be more performant to avoid z-index completely, and re-append the last touched element to the DOM, so it's the last child and therefore highest in z-index due to ordering.
-  - 2025-06-26 - implemented this in a really basic way
-
-- [ ] Move `print-svgs-prototype` to separate project
-  - Separate domain probably makes sense too
-
-- [ ] Add on-page docs-ish notes about print quirks
-  - This tool is likely easiest to use on a larger screen, such as a tablet or laptop
-  - Printing from certain browsers can be annoying.
-  - Chrome seems to have the most considered approach.
-  - Firefox seems to work pretty well, though I've run into some nitpicky bugs when printing SVGs.
-  - Safari can be frustrating. The print preview sometimes doesn't match the printed document.
-
-- [ ] Implement page size adjustment
-  - In theory could rely on browser print... in practice, nice to have a preview
-  - Number inputs for width and height
-
-- [ ] Implement page size presets
-  - Probably more useful than custom units
-
-- [ ] Implement page size units
-  - Start with `inches` most likely, cause that's how paper works where I am...
-  - Add `mm` probably, that's it really
-
 ### Later
-
-#### Publish to a more permanent domain home
-
-- Maybe `paper-mini.zch.sh`
-- Could rename the repository to match
 
 #### Explore path smoothing after boolean addition
 
