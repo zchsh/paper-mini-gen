@@ -135,7 +135,6 @@ export async function runVectorProcessing(imageMetricsArg) {
 		svgFileBasename = imageBasename;
 	}
 	downloadLink.download = `${svgFileBasename}.svg`;
-	downloadLink.textContent = "Download SVG";
 	// Remove the disabled attribute from the copy button
 	const copyButton = document.getElementById("copy-svg-button");
 	copyButton.disabled = false;
