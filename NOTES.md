@@ -23,6 +23,7 @@
   - 2025-04-13 at 18:05 - stubbedin `demo-smooth-to-polyline`
   - 2025-05-10 at 10:27 - there's a Figma plugin for this that might be worth trying: <https://www.figma.com/community/plugin/809139536998662893/simplify>. Might make sense to set up "Copy SVG" at every step for debug purposes... then you can test the smoothing process in Figma, see if it works, and if it does and the plugin is licensed appropriately, swipe the code and integrate it here.
   - 2025-05-13 at 09:41 - <https://mourner.github.io/simplify-js/> looks perfect
+  - 2025-06-26 at 19:55 - for this specific use case I think what I'm looking for is more of a "shrink wrap" situation... like <https://stackoverflow.com/questions/56511668/2d-path-shrink-wrap-algorithms> . Maybe run <https://mourner.github.io/simplify-js/> first, then some shrink wrap-ish algorithm? Maybe there's some kind of "concave-ness" tolerance that'd make sense? Look at three points at a time, start from starting point? Great case for a separate little demo thing.
 
 #### Consider joiner arc settings
 
