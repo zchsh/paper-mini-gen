@@ -2,8 +2,6 @@ import { pathDataStringFromRegions } from "../render/path-data-string-from-regio
 import { getFallbackViewBox } from "../render/get-fallback-viewbox.js";
 import { createSvgElem } from "../render/create-svg-elem.js";
 
-const OUTLINE_COLOR = "#DDDDDD";
-
 /**
  * Given a set of polygons representing the outline of a cutout shape,
  * an HTMLImageElement containing the original image artwork, and
@@ -35,7 +33,14 @@ const OUTLINE_COLOR = "#DDDDDD";
 export async function layoutFinalSvg(
 	outlinePolygons,
 	imgData,
-	{ blurPadding, scalePreTrace, scalePostTrace, sizeOriginal, baseData }
+	{
+		blurPadding,
+		scalePreTrace,
+		scalePostTrace,
+		sizeOriginal,
+		baseData,
+		outlineColor,
+	}
 ) {
 	/**
 	 * Grab a UUID for this document. This way,
@@ -124,7 +129,7 @@ export async function layoutFinalSvg(
 			createSvgElem("use", {
 				href: `#${id}`,
 				fill: "none",
-				stroke: OUTLINE_COLOR,
+				stroke: outlineColor,
 				"stroke-width": 0.5,
 				"stroke-linecap": "round",
 				"stroke-linejoin": "round",
@@ -224,7 +229,7 @@ export async function layoutFinalSvg(
 	const baseRadius = baseData.size / 2;
 	// Valley folds
 	const valleyFoldStyle = {
-		stroke: OUTLINE_COLOR,
+		stroke: outlineColor,
 		"stroke-width": 0.5,
 		"stroke-dasharray": "2 2",
 	};
@@ -244,7 +249,7 @@ export async function layoutFinalSvg(
 	});
 	// Mountain folds
 	const mountainFoldStyle = {
-		stroke: OUTLINE_COLOR,
+		stroke: outlineColor,
 		"stroke-width": 0.5,
 		"stroke-dasharray": "1 2 4 2",
 	};

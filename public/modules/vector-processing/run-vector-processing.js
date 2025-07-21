@@ -7,6 +7,8 @@ import { applyUnion } from "./clipperjs-wrappers/apply-union.js";
 import { arrangeForUnion } from "../layout/arrange-for-union.js";
 import { layoutFinalSvg } from "../layout/layout-final-svg.js";
 import { scaleToTargetHeight } from "../layout/scale-to-target-height.js";
+// RENDER
+import { hexColorFromLuminosity } from "../render/hex-color-from-luminosity.js";
 // CACHEING RESULTS
 import { getCachedResult } from "../util/cache-result.js";
 // RASTER processing, which is a pre-requisite and MIGHT have to be run
@@ -103,12 +105,17 @@ export async function runVectorProcessing(imageMetricsArg) {
 	 * including the original image, a reverse-side image,
 	 * the outline union shape, and fold lines.
 	 */
+	// const outlineColor = document.getElementById("outlineColor").value;
+	const outlineLuminosity = getInputAsInt("outlineLuminosity");
+	const outlineColor =
+		hexColorFromLuminosity(outlineLuminosity) || outlineColor;
 	const finalSvgElem = await layoutFinalSvg(polygons_union, imgData, {
 		blurPadding,
 		scalePreTrace,
 		scalePostTrace,
 		sizeOriginal,
 		baseData,
+		outlineColor,
 	});
 	// Render the final SVG layout
 	const finalContainer = document.getElementById("layout-container");

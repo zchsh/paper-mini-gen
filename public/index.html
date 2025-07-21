@@ -482,6 +482,41 @@
 						value="0"
 					/>
 				</div>
+
+				<div class="input-container">
+					<span>Outline color</span>
+					<!-- <input
+						id="outlineColor"
+						type="color"
+						oninput="handleVectorEffect()"
+						value="#dddddd"
+					/> -->
+					<input
+						id="outlineLuminosity-slider"
+						oninput="document.getElementById('outlineLuminosity').value = this.value; handleVectorEffect()"
+						type="range"
+						min="0"
+						max="100"
+						value="87"
+					/>
+					<input
+						id="outlineLuminosity"
+						oninput="document.getElementById('outlineLuminosity-slider').value = this.value; handleVectorEffect()"
+						type="number"
+						min="0"
+						max="100"
+						value="87"
+					/>
+
+					<!-- <input
+						id="outlineLuminosity"
+						oninput="handleVectorEffect()"
+						type="number"
+						min="0"
+						max="100"
+						value="87"
+					/> -->
+				</div>
 			</div>
 
 			<!--  -->
