@@ -8,6 +8,9 @@
 - [x] Update so downloaded SVG has similar filename to uploaded image
   - First need to see if I can get uploaded image name...
 
+- [ ] Add "Compatible SVGs for mediocre software" setting
+  - Remove uses of core SVG features such as `<def>` and `<use>`. Some software still struggles to support those basic features. File size will be much larger, as duplicate path geometry and image data will need to be repeated rather than referenced.
+
 ### Later
 
 #### Explore path smoothing after boolean addition
